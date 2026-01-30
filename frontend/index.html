@@ -6,868 +6,1333 @@
     <title>Школьный портал - Главная</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Базовые стили */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+        
+         /* Базовые стили */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4f8 0%, #ffffff 50%, #e8f0f7 100%);
+            min-height: 100vh;
+            color: #2d3748;
+            margin: 0;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Контейнеры */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .content-container {
+            max-width: 80rem;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            position: relative;
+            z-index: 10;
+            margin-top: -2rem;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        /* Анимации */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Хедер */
+        .header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e40af;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            animation: bounce 2s infinite;
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .nav-link:hover::before {
+            left: 100%;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .nav-link i {
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover i {
+            transform: scale(1.2);
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(59, 130, 246, 0.08);
+            color: #2d3748;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background: rgba(59, 130, 246, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .admin-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #4a5568;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Hero секция */
+        .hero {
+            position: relative;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+            color: white;
+            overflow: hidden;
+            padding: 100px 0 80px;
+            margin-bottom: -40px;
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.1;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .blob-1 {
+            top: 20%;
+            left: 10%;
+            width: 300px;
+            height: 300px;
+            background: #8b5cf6;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            bottom: 20%;
+            right: 10%;
+            width: 350px;
+            height: 350px;
+            background: #3b82f6;
+            animation-delay: 2s;
+        }
+
+        .blob-3 {
+            top: 40%;
+            right: 20%;
+            width: 200px;
+            height: 200px;
+            background: #ec4899;
+            animation-delay: 4s;
+        }
+
+        .hero-content {
+            position: relative;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            animation: pulse 2s infinite;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #ffffff, #e2e8f0, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: #e2e8f0;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        /* Поиск */
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: slideUp 0.8s ease-out 0.3s both;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1.3rem;
+            z-index: 2;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 60px;
+            padding: 0 70px;
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1rem;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: #cbd5e1;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.6);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Быстрые ссылки */
+        .quick-links-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+            animation: slideUp 0.8s ease-out 0.4s both;
+        }
+
+        @media (min-width: 768px) {
+            .quick-links-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .quick-link-card {
+            border-radius: 16px;
+            background: white;
+            cursor: pointer;
+            border: 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .quick-link-card:hover {
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            transform: translateY(-8px) rotateX(5deg);
+        }
+
+        .quick-link-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .quick-link-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .quick-link-inner {
+            display: flex;
+            align-items: center;
+        }
+
+        .quick-link-icon-wrapper {
+            padding: 1.2rem;
+            color: white;
+            transition: all 0.4s ease;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            min-width: 70px;
+        }
+
+        .quick-link-card:hover .quick-link-icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .quick-link-info {
+            padding: 1.2rem;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.95rem;
+        }
+
+        .quick-link-info i {
+            color: #94a3b8;
+            transition: all 0.3s ease;
+        }
+
+        .quick-link-card:hover .quick-link-info i {
+            transform: translateX(6px);
+            color: var(--gradient-start);
+        }
+
+        /* Статистика */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+            animation: slideUp 0.8s ease-out 0.5s both;
+        }
+
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .stat-card {
+            border-radius: 16px;
+            background: white;
+            overflow: hidden;
+            border: 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .stat-inner {
+            display: flex;
+            align-items: center;
+            padding: 0;
+        }
+
+        .stat-icon-wrapper {
+            padding: 1.2rem;
+            color: white;
+            min-width: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--icon-color1), var(--icon-color2));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-icon-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+        }
+
+        .stat-card:hover .stat-icon-wrapper::before {
+            animation: shine 1s;
+        }
+
+        @keyframes shine {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .stat-icon-wrapper i {
+            font-size: 1.5rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .stat-info {
+            padding: 1.2rem;
+            flex-grow: 1;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #718096;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2d3748;
+            line-height: 1;
+        }
+
+        /* Срочные объявления */
+        .urgent-section {
+            background: linear-gradient(135deg, #fef2f2 0%, #fffbeb 100%);
+            border-radius: 20px;
+            padding: 1.8rem;
+            border: 2px solid #fca5a5;
+            margin-bottom: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out 0.6s both;
+        }
+
+        .urgent-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ef4444, #f97316);
+        }
+
+        .urgent-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #dc2626;
+            margin-bottom: 1.2rem;
+        }
+
+        .urgent-title i {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Объявления */
+        .announcements-grid {
+            display: grid;
+            gap: 1.2rem;
+            grid-template-columns: 1fr;
+            animation: slideUp 0.8s ease-out 0.7s both;
+        }
+
+        @media (min-width: 768px) {
+            .announcements-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .announcements-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .announcement-card {
+            border-radius: 16px;
+            background: white;
+            cursor: pointer;
+            overflow: hidden;
+            border: 2px solid transparent;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .announcement-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .announcement-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent, rgba(59, 130, 246, 0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .announcement-card:hover::before {
+            opacity: 1;
+        }
+
+        .announcement-content {
+            padding: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .announcement-header {
+            margin-bottom: 0.8rem;
+        }
+
+        .announcement-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 8px;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .badge:hover::before {
+            left: 100%;
+        }
+
+        .badge-icon {
+            width: 0.8rem;
+            height: 0.8rem;
+            margin-right: 0.4rem;
+            transition: transform 0.3s ease;
+        }
+
+        .badge:hover .badge-icon {
+            transform: scale(1.2);
+        }
+
+        .badge-all {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+            font-weight: 600;
+            border-color: #93c5fd;
+        }
+
+        .badge-type {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            color: #4b5563;
+            font-weight: 500;
+            border-color: #d1d5db;
+        }
+
+        /* Убираем hover с баджиков категорий */
+.badge-type:hover,
+.badge-all:hover {
+    transform: none !important;
+    box-shadow: none !important;
 }
 
-body {
-    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #f1f5f9 100%);
-    min-height: 100vh;
-    color: #334155;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* Хедер */
-.header {
-    background: white;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-.logo i {
-    color: #3b82f6;
-    font-size: 1.8rem;
-}
-
-.nav {
-    display: flex;
-    gap: 30px;
-}
-
-.nav-link {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    color: #64748b;
-    font-weight: 500;
-    transition: color 0.3s;
-}
-
-.nav-link:hover,
-.nav-link.active {
-    color: #3b82f6;
-}
-
-.nav-link i {
-    font-size: 0.9rem;
-}
-
-.menu-toggle {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #64748b;
-    cursor: pointer;
-}
-
-/* Hero секция */
-.hero {
-    position: relative;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-    color: white;
-    overflow: hidden;
-    padding: 80px 0;
-    margin-bottom: -40px;
-}
-
-.hero-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    opacity: 0.1;
-}
-
-.blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(60px);
-}
-
-.blob-1 {
-    top: 80px;
-    left: 80px;
-    width: 288px;
-    height: 288px;
-    background: #3b82f6;
-}
-
-.blob-2 {
-    bottom: 80px;
-    right: 80px;
-    width: 384px;
-    height: 384px;
-    background: #8b5cf6;
-}
-
-.hero-content {
-    position: relative;
-    text-align: center;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    margin-bottom: 20px;
-}
-
-.hero-title {
-    font-size: 3.5rem;
-    font-weight: 800;
-    margin-bottom: 16px;
-    background: linear-gradient(90deg, #ffffff, #e2e8f0, #cbd5e1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.hero-subtitle {
-    font-size: 1.25rem;
-    color: #cbd5e1;
-    margin-bottom: 32px;
-    line-height: 1.6;
-}
-
-/* Поиск */
-.search-container {
-    position: relative;
-    max-width: 560px;
-    margin: 0 auto;
-}
-
-.search-icon {
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #94a3b8;
-    font-size: 1.2rem;
-}
-
-.search-input {
-    width: 100%;
-    height: 56px;
-    padding: 0 60px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 16px;
-    color: white;
-    font-size: 1.1rem;
-    backdrop-filter: blur(10px);
-}
-
-.search-input::placeholder {
-    color: #94a3b8;
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: rgba(255,255,255,0.4);
-}
-
-/* Основной контент */
-.main {
-    padding: 60px 0;
-}
-
-/* Быстрые ссылки */
-.quick-links {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin-bottom: 32px;
-}
-
-@media (min-width: 768px) {
-    .quick-links {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-.quick-link {
-    display: flex;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.quick-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-}
-
-.quick-link-icon {
-    padding: 20px;
-    border-radius: 12px 0 0 12px;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.3s;
-}
-
-.quick-link:hover .quick-link-icon {
-    transform: scale(1.1);
-}
-
-.quick-link-content {
-    flex: 1;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-weight: 500;
-}
-
-.quick-link-content i {
-    color: #94a3b8;
-    transition: transform 0.3s;
-}
-
-.quick-link:hover .quick-link-content i {
-    transform: translateX(4px);
-}
-
-/* Цвета */
-.bg-blue { background: #3b82f6; }
-.bg-green { background: #10b981; }
-.bg-purple { background: #8b5cf6; }
-.bg-pink { background: #ec4899; }
-.bg-orange { background: #f97316; }
-.bg-amber { background: #f59e0b; }
-
-/* Карточки */
-.card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    border: 1px solid #e2e8f0;
-}
-
-.card-content {
-    padding: 24px;
-}
-
-/* Статистика */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin-bottom: 32px;
-}
-
-@media (min-width: 768px) {
-    .stats-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-.stat-card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    transition: transform 0.3s;
-}
-
-.stat-card:hover {
-    transform: translateY(-2px);
-}
-
-.stat-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.5rem;
-}
-
-.stat-info h3 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 4px;
-}
-
-.stat-info p {
-    color: #64748b;
-    font-size: 0.9rem;
-}
-
-/* Секции */
-.section-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1e293b;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.title-indicator {
-    width: 6px;
-    height: 24px;
-    border-radius: 3px;
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.btn-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: #2563eb;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s;
-}
-
-.btn-link:hover {
-    color: #1d4ed8;
-}
-
-.btn-link i {
-    transition: transform 0.3s;
-}
-
-.btn-link:hover i {
-    transform: translateX(4px);
-}
-
-/* Срочные объявления */
-.urgent-section {
-    background: linear-gradient(90deg, #fef2f2, #fffbeb);
-    border: 1px solid #fecaca;
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 32px;
-}
-
-.urgent-section .section-title {
-    color: #dc2626;
-}
-
-/* Сетка объявлений */
-.announcements-grid {
-    display: grid;
-    gap: 20px;
-    grid-template-columns: 1fr;
-}
-
-@media (min-width: 768px) {
-    .announcements-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1024px) {
-    .announcements-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-/* Карточка объявления */
-.announcement-card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    border: 1px solid #e2e8f0;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
+/* Оставляем hover только для интерактивных элементов */
+.quick-link-card:hover,
 .announcement-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-    border-color: #3b82f6;
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
 }
 
-.announcement-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 12px;
+        .badge-all:hover {
+            background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
+        }
+
+        .badge-type:hover {
+            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+        }
+
+        .announcement-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.8rem;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: color 0.3s ease;
+        }
+
+        .announcement-card:hover .announcement-title {
+            color: #3b82f6;
+        }
+
+        .announcement-text {
+            color: #6b7280;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1.2rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .announcement-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            padding-top: 0.8rem;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .announcement-date {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Секция заголовков */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            margin-top: 2.5rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .title-indicator {
+            width: 8px;
+            height: 32px;
+            border-radius: 4px;
+            background: linear-gradient(135deg, currentColor, transparent);
+        }
+
+        .btn-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid transparent;
+        }
+
+        .btn-link:hover {
+            color: #1d4ed8;
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-link i {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-link:hover i {
+            transform: translateX(4px);
+        }
+
+        /* Карточка пользователя */
+        .user-card {
+            border-radius: 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: 0;
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+            margin-top: 3rem;
+            overflow: hidden;
+            position: relative;
+            animation: slideUp 0.8s ease-out 0.8s both;
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 50%);
+        }
+
+        .user-card-content {
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-welcome {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.95rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .user-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .user-role {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-role i {
+            font-size: 1rem;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Кнопки */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #2563eb;
+            box-shadow: 0 4px 15px rgba(255,255,255,0.3);
+        }
+
+        .btn-primary:hover {
+            background: #f8fafc;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255,255,255,0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(20px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateY(-3px);
+        }
+
+        /* Исправленные стили для модальных окон */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: white;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 10000;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-header {
+            padding: 20px 25px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 1;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1.4;
+            padding-right: 40px;
+            flex: 1;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #6b7280;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .modal-close:hover {
+            background: #f3f4f6;
+            color: #374151;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            font-size: 0.9rem;
+            background: #f9fafb;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .meta-item i {
+            color: #9ca3af;
+        }
+
+        .modal-text {
+            line-height: 1.7;
+            color: #374151;
+            font-size: 1.05rem;
+        }
+
+        .modal-text p {
+            margin-bottom: 16px;
+        }
+
+        .modal-text strong {
+            color: #1f2937;
+            font-weight: 700;
+        }
+
+        .modal-text ul, 
+        .modal-text ol {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+
+        .modal-text li {
+            margin-bottom: 8px;
+        }
+
+        /* Запрещаем скролл страницы */
+        body.no-scroll {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+/* Убираем hover эффекты у баджиков категорий */
+.badge-type:hover,
+.badge-all:hover,
+.badge[style*="background: linear-gradient"]:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    cursor: default !important;
+    background: inherit !important;
 }
 
-.announcement-title {
-    font-weight: 600;
-    color: #1e293b;
-    margin-bottom: 8px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+/* Оставляем hover только у карточек объявлений */
+.announcement-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    border-color: rgba(59, 130, 246, 0.3);
 }
 
-.announcement-content {
-    color: #64748b;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    margin-bottom: 16px;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+/* Убираем анимацию при наведении на баджики */
+.badge:hover::before {
+    left: -100% !important;
 }
 
-.announcement-meta {
-    display: flex;
-    gap: 16px;
-    font-size: 0.85rem;
-    color: #94a3b8;
+.badge:hover .badge-icon {
+    transform: scale(1) !important;
 }
 
-.announcement-meta i {
-    margin-right: 4px;
+/* Делаем баджики некликабельными (опционально) */
+.badge-type,
+.badge-all,
+.badge[style*="background: linear-gradient"] {
+    pointer-events: none;
 }
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .nav {
+                display: none;
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 1.5rem;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                border-radius: 0 0 20px 20px;
+                z-index: 999;
+            }
+            
+            .nav.active {
+                display: flex;
+                animation: slideDown 0.3s ease-out;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .user-card-content {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+            
+            .user-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .content-container {
+                padding-top: 1rem;
+                margin-top: -1rem;
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+            }
+        }
 
-.badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
-}
+        @media (max-width: 480px) {
+            .hero {
+                padding: 80px 0 60px;
+            }
+            
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            
+            .stats-grid,
+            .quick-links-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-section {
+                gap: 10px;
+            }
+            
+            .user-name {
+                display: none;
+            }
+        }
 
-.badge-urgent {
-    background: #fee2e2;
-    color: #dc2626;
-}
+        /* Скроллбар */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
 
-.badge-pinned {
-    background: #fef3c7;
-    color: #d97706;
-}
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 5px;
+        }
 
-.badge-category {
-    background: #e0e7ff;
-    color: #3730a3;
-}
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 5px;
+        }
 
-/* Карточка пользователя */
-.user-card {
-    background: linear-gradient(90deg, #3b82f6, #6366f1);
-    color: white;
-    border-radius: 16px;
-    margin-top: 32px;
-    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
-}
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+        }
 
-.user-card-content {
-    padding: 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        /* Выделение текста */
+        ::selection {
+            background: rgba(59, 130, 246, 0.3);
+            color: #1e293b;
+        }
 
-.user-welcome {
-    color: rgba(255,255,255,0.9);
-    font-size: 0.9rem;
-    margin-bottom: 4px;
-}
-
-.user-card-content h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-
-.user-role {
-    color: rgba(255,255,255,0.8);
-    font-size: 0.9rem;
-}
-
-.user-actions {
-    display: flex;
-    gap: 12px;
-}
-
-/* Кнопки */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 500;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-size: 0.95rem;
-}
-
-.btn-primary {
-    background: white;
-    color: #2563eb;
-}
-
-.btn-primary:hover {
-    background: #eff6ff;
-}
-
-.btn-secondary {
-    background: rgba(255,255,255,0.2);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.3);
-}
-
-.btn-secondary:hover {
-    background: rgba(255,255,255,0.3);
-}
-
-/* Модальное окно */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.modal-content {
-    background: white;
-    border-radius: 16px;
-    max-width: 600px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    animation: modalSlide 0.3s ease;
-}
-
-@keyframes modalSlide {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.modal-header {
-    padding: 20px;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-header h3 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #1e293b;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #64748b;
-    cursor: pointer;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-}
-
-.modal-close:hover {
-    background: #f1f5f9;
-}
-
-.modal-body {
-    padding: 20px;
-}
-
-.modal-meta {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.meta-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #64748b;
-    font-size: 0.9rem;
-}
-
-.modal-text {
-    line-height: 1.6;
-    color: #334155;
-}
-
-/* Футер */
-.footer {
-    background: #1e293b;
-    color: white;
-    padding: 30px 0;
-    text-align: center;
-    margin-top: 60px;
-}
-
-/* Утилиты */
-.loading {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 40px;
-    color: #64748b;
-    font-size: 1.1rem;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* Стили для результатов поиска */
-.search-results {
-    margin-bottom: 32px;
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .nav {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: white;
-        flex-direction: column;
-        padding: 20px;
-        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-    }
-    
-    .nav.active {
-        display: flex;
-    }
-    
-    .menu-toggle {
-        display: block;
-    }
-    
-    .hero-title {
-        font-size: 2.5rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 1.1rem;
-    }
-    
-    .user-card-content {
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
-    }
-    
-    .user-actions {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .hero {
-        padding: 60px 0;
-    }
-    
-    .hero-title {
-        font-size: 2rem;
-    }
-    
-    .stats-grid,
-    .quick-links {
-        grid-template-columns: 1fr;
-    }
-    
-    .modal-meta {
-        flex-direction: column;
-        gap: 10px;
-    }
-}
-
-/* Анимации */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.fade-in {
-    animation: fadeInUp 0.6s ease forwards;
-}
-
-/* Индикатор срочности в карточке */
-.urgent-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    background: #ef4444;
-    border-radius: 50%;
-    margin-right: 8px;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        opacity: 0.6;
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0.6;
-    }
-}
-
-/* Пустая состояние */
-.empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px 20px;
-    color: #94a3b8;
-}
-
-.empty-state i {
-    font-size: 3rem;
-    margin-bottom: 16px;
-    opacity: 0.5;
-}
-
-/* Скроллбар */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-/* Выделение текста */
-::selection {
-    background: rgba(59, 130, 246, 0.3);
-    color: #1e293b;
-}
-
-/* Фокус состояния */
-:focus {
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
-}
-
-:focus:not(:focus-visible) {
-    outline: none;
-}
-    
+        /* Эффект параллакса для некоторых элементов */
+        .parallax {
+            will-change: transform;
+        }
     </style>
 </head>
 <body>
-    <!-- Хедер -->
+     <!-- Хедер -->
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-school"></i>
-                    <span>Школьный портал</span>
-                </div>
+                <a href="index.html" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <span class="logo-text">Школьный портал</span>
+                </a>
+                
                 <nav class="nav">
-                    <a href="index.html" class="nav-link active"><i class="fas fa-home"></i> Главная</a>
-                    <a href="announcements.html" class="nav-link"><i class="fas fa-bullhorn"></i> Объявления</a>
-                    <a href="schedule.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Расписание</a>
-                    <a href="profile.html" class="nav-link"><i class="fas fa-user"></i> Войти</a>
+                    <a href="index.html" class="nav-link active">
+                        <i class="fas fa-home"></i>
+                        Главная
+                    </a>
+                    <a href="announcements.html" class="nav-link">
+                        <i class="fas fa-bullhorn"></i>
+                        Объявления
+                    </a>
+                    <a href="Schedule.html" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
+                        Расписание
+                    </a>
+                    <a href="profile.html" class="nav-link">
+                        <i class="fas fa-user"></i>
+                        Профиль
+                    </a>
                 </nav>
+                
+                <div class="user-section">
+                    <a href="admin.html" class="admin-btn">
+                        <i class="fas fa-shield"></i>
+                        Админ
+                    </a>
+                </div>
+                
                 <button class="menu-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -880,10 +1345,11 @@ body {
         <div class="hero-background">
             <div class="blob blob-1"></div>
             <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
         </div>
         <div class="container">
             <div class="hero-content">
-                <span class="badge">
+                <span class="hero-badge">
                     <i class="fas fa-book-open"></i>
                     Цифровая доска объявлений
                 </span>
@@ -906,202 +1372,565 @@ body {
         </div>
     </section>
 
-    <main class="main">
-        <div class="container">
-            <!-- Быстрые ссылки -->
-            <div class="quick-links">
-                <a href="announcements.html?category=students" class="quick-link">
-                    <div class="quick-link-icon bg-green">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <div class="quick-link-content">
-                        <span>Ученикам</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </a>
-                
-                <a href="announcements.html?category=teachers" class="quick-link">
-                    <div class="quick-link-icon bg-purple">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                    <div class="quick-link-content">
-                        <span>Учителям</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </a>
-                
-                <a href="announcements.html?category=parents" class="quick-link">
-                    <div class="quick-link-icon bg-pink">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <div class="quick-link-content">
-                        <span>Родителям</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </a>
-                
-                <a href="schedule.html" class="quick-link">
-                    <div class="quick-link-icon bg-blue">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="quick-link-content">
-                        <span>Расписание</span>
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </a>
+    <!-- Основной контент -->
+    <div class="content-container">
+        <!-- Быстрые ссылки -->
+<div class="quick-links-grid">
+    <a href="announcements.html?filter=category:students" class="quick-link-card" 
+       style="--gradient-start: #10b981; --gradient-end: #059669;">
+        <div class="quick-link-inner">
+            <div class="quick-link-icon-wrapper">
+                <i class="fas fa-graduation-cap fa-lg"></i>
             </div>
-
-            <!-- Результаты поиска (скрыто по умолчанию) -->
-            <div id="searchResults" class="search-results" style="display: none;">
-                <div class="card">
-                    <div class="card-content">
-                        <h3>Результаты поиска (<span id="resultsCount">0</span>)</h3>
-                        <div id="resultsList" class="announcements-grid">
-                            <!-- Результаты поиска будут здесь -->
-                        </div>
-                    </div>
-                </div>
+            <div class="quick-link-info">
+                <span>Ученикам</span>
+                <i class="fas fa-chevron-right"></i>
             </div>
+        </div>
+    </a>
+    
+    <a href="announcements.html?filter=category:teachers" class="quick-link-card"
+       style="--gradient-start: #8b5cf6; --gradient-end: #7c3aed;">
+        <div class="quick-link-inner">
+            <div class="quick-link-icon-wrapper">
+                <i class="fas fa-briefcase fa-lg"></i>
+            </div>
+            <div class="quick-link-info">
+                <span>Учителям</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+    </a>
+    
+    <a href="announcements.html?filter=category:parents" class="quick-link-card"
+       style="--gradient-start: #ec4899; --gradient-end: #db2777;">
+        <div class="quick-link-inner">
+            <div class="quick-link-icon-wrapper">
+                <i class="fas fa-heart fa-lg"></i>
+            </div>
+            <div class="quick-link-info">
+                <span>Родителям</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+    </a>
+    
+    <a href="schedule.html" class="quick-link-card"
+       style="--gradient-start: #3b82f6; --gradient-end: #2563eb;">
+        <div class="quick-link-inner">
+            <div class="quick-link-icon-wrapper">
+                <i class="fas fa-clock fa-lg"></i>
+            </div>
+            <div class="quick-link-info">
+                <span>Расписание</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+    </a>
+</div>
 
-            <!-- Статистика -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon bg-blue">
-                        <i class="fas fa-bell"></i>
+        <!-- Статистика -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-inner">
+                    <div class="stat-icon-wrapper" style="--icon-color1: #3b82f6; --icon-color2: #2563eb;">
+                        <i class="fas fa-bell fa-lg"></i>
                     </div>
                     <div class="stat-info">
-                        <h3 id="totalAnnouncements">0</h3>
-                        <p>Объявления</p>
+                        <p class="stat-label">Объявления</p>
+                        <p class="stat-value">8</p>
                     </div>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon bg-green">
-                        <i class="fas fa-newspaper"></i>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-inner">
+                    <div class="stat-icon-wrapper" style="--icon-color1: #10b981; --icon-color2: #059669;">
+                        <i class="fas fa-newspaper fa-lg"></i>
                     </div>
                     <div class="stat-info">
-                        <h3 id="totalNews">0</h3>
-                        <p>Новости</p>
+                        <p class="stat-label">Новости</p>
+                        <p class="stat-value">1</p>
                     </div>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon bg-purple">
-                        <i class="fas fa-calendar"></i>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-inner">
+                    <div class="stat-icon-wrapper" style="--icon-color1: #8b5cf6; --icon-color2: #7c3aed;">
+                        <i class="fas fa-calendar fa-lg"></i>
                     </div>
                     <div class="stat-info">
-                        <h3 id="totalEvents">0</h3>
-                        <p>Мероприятия</p>
+                        <p class="stat-label">Мероприятия</p>
+                        <p class="stat-value">4</p>
                     </div>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon bg-orange">
-                        <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-inner">
+                    <div class="stat-icon-wrapper" style="--icon-color1: #f97316; --icon-color2: #ea580c;">
+                        <i class="fas fa-exclamation-triangle fa-lg"></i>
                     </div>
                     <div class="stat-info">
-                        <h3 id="totalUrgent">0</h3>
-                        <p>Срочные</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Срочные объявления -->
-            <div id="urgentSection" class="urgent-section" style="display: none;">
-                <h2 class="section-title">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Срочные объявления
-                </h2>
-                <div id="urgentList" class="announcements-grid">
-                    <!-- Срочные объявления будут здесь -->
-                </div>
-            </div>
-
-            <!-- Закрепленные объявления -->
-            <div id="pinnedSection" class="pinned-section" style="display: none;">
-                <h2 class="section-title">
-                    <span class="title-indicator bg-amber"></span>
-                    Закреплённые
-                </h2>
-                <div id="pinnedList" class="announcements-grid">
-                    <!-- Закрепленные объявления будут здесь -->
-                </div>
-            </div>
-
-            <!-- Последние объявления -->
-            <div class="recent-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="title-indicator bg-blue"></span>
-                        Последние объявления
-                    </h2>
-                    <a href="announcements.html" class="btn-link">
-                        Все объявления
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-                
-                <div id="recentList" class="announcements-grid">
-                    <!-- Последние объявления будут здесь -->
-                    <div class="loading">Загрузка объявлений...</div>
-                </div>
-            </div>
-
-            <!-- Карточка пользователя (если вошел) -->
-            <div id="userCard" class="user-card" style="display: none;">
-                <div class="user-card-content">
-                    <div>
-                        <p class="user-welcome">Добро пожаловать</p>
-                        <h3 id="userName">Имя пользователя</h3>
-                        <p id="userRole" class="user-role">Роль пользователя</p>
-                    </div>
-                    <div class="user-actions">
-                        <a href="profile.html" class="btn btn-secondary">
-                            Мой профиль
-                        </a>
-                        <a href="admin.html" id="adminButton" class="btn btn-primary" style="display: none;">
-                            Админ-панель
-                        </a>
+                        <p class="stat-label">Срочные</p>
+                        <p class="stat-value">1</p>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
 
-    <!-- Модальное окно объявления -->
-    <div id="announcementModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Заголовок объявления</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="modal-meta">
-                    <span id="modalAuthor" class="meta-item">
-                        <i class="fas fa-user"></i> Автор
-                    </span>
-                    <span id="modalDate" class="meta-item">
-                        <i class="fas fa-calendar"></i> Дата
-                    </span>
-                    <span id="modalCategory" class="meta-item">
-                        <i class="fas fa-tag"></i> Категория
-                    </span>
+        <!-- Срочные объявления -->
+        <div class="urgent-section">
+            <h2 class="urgent-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                Срочные объявления
+            </h2>
+            <div class="announcements-grid">
+                <div class="announcement-card" style="border-left-color: #ef4444;" data-modal="urgent1">
+                    <div class="announcement-content">
+                        <div class="announcement-header">
+                            <div class="announcement-badges">
+                                <span class="badge badge-all">
+                                    <i class="fas fa-users badge-icon"></i>
+                                    Для всех
+                                </span>
+                                <span class="badge badge-type">
+                                    <i class="fas fa-bell badge-icon"></i>
+                                    Объявление
+                                </span>
+                            </div>
+                        </div>
+                        <h3 class="announcement-title">
+                            <i class="fas fa-exclamation-triangle" style="color: #ef4444; margin-right: 4px;"></i>
+                            ⚠️ Изменение в расписании на понедельник
+                        </h3>
+                        <p class="announcement-text">
+                            Внимание! В связи с проведением ремонтных работ в кабинете физики уроки физики для всех классов переносятся в кабинет 305. Просим учителей и учеников учитывать эту информацию при планировании учебного дня.
+                        </p>
+                        <div class="announcement-footer">
+                            <span class="announcement-date">
+                                <i class="far fa-calendar"></i>
+                                21 января 2026 года
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div id="modalContent" class="modal-text">
-                    Содержание объявления...
+            </div>
+        </div>
+
+
+    <!-- Закрепленные объявления - ТЕКСТ КАРТОЧКИ (не модалка) -->
+    <div class="section-header">
+        <h2 class="section-title">
+            <span class="title-indicator" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></span>
+            Закреплённые
+        </h2>
+    </div>
+    
+    <div class="announcements-grid">
+        <div class="announcement-card" style="box-shadow: 0 0 0 3px #fbbf24, 0 10px 30px rgba(251, 191, 36, 0.2);" data-modal="pinned1">
+            <div class="announcement-content">
+                <div class="announcement-header">
+                    <div class="announcement-badges">
+                        <span class="badge badge-all">
+                            <i class="fas fa-users badge-icon"></i>
+                            Для всех
+                        </span>
+                        <span class="badge badge-type">
+                            <i class="fas fa-calendar badge-icon"></i>
+                            Мероприятие
+                        </span>
+                    </div>
+                </div>
+                <h3 class="announcement-title">🎓 Начало учебного года 2025</h3>
+                <p class="announcement-text">
+                    Уважаемые ученики, учителя и родители! Поздравляем с началом нового учебного года! Торжественная линейка состоится 1 сентября в 9:00 на школьном дворе...
+                </p>
+                <div class="announcement-footer">
+                    <span class="announcement-date">
+                        <i class="far fa-calendar"></i>
+                        21 января 2026 года
+                    </span>
+                    <span style="color: #2563eb; font-weight: 600;">
+                        <i class="far fa-calendar" style="margin-right: 4px;"></i>
+                        1 сентября
+                    </span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Футер -->
-    <footer class="footer">
-        <div class="container">
-            <p>© 2024 Школьный портал. Все права защищены.</p>
+    <!-- Последние объявления -->
+    <div class="section-header">
+        <h2 class="section-title">
+            <span class="title-indicator" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);"></span>
+            Последние объявления
+        </h2>
+        <a href="announcements.html" class="btn-link">
+            Все объявления
+            <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+    
+    <div class="announcements-grid">
+        <div class="announcement-card" data-modal="recent1">
+            <div class="announcement-content">
+                <div class="announcement-header">
+                    <div class="announcement-badges">
+                        <span class="badge" style="background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #be185d; border-color: #f9a8d4;">
+                            <i class="fas fa-heart badge-icon"></i>
+                            Родителям
+                        </span>
+                        <span class="badge badge-type">
+                            <i class="fas fa-calendar badge-icon"></i>
+                            Мероприятие
+                        </span>
+                    </div>
+                </div>
+                <h3 class="announcement-title">📚 Родительское собрание 10-х классов</h3>
+                <p class="announcement-text">
+                    Уважаемые родители учащихся 10-х классов! Приглашаем вас на родительское собрание, которое состоится 15 сентября в 18:00 в актовом зале...
+                </p>
+                <div class="announcement-footer">
+                    <span class="announcement-date">
+                        <i class="far fa-calendar"></i>
+                        21 января 2026 года
+                    </span>
+                    <span style="color: #2563eb; font-weight: 600;">
+                        <i class="far fa-calendar" style="margin-right: 4px;"></i>
+                        15 сентября
+                    </span>
+                </div>
+            </div>
         </div>
-    </footer>
+        
+        <!-- ... остальные карточки recent2-recent6 ... -->
+    </div>
 
-    <script src="js/api.js"></script>
-    <script src="js/main.js"></script>
+    <!-- ========== МОДАЛЬНЫЕ ОКНА (добавьте в конец body перед script) ========== -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+    
+    <!-- Модальное окно для срочного объявления -->
+    <div class="modal" id="urgent1">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                <i class="fas fa-exclamation-triangle" style="color: #ef4444; margin-right: 10px;"></i>
+                ⚠️ Изменение в расписании на понедельник
+            </h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-meta">
+                <span class="meta-item">
+                    <i class="fas fa-user"></i> Администрация школы
+                </span>
+                <span class="meta-item">
+                    <i class="far fa-calendar"></i> 21 января 2026 года
+                </span>
+                <span class="meta-item">
+                    <i class="fas fa-tag"></i> Для всех
+                </span>
+            </div>
+            <div class="modal-text">
+                <p><strong>Внимание, ученики и учителя!</strong></p>
+                <p>В связи с проведением срочных ремонтных работ в кабинете физики №201, уроки физики для всех классов на понедельник (26 января 2026 года) переносятся.</p>
+                
+                <p><strong>Новое расписание:</strong></p>
+                <ul style="margin: 20px 0; padding-left: 25px;">
+                    <li>9А класс → Кабинет 305 (3 этаж)</li>
+                    <li>9Б класс → Кабинет 305 (3 этаж)</li>
+                    <li>10А класс → Кабинет 305 (3 этаж)</li>
+                    <li>10Б класс → Кабинет 305 (3 этаж)</li>
+                    <li>11А класс → Кабинет 305 (3 этаж)</li>
+                    <li>11Б класс → Кабинет 305 (3 этаж)</li>
+                </ul>
+                
+                <p><strong>Важная информация:</strong></p>
+                <p>• Работы будут проводиться с 8:00 до 16:00<br>
+                • Доступ в кабинет 201 строго запрещён<br>
+                • Остальные уроки проходят по расписанию<br>
+                • Просьба к учителям и ученикам заранее подойти к новому кабинету</p>
+                
+                <p>Просим отнестись с пониманием к временным неудобствам. О завершении работ будет сообщено дополнительно.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для закрепленного объявления -->
+    <div class="modal" id="pinned1">
+        <div class="modal-header">
+            <h3 class="modal-title">🎓 Начало учебного года 2025</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-meta">
+                <span class="meta-item">
+                    <i class="fas fa-user"></i> Директор школы
+                </span>
+                <span class="meta-item">
+                    <i class="far fa-calendar"></i> 21 января 2026 года
+                </span>
+                <span class="meta-item">
+                    <i class="fas fa-tag"></i> Для всех
+                </span>
+            </div>
+            <div class="modal-text">
+                <p><strong>Уважаемые ученики, учителя и родители!</strong></p>
+                <p>Поздравляем с началом нового учебного года 2025-2026! Желаем всем успехов, новых достижений и интересных открытий!</p>
+                
+                <p><strong>Торжественная линейка:</strong></p>
+                <p>• Дата: 1 сентября 2025 года<br>
+                • Время: 9:00<br>
+                • Место: Школьный двор<br>
+                • Форма одежды: парадная</p>
+                
+                <p><strong>Расписание на 1 сентября:</strong></p>
+                <ul style="margin: 20px 0; padding-left: 25px;">
+                    <li>09:00 — 09:30 — Торжественная линейка</li>
+                    <li>10:00 — 10:45 — Классные часы</li>
+                    <li>11:00 — 11:45 — Знакомство с расписанием</li>
+                    <li>12:00 — 12:45 — Вводные занятия</li>
+                    <li>13:00 — Окончание учебного дня</li>
+                </ul>
+                
+                <p><strong>Важная информация для родителей:</strong></p>
+                <p>• Списки классов будут размещены 30 августа<br>
+                • Встреча с классными руководителями — 1 сентября после линейки<br>
+                • Организационные собрания — 2-3 сентября</p>
+                
+                <p>С нетерпением ждём встречи с вами! Давайте вместе сделаем этот учебный год ярким и успешным!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для recent1 -->
+    <div class="modal" id="recent1">
+        <div class="modal-header">
+            <h3 class="modal-title">📚 Родительское собрание 10-х классов</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-meta">
+                <span class="meta-item">
+                    <i class="fas fa-user"></i> Завуч по учебной работе
+                </span>
+                <span class="meta-item">
+                    <i class="far fa-calendar"></i> 21 января 2026 года
+                </span>
+                <span class="meta-item">
+                    <i class="fas fa-tag"></i> Родителям
+                </span>
+            </div>
+            <div class="modal-text">
+                <p><strong>Уважаемые родители учащихся 10-х классов!</strong></p>
+                <p>Приглашаем вас на первое в этом учебном году родительское собрание, посвящённое организации учебного процесса в 10-х классах.</p>
+                
+                <p><strong>Информация о собрании:</strong></p>
+                <p>• Дата: 15 сентября 2025 года<br>
+                • Время: 18:00<br>
+                • Место: Актовый зал школы</p>
+                
+                <p><strong>Повестка дня:</strong></p>
+                <ol style="margin: 20px 0; padding-left: 25px;">
+                    <li>Встреча с классными руководителями 10-х классов</li>
+                    <li>Организация учебного процесса в старшей школе</li>
+                    <li>Особенности подготовки к ЕГЭ в 10-м классе</li>
+                    <li>Расписание дополнительных занятий и кружков</li>
+                    <li>Организационные вопросы</li>
+                </ol>
+                
+                <p><strong>Важно:</strong></p>
+                <p>• При себе иметь паспорт для прохода в школу<br>
+                • Заполненные согласия на обработку персональных данных<br>
+                • Блокнот и ручку для записей</p>
+                
+                <p><strong>Контакты для вопросов:</strong><br>
+                Завуч по учебной работе — Иванова Мария Петровна<br>
+                Телефон: +7 (495) 123-45-67 (доб. 123)<br>
+                Email: z@school-portal.ru</p>
+                
+                <p>Ждём вас на собрании! Ваше участие очень важно для успешной учёбы ваших детей.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Добавьте такие же модальные окна для recent2, recent3, recent4, recent5, recent6 -->
+
+    <!-- JavaScript -->
+    <script>
+        // ========== МОДАЛЬНАЯ СИСТЕМА ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Загружаем модальные окна...');
+            
+            const modalOverlay = document.getElementById('modalOverlay');
+            const announcementCards = document.querySelectorAll('.announcement-card');
+            
+            // Проверяем элементы
+            console.log('✅ Найдено карточек:', announcementCards.length);
+            console.log('✅ Найдено модальных окон:', document.querySelectorAll('.modal').length);
+            console.log('✅ Оверлей:', modalOverlay ? '✓ найден' : '✗ не найден');
+            
+            // ===== 1. ФУНКЦИЯ ОТКРЫТИЯ МОДАЛКИ =====
+            window.openModal = function(modalId) {
+                console.log('📂 Открываем модалку:', modalId);
+                
+                const modal = document.getElementById(modalId);
+                if (!modal) {
+                    console.error('❌ Модальное окно не найдено:', modalId);
+                    return;
+                }
+                
+                if (!modalOverlay) {
+                    console.error('❌ Оверлей не найден');
+                    return;
+                }
+                
+                // Показываем оверлей
+                modalOverlay.style.display = 'block';
+                
+                // Анимация появления
+                setTimeout(() => {
+                    modalOverlay.style.opacity = '1';
+                    modal.classList.add('active');
+                    document.body.classList.add('no-scroll');
+                }, 10);
+                
+                console.log('✅ Модалка открыта');
+            };
+            
+            // ===== 2. ФУНКЦИЯ ЗАКРЫТИЯ МОДАЛКИ =====
+            window.closeModal = function() {
+                console.log('📕 Закрываем все модалки');
+                
+                // Закрываем все модалки
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+                
+                // Скрываем оверлей с анимацией
+                if (modalOverlay) {
+                    modalOverlay.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        modalOverlay.style.display = 'none';
+                        document.body.classList.remove('no-scroll');
+                        console.log('✅ Все модалки закрыты');
+                    }, 400);
+                }
+            };
+            
+            // ===== 3. ОБРАБОТЧИК КЛИКА НА КАРТОЧКИ =====
+            announcementCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // Если кликнули на бадж - не открываем модалку
+                    if (e.target.closest('.badge')) {
+                        console.log('Клик на бадж - игнорируем');
+                        return;
+                    }
+                    
+                    // Получаем ID модалки из data-modal
+                    const modalId = this.getAttribute('data-modal');
+                    
+                    if (modalId) {
+                        console.log('🟢 Клик на карточку:', modalId);
+                        openModal(modalId);
+                    }
+                });
+            });
+            
+            // ===== 4. ОБРАБОТЧИКИ ЗАКРЫТИЯ =====
+            
+            // Клик на крестик
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal-close') || 
+                    e.target.closest('.modal-close')) {
+                    console.log('✖️ Клик на крестик');
+                    closeModal();
+                }
+            });
+            
+            // Клик на оверлей
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    console.log('🌌 Клик на оверлей');
+                    closeModal();
+                }
+            });
+            
+            // Закрытие по ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    console.log('⌨️ Нажата ESC');
+                    closeModal();
+                }
+            });
+            
+            // ===== 5. ПОИСК (ваш существующий код) =====
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase().trim();
+                    
+                    if (searchTerm === '') {
+                        announcementCards.forEach(card => {
+                            card.style.display = 'block';
+                            setTimeout(() => {
+                                card.style.opacity = '1';
+                                card.style.transform = 'none';
+                            }, 10);
+                        });
+                        return;
+                    }
+                    
+                    announcementCards.forEach(card => {
+                        const title = card.querySelector('.announcement-title').textContent.toLowerCase();
+                        const text = card.querySelector('.announcement-text').textContent.toLowerCase();
+                        
+                        if (title.includes(searchTerm) || text.includes(searchTerm)) {
+                            card.style.display = 'block';
+                            setTimeout(() => {
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0)';
+                            }, 10);
+                        } else {
+                            card.style.opacity = '0';
+                            card.style.transform = 'translateY(20px)';
+                            setTimeout(() => {
+                                card.style.display = 'none';
+                            }, 300);
+                        }
+                    });
+                });
+            }
+            
+            // ===== 6. ДОПОЛНИТЕЛЬНЫЕ АНИМАЦИИ =====
+            
+            // Параллакс эффект
+            const blobs = document.querySelectorAll('.blob');
+            if (blobs.length > 0) {
+                window.addEventListener('mousemove', (e) => {
+                    const x = e.clientX / window.innerWidth;
+                    const y = e.clientY / window.innerHeight;
+                    
+                    blobs.forEach((blob, index) => {
+                        const speed = 0.5 + index * 0.1;
+                        const xMove = (x - 0.5) * 50 * speed;
+                        const yMove = (y - 0.5) * 50 * speed;
+                        
+                        blob.style.transform = `translate(${xMove}px, ${yMove}px)`;
+                    });
+                });
+            }
+            
+            console.log('🎉 Модальная система готова к работе!');
+        });
+        
+        // Анимация загрузки страницы
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
+            document.body.style.transform = 'translateY(0)';
+        });
+    </script>
 </body>
 </html>

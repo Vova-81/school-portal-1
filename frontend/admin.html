@@ -3,1122 +3,344 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админ-панель - Школьный портал</title>
+    <title>Административная панель - Школьный портал</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* === БАЗОВЫЕ СТИЛИ === */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         :root {
-            --primary: #3b82f6;
-            --primary-hover: #2563eb;
-            --danger: #ef4444;
-            --danger-hover: #dc2626;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --sidebar-width: 250px;
-        }
-        
-        body {
-            background: #f8fafc;
-            color: #334155;
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
-        
-        /* === КОМПОНЕНТ: CARD === */
-        .card {
-            background: white;
-            border-radius: 0.75rem;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover:hover {
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-            border-color: #3b82f6;
-        }
-        
-        .card-header {
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
-            background: #f9fafb;
-        }
-        
-        .card-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #1e293b;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .card-content {
-            padding: 1.5rem;
-        }
-        
-        .card-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid #e5e7eb;
-            background: #f9fafb;
-        }
-        
-        /* === КОМПОНЕНТ: BUTTON === */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.625rem 1.25rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-            gap: 0.5rem;
-            white-space: nowrap;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-        
-        .btn-secondary {
-            background-color: white;
-            color: #374151;
-            border-color: #d1d5db;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #f9fafb;
-            border-color: #9ca3af;
-        }
-        
-        .btn-danger {
-            background-color: var(--danger);
-            color: white;
-            border-color: var(--danger);
-        }
-        
-        .btn-danger:hover {
-            background-color: var(--danger-hover);
-        }
-        
-        .btn-success {
-            background-color: var(--success);
-            color: white;
-            border-color: var(--success);
-        }
-        
-        .btn-sm {
-            padding: 0.375rem 0.75rem;
-            font-size: 0.75rem;
-        }
-        
-        .btn-lg {
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-        }
-        
-        .btn-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            padding: 0;
-        }
-        
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        /* === КОМПОНЕНТ: TABS === */
-        .tabs {
-            border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 1.5rem;
-        }
-        
-        .tabs-list {
-            display: flex;
-            gap: 0.25rem;
-            overflow-x: auto;
-        }
-        
-        .tab-btn {
-            padding: 0.75rem 1.5rem;
-            background: none;
-            border: none;
-            border-bottom: 2px solid transparent;
-            cursor: pointer;
-            font-weight: 500;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-        
-        .tab-btn:hover {
-            color: var(--primary);
-            background: #f8fafc;
-        }
-        
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-            background: #eff6ff;
-        }
-        
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        /* === КОМПОНЕНТ: BADGE === */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-        
-        .badge-primary {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-        
-        .badge-success {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .badge-warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-        
-        .badge-danger {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        
-        .badge-secondary {
-            background: #f3f4f6;
-            color: #374151;
-        }
-        
-        /* === КОМПОНЕНТ: TABLE === */
-        .table-container {
-            border-radius: 0.75rem;
-            overflow: hidden;
-            border: 1px solid #e5e7eb;
-            background: white;
-        }
-        
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .table thead {
-            background: #f9fafb;
-        }
-        
-        .table th {
-            padding: 1rem 1.5rem;
-            text-align: left;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: 1px solid #e5e7eb;
-            white-space: nowrap;
-        }
-        
-        .table td {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid #f3f4f6;
-            color: #374151;
-            font-size: 0.875rem;
-        }
-        
-        .table tbody tr:hover {
-            background: #f9fafb;
-        }
-        
-        .table tbody tr:last-child td {
-            border-bottom: none;
-        }
-        
-        /* === КОМПОНЕНТ: INPUT === */
-        .input-group {
-            margin-bottom: 1rem;
-        }
-        
-        .input-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #374151;
-        }
-        
-        .input-label-required::after {
-            content: " *";
-            color: #ef4444;
-        }
-        
-        .input {
-            width: 100%;
-            padding: 0.625rem 0.875rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-            background: white;
-        }
-        
-        .input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        .input-error {
-            border-color: var(--danger);
-        }
-        
-        .input-error:focus {
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-        }
-        
-        .input-help {
-            font-size: 0.75rem;
-            color: #6b7280;
-            margin-top: 0.25rem;
-        }
-        
-        .input-help-error {
-            color: var(--danger);
-        }
-        
-        /* === КОМПОНЕНТ: TEXTAREA === */
-        .textarea {
-            width: 100%;
-            padding: 0.625rem 0.875rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-family: inherit;
-            resize: vertical;
-            min-height: 100px;
-            transition: all 0.2s;
-        }
-        
-        .textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        /* === КОМПОНЕНТ: SELECT === */
-        .select {
-            width: 100%;
-            padding: 0.625rem 2.5rem 0.625rem 0.875rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            background-color: white;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 0.5rem center;
-            background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
-            appearance: none;
-            cursor: pointer;
-        }
-        
-        .select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        /* === КОМПОНЕНТ: SWITCH === */
-        .switch {
-            display: inline-flex;
-            align-items: center;
-            cursor: pointer;
-        }
-        
-        .switch-input {
-            display: none;
-        }
-        
-        .switch-toggle {
-            position: relative;
-            width: 3rem;
-            height: 1.5rem;
-            background-color: #d1d5db;
-            border-radius: 9999px;
-            transition: all 0.3s;
-            flex-shrink: 0;
-        }
-        
-        .switch-toggle::after {
-            content: '';
-            position: absolute;
-            width: 1.25rem;
-            height: 1.25rem;
-            background-color: white;
-            border-radius: 50%;
-            top: 0.125rem;
-            left: 0.125rem;
-            transition: all 0.3s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-        
-        .switch-input:checked + .switch-toggle {
-            background-color: var(--primary);
-        }
-        
-        .switch-input:checked + .switch-toggle::after {
-            transform: translateX(1.5rem);
-        }
-        
-        .switch-label {
-            margin-left: 0.75rem;
-            font-size: 0.875rem;
-            color: #374151;
-        }
-        
-        /* === КОМПОНЕНТ: DIALOG === */
-        .dialog-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            padding: 1rem;
-        }
-        
-        .dialog-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .dialog {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
-        }
-        
-        .dialog-overlay.active .dialog {
-            transform: scale(1);
-        }
-        
-        .dialog-header {
-            padding: 1.5rem 1.5rem 1rem;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 1;
-        }
-        
-        .dialog-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1e293b;
-            line-height: 1.3;
-        }
-        
-        .dialog-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #6b7280;
-            cursor: pointer;
-            width: 2.5rem;
-            height: 2.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.5rem;
-            flex-shrink: 0;
-            margin-left: auto;
-        }
-        
-        .dialog-close:hover {
-            background-color: #f3f4f6;
-        }
-        
-        .dialog-body {
-            padding: 1.5rem;
-        }
-        
-        .dialog-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-            background-color: #f9fafb;
-        }
-        
-        /* === КОМПОНЕНТ: ALERT === */
-        .alert {
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-        }
-        
-        .alert-success {
-            background-color: #d1fae5;
-            border: 1px solid #a7f3d0;
-            color: #065f46;
-        }
-        
-        .alert-error {
-            background-color: #fee2e2;
-            border: 1px solid #fecaca;
-            color: #991b1b;
-        }
-        
-        .alert-warning {
-            background-color: #fef3c7;
-            border: 1px solid #fde68a;
-            color: #92400e;
-        }
-        
-        .alert-info {
-            background-color: #dbeafe;
-            border: 1px solid #bfdbfe;
-            color: #1e40af;
-        }
-        
-        .alert-icon {
-            font-size: 1.25rem;
-            flex-shrink: 0;
-            margin-top: 0.125rem;
-        }
-        
-        .alert-content {
-            flex: 1;
-        }
-        
-        .alert-title {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        
-        .alert-close {
-            background: none;
-            border: none;
-            color: inherit;
-            cursor: pointer;
-            padding: 0.25rem;
-            border-radius: 0.25rem;
-            opacity: 0.7;
-        }
-        
-        .alert-close:hover {
-            opacity: 1;
-            background: rgba(0,0,0,0.1);
-        }
-        
-        /* === ЛЕЙАУТ АДМИНКИ === */
-        .admin-header {
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .admin-header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .admin-brand {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .admin-logo {
-            width: 3rem;
-            height: 3rem;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-        }
-        
-        .admin-title h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
-        
-        .admin-title p {
-            font-size: 0.875rem;
-            color: #64748b;
-        }
-        
-        .admin-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .admin-main {
-            padding: 1.5rem 0;
-        }
-        
-        /* === ДАШБОРД === */
-        .stats-grid {
-            display: grid;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        @media (min-width: 768px) {
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        
-        .stat-card {
-            display: flex;
-            align-items: center;
-            padding: 1.5rem;
-        }
-        
-        .stat-icon {
-            width: 3rem;
-            height: 3rem;
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            flex-shrink: 0;
-        }
-        
-        .stat-info {
-            flex: 1;
-        }
-        
-        .stat-value {
-            font-size: 1.875rem;
-            font-weight: 700;
-            color: #1e293b;
-            line-height: 1;
-        }
-        
-        .stat-label {
-            font-size: 0.875rem;
-            color: #64748b;
-            margin-top: 0.25rem;
-        }
-        
-        .stat-change {
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-top: 0.25rem;
-        }
-        
-        .stat-change.positive {
-            color: #10b981;
-        }
-        
-        .stat-change.negative {
-            color: #ef4444;
-        }
-        
-        /* === ТАБЛИЦЫ === */
-        .table-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-        }
-        
-        .table-search {
-            position: relative;
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .table-search-icon {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-        }
-        
-        .table-search-input {
-            width: 100%;
-            padding: 0.5rem 0.75rem 0.5rem 2.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-        }
-        
-        .table-search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
-        .table-filters {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .table-pagination {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            border-top: 1px solid #e5e7eb;
-            background: #f9fafb;
-        }
-        
-        .pagination-info {
-            font-size: 0.875rem;
-            color: #64748b;
-        }
-        
-        .pagination-controls {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .pagination-btn {
-            width: 2.25rem;
-            height: 2.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            background: white;
-            cursor: pointer;
-        }
-        
-        .pagination-btn:hover:not(:disabled) {
-            background: #f3f4f6;
-        }
-        
-        .pagination-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .pagination-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        
-        /* === ФОРМЫ === */
-        .form-grid {
-            display: grid;
-            gap: 1.5rem;
-        }
-        
-        @media (min-width: 768px) {
-            .form-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        .form-full {
-            grid-column: 1 / -1;
-        }
-        
-        /* === АДАПТИВНОСТЬ === */
-        @media (max-width: 768px) {
-            .admin-header-content {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
-            
-            .admin-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .tabs-list {
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                padding-bottom: 0.25rem;
-            }
-            
-            .table-actions {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .table-filters {
-                order: 2;
-            }
-        }
-        
-        /* === СПИННЕР === */
-        .spinner {
-            width: 1.5rem;
-            height: 1.5rem;
-            border: 2px solid #e5e7eb;
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* === УТИЛИТЫ === */
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .w-full { width: 100%; }
-        .mb-4 { margin-bottom: 1rem; }
-        .mt-4 { margin-top: 1rem; }
-        .gap-4 { gap: 1rem; }
-        .hidden { display: none; }
-        
-        /* === AVATAR === */
-        .avatar {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 2rem;
-            height: 2rem;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            color: white;
-            font-weight: 600;
-            font-size: 0.75rem;
-            flex-shrink: 0;
-        }
-        
-        .avatar-lg {
-            width: 3rem;
-            height: 3rem;
-            font-size: 1rem;
-        }
-        
-        /* === ACTION BUTTONS === */
-        .action-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .action-btn {
-            width: 2rem;
-            height: 2rem;
-            border-radius: 0.375rem;
-            border: 1px solid #e5e7eb;
-            background: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #64748b;
-            transition: all 0.2s;
-        }
-        
-        .action-btn:hover {
-            background: #f3f4f6;
-        }
-        
-        .action-btn.edit:hover {
-            color: var(--primary);
-            border-color: #bfdbfe;
-        }
-        
-        .action-btn.delete:hover {
-            color: var(--danger);
-            border-color: #fecaca;
-        }
-        
-        /* === LOADING === */
-        .admin-loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(4px);
-        }
-        
-        /* === EMPTY STATE === */
-        .empty-state {
-            text-align: center;
-            padding: 3rem 1.5rem;
-        }
-        
-        .empty-state i {
-            font-size: 3rem;
-            color: #cbd5e1;
-            margin-bottom: 1rem;
-        }
-        
-        .empty-state h3 {
-            font-size: 1.25rem;
-            font-weight: 500;
-            color: #64748b;
-            margin-bottom: 0.5rem;
-        }
-        
-        .empty-state p {
-            color: #94a3b8;
-            margin-bottom: 1.5rem;
-        }
+            --primary: #4f46e5; --primary-hover: #4338ca; --primary-light: #e0e7ff;
+            --danger: #ef4444; --danger-hover: #dc2626; --success: #10b981;
+            --warning: #f59e0b; --info: #06b6d4; --gray-50: #f8fafc;
+            --gray-100: #f1f5f9; --gray-200: #e2e8f0; --gray-300: #cbd5e1;
+            --gray-400: #94a3b8; --gray-500: #64748b; --gray-600: #475569;
+            --gray-700: #334155; --gray-800: #1e293b; --gray-900: #0f172a;
+        }
+        body { background: linear-gradient(135deg, var(--gray-50) 0%, #f0f9ff 100%); color: var(--gray-800); min-height: 100vh; line-height: 1.5; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; }
+        .card { background: white; border-radius: 0.75rem; border: 1px solid var(--gray-200); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; transition: all 0.2s; }
+        .card:hover { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); transform: translateY(-2px); }
+        .card-content { padding: 1.5rem; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-weight: 500; font-size: 0.875rem; cursor: pointer; transition: all 0.15s; border: 2px solid transparent; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .btn-secondary { background: white; color: var(--gray-700); border-color: var(--gray-300); }
+        .btn-secondary:hover { background: var(--gray-50); border-color: var(--gray-400); }
+        .btn-danger { background: linear-gradient(135deg, var(--danger), var(--danger-hover)); color: white; }
+        .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.75rem; }
+        .tabs { border-bottom: 1px solid var(--gray-200); margin-bottom: 2rem; padding-bottom: 0.25rem; }
+        .tabs-list { display: flex; gap: 0.25rem; }
+        .tab-btn { flex: 1; padding: 0.875rem 1.25rem; border: none; background: none; border-radius: 0.75rem; font-weight: 500; color: var(--gray-500); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .tab-btn:hover { color: var(--primary); background: var(--primary-light); }
+        .tab-btn.active { color: var(--primary); background: var(--primary-light); }
+        .tab-content { display: none; animation: fadeIn 0.4s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .badge-primary { background: var(--primary-light); color: var(--primary); }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-secondary { background: var(--gray-100); color: var(--gray-700); }
+        .table-container { border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--gray-200); background: white; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table thead { background: linear-gradient(to right, var(--gray-50), var(--gray-100)); }
+        .table th { padding: 1rem 1.25rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--gray-200); }
+        .table td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); font-size: 0.875rem; }
+        .table tbody tr:hover td { background: var(--primary-light); }
+        .input-group { margin-bottom: 1.25rem; }
+        .input-label { display: block; margin-bottom: 0.375rem; font-size: 0.875rem; font-weight: 500; color: var(--gray-700); }
+        .input-label-required::after { content: "*"; color: var(--danger); margin-left: 0.25rem; font-weight: bold; }
+        .input { width: 100%; padding: 0.625rem 0.875rem; border: 2px solid var(--gray-300); border-radius: 0.5rem; font-size: 0.875rem; transition: all 0.15s; background: white; color: var(--gray-800); }
+        .input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .select { width: 100%; padding: 0.625rem 2.5rem 0.625rem 0.875rem; border: 2px solid var(--gray-300); border-radius: 0.5rem; font-size: 0.875rem; background-color: white; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.875rem center; background-repeat: no-repeat; background-size: 1.25em 1.25em; appearance: none; cursor: pointer; }
+        .select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .textarea { width: 100%; padding: 0.625rem 0.875rem; border: 2px solid var(--gray-300); border-radius: 0.5rem; font-size: 0.875rem; font-family: inherit; resize: vertical; min-height: 100px; }
+        
+        /* Загрузка файлов */
+        .file-upload { position: relative; }
+        .file-input { width: 0.1px; height: 0.1px; opacity: 0; overflow: hidden; position: absolute; z-index: -1; }
+        .file-label { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 1rem; border: 2px dashed var(--gray-300); border-radius: 0.5rem; background: var(--gray-50); cursor: pointer; transition: all 0.15s; }
+        .file-label:hover { border-color: var(--primary); background: var(--primary-light); }
+        .file-list { margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .file-item { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem; background: var(--gray-50); border-radius: 0.375rem; }
+        .file-info { display: flex; align-items: center; gap: 0.5rem; }
+        .file-name { font-size: 0.875rem; font-weight: 500; }
+        .file-size { font-size: 0.75rem; color: var(--gray-500); }
+        .file-remove { color: var(--danger); cursor: pointer; padding: 0.25rem; border-radius: 0.25rem; transition: all 0.15s; }
+        .file-remove:hover { background: var(--danger); color: white; }
+        
+        .modal-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal-backdrop.active { opacity: 1; visibility: visible; }
+        .modal { background: white; border-radius: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal-backdrop.active .modal { transform: scale(1); }
+        .modal-header { padding: 1.5rem 1.5rem 1rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: flex-start; }
+        .modal-title { font-size: 1.25rem; font-weight: 600; color: var(--gray-900); }
+        .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--gray-400);
+    cursor: pointer;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.modal-close:hover {
+    background: var(--gray-100);
+    color: var(--danger);
+    transform: rotate(90deg) scale(1.1);
+}
+        .modal-close:hover::before, .modal-close:hover::after { width: 70%; height: 3px; }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer { padding: 1.25rem 1.5rem; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 0.75rem; background: var(--gray-50); border-radius: 0 0 1.5rem 1.5rem; }
+        .alert-container { position: fixed; top: 1rem; right: 1rem; z-index: 1100; max-width: 400px; width: 100%; display: flex; flex-direction: column; gap: 0.75rem; }
+        .alert { padding: 1rem 1.25rem; border-radius: 0.75rem; display: flex; align-items: flex-start; gap: 0.75rem; background: white; border-left: 4px solid; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); animation: slideInRight 0.3s; }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+        .alert-success { border-left-color: var(--success); }
+        .alert-error { border-left-color: var(--danger); }
+        .alert-info { border-left-color: var(--info); }
+        .admin-header { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(226,232,240,0.8); padding: 1rem 0; position: sticky; top: 0; z-index: 100; }
+        .admin-header-content { display: flex; justify-content: space-between; align-items: center; }
+        .admin-brand { display: flex; align-items: center; gap: 1rem; }
+        .admin-logo { width: 3rem; height: 3rem; background: linear-gradient(135deg, var(--primary), #8b5cf6); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .admin-actions { display: flex; align-items: center; gap: 0.75rem; }
+        .admin-main { padding: 1.5rem 0; }
+        .table-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem; }
+        .search-wrapper { flex: 1; min-width: 300px; position: relative; }
+        .search-input { width: 100%; padding: 0.625rem 1rem 0.625rem 2.5rem; border: 2px solid var(--gray-300); border-radius: 0.5rem; font-size: 0.875rem; background: white; }
+        .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--gray-400); }
+        .filters { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .form-grid { display: grid; gap: 1.5rem; }
+        @media (min-width: 768px) { .form-grid { grid-template-columns: repeat(2, 1fr); } }
+        .form-full { grid-column: 1 / -1; }
+        .avatar { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #7c3aed); color: white; font-weight: 600; font-size: 0.75rem; }
+        .action-buttons { display: flex; gap: 0.5rem; }
+        .action-btn { width: 2rem; height: 2rem; border-radius: 0.5rem; border: 2px solid var(--gray-200); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--gray-500); transition: all 0.15s; }
+        .action-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .admin-loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(4px); }
+        .spinner { width: 1.5rem; height: 1.5rem; border: 2px solid var(--gray-300); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .empty-state { text-align: center; padding: 3rem 1.5rem; }
+        .add-class-section, .delete-class-section { margin-top: 10px; padding: 15px; background: var(--gray-50); border-radius: 8px; border: 1px solid var(--gray-200); }
+        .class-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; transition: all 0.3s; }
+        .time-input-group { display: flex; align-items: center; gap: 10px; }
+        .switch { display: inline-flex; align-items: center; cursor: pointer; }
+        .switch-input { display: none; }
+        .switch-toggle { position: relative; width: 3rem; height: 1.5rem; background-color: var(--gray-300); border-radius: 9999px; transition: all 0.15s; flex-shrink: 0; }
+        .switch-toggle::after { content: ''; position: absolute; width: 1.25rem; height: 1.25rem; background-color: white; border-radius: 50%; top: 0.125rem; left: 0.125rem; transition: all 0.15s; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+        .switch-input:checked + .switch-toggle { background-color: var(--primary); }
+        .switch-input:checked + .switch-toggle::after { transform: translateX(1.5rem); }
+        .switch-label { margin-left: 0.75rem; font-size: 0.875rem; color: var(--gray-700); }
+        /* === УЛУЧШЕННЫЕ КНОПКИ ХЕДЕРА === */
+.admin-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.btn-secondary.btn-sm, #logoutBtn {
+    position: relative;
+    overflow: hidden;
+    border: none !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase;
+    font-size: 0.75rem !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 50px !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-width: 140px;
+    height: 48px;
+    cursor: pointer;
+}
+
+/* Кнопка "На сайт" */
+.btn-secondary.btn-sm {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    color: white !important;
+}
+
+.btn-secondary.btn-sm::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+    transition: left 0.8s ease;
+}
+
+.btn-secondary.btn-sm:hover::before {
+    left: 100%;
+}
+
+.btn-secondary.btn-sm:hover {
+    transform: translateY(-4px) scale(1.08);
+    box-shadow: 0 12px 25px rgba(99, 102, 241, 0.35) !important;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    letter-spacing: 1px !important;
+}
+
+.btn-secondary.btn-sm i {
+    font-size: 1.1rem;
+    transition: all 0.4s ease;
+}
+
+.btn-secondary.btn-sm:hover i {
+    transform: translateX(4px) rotate(15deg);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Кнопка "Выйти" */
+#logoutBtn {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: white !important;
+}
+
+#logoutBtn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+#logoutBtn:hover::before {
+    width: 150%;
+    height: 150%;
+}
+
+#logoutBtn:hover {
+    transform: translateY(-4px) scale(1.08);
+    box-shadow: 0 12px 25px rgba(239, 68, 68, 0.35) !important;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    letter-spacing: 1px !important;
+}
+
+#logoutBtn i {
+    font-size: 1.1rem;
+    transition: all 0.4s ease;
+}
+
+#logoutBtn:hover i {
+    transform: translateX(-4px) rotate(-20deg);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Анимация пульсации для кнопки "Выйти" */
+@keyframes logoutPulse {
+    0% {
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4),
+                    0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    70% {
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4),
+                    0 0 0 12px rgba(239, 68, 68, 0);
+    }
+    100% {
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4),
+                    0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+#logoutBtn {
+    animation: logoutPulse 3s infinite;
+}
+
+#logoutBtn:hover {
+    animation: none;
+}
+
+/* Эффект нажатия */
+.btn-secondary.btn-sm:active, #logoutBtn:active {
+    transform: translateY(-1px) scale(1.02);
+    transition: all 0.1s ease !important;
+}
+
+/* Адаптивность для кнопок */
+@media (max-width: 768px) {
+    .admin-actions {
+        width: 100%;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+    
+    .btn-secondary.btn-sm, #logoutBtn {
+        min-width: 120px;
+        padding: 0.625rem 1.25rem !important;
+        font-size: 0.7rem !important;
+    }
+}
+
+/* Эффект свечения при фокусе */
+.btn-secondary.btn-sm:focus, #logoutBtn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3),
+                0 12px 25px rgba(99, 102, 241, 0.35) !important;
+}
+
+#logoutBtn:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3),
+                0 12px 25px rgba(239, 68, 68, 0.35) !important;
+}
     </style>
 </head>
 <body>
-    <!-- Загрузка -->
-    <div id="loadingScreen" class="admin-loading">
-        <div class="spinner"></div>
-    </div>
+    <div class="alert-container" id="alertsContainer"></div>
+    <div id="loadingScreen" class="admin-loading"><div class="spinner"></div></div>
 
-    <!-- Алерты -->
-    <div id="alertsContainer" style="position: fixed; top: 1rem; right: 1rem; z-index: 1000; max-width: 400px;"></div>
-
-    <!-- Хедер -->
     <header class="admin-header">
         <div class="container">
             <div class="admin-header-content">
                 <div class="admin-brand">
-                    <div class="admin-logo">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
+                    <div class="admin-logo"><i class="fas fa-school"></i></div>
                     <div class="admin-title">
-                        <h1>Админ-панель</h1>
-                        <p>Управление школьным порталом</p>
+                        <h1>Административная панель</h1>
+                        <p>Школа №46</p>
                     </div>
                 </div>
                 <div class="admin-actions">
-                    <button class="btn btn-secondary btn-sm" onclick="location.href='index.html'">
-                        <i class="fas fa-home"></i>
-                        На сайт
-                    </button>
-                    <button class="btn btn-danger btn-sm" id="logoutBtn">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Выйти
-                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="location.href='index.html'"><i class="fas fa-home"></i> На сайт</button>
+                    <button class="btn btn-danger btn-sm" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Основной контент -->
     <main class="admin-main">
         <div class="container">
-            <!-- Табы -->
             <div class="tabs">
                 <div class="tabs-list">
-                    <button class="tab-btn active" data-tab="dashboard">
-                        <i class="fas fa-tachometer-alt"></i>
-                        Дашборд
-                    </button>
-                    <button class="tab-btn" data-tab="announcements">
-                        <i class="fas fa-bullhorn"></i>
-                        Объявления
-                    </button>
-                    <button class="tab-btn" data-tab="schedule">
-                        <i class="fas fa-calendar-alt"></i>
-                        Расписание
-                    </button>
-                    <button class="tab-btn" data-tab="users">
-                        <i class="fas fa-users"></i>
-                        Пользователи
-                    </button>
+                    <button class="tab-btn active" data-tab="announcements"><i class="fas fa-bullhorn"></i> Объявления</button>
+                    <button class="tab-btn" data-tab="schedule"><i class="fas fa-calendar-alt"></i> Расписание</button>
+                    <button class="tab-btn" data-tab="users"><i class="fas fa-users"></i> Пользователи</button>
                 </div>
             </div>
 
-            <!-- ДАШБОРД -->
-            <div id="dashboardTab" class="tab-content active">
-                <!-- Статистика -->
-                <div class="stats-grid">
-                    <div class="card stat-card">
-                        <div class="stat-icon" style="background: #dbeafe; color: #1e40af;">
-                            <i class="fas fa-bullhorn"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="totalAnnouncements">0</div>
-                            <div class="stat-label">Объявлений</div>
-                            <div class="stat-change positive" id="announcementsChange">+12%</div>
-                        </div>
-                    </div>
-                    
-                    <div class="card stat-card">
-                        <div class="stat-icon" style="background: #d1fae5; color: #065f46;">
-                            <i class="fas fa-calendar-alt"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="totalLessons">0</div>
-                            <div class="stat-label">Уроков</div>
-                            <div class="stat-change positive" id="lessonsChange">+5%</div>
-                        </div>
-                    </div>
-                    
-                    <div class="card stat-card">
-                        <div class="stat-icon" style="background: #fef3c7; color: #92400e;">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="totalUsers">0</div>
-                            <div class="stat-label">Пользователей</div>
-                            <div class="stat-change positive" id="usersChange">+8%</div>
-                        </div>
-                    </div>
-                    
-                    <div class="card stat-card">
-                        <div class="stat-icon" style="background: #f3e8ff; color: #7c3aed;">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="activeUsers">0</div>
-                            <div class="stat-label">Онлайн</div>
-                            <div class="stat-change positive" id="activeChange">+3%</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Таблицы -->
-                <div class="form-grid">
-                    <!-- Последние объявления -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-bell"></i>
-                                Последние объявления
-                            </h3>
-                        </div>
-                        <div class="card-content">
-                            <div class="table-container">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Заголовок</th>
-                                            <th>Категория</th>
-                                            <th>Дата</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="recentAnnouncementsTable">
-                                        <!-- Заполнится через JS -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Последние пользователи -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-user-plus"></i>
-                                Новые пользователи
-                            </h3>
-                        </div>
-                        <div class="card-content">
-                            <div class="table-container">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Имя</th>
-                                            <th>Роль</th>
-                                            <th>Дата</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="recentUsersTable">
-                                        <!-- Заполнится через JS -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ОБЪЯВЛЕНИЯ -->
-            <div id="announcementsTab" class="tab-content">
+            <div id="announcementsTab" class="tab-content active">
                 <div class="table-actions">
-                    <div class="table-search">
-                        <i class="fas fa-search table-search-icon"></i>
-                        <input type="text" class="table-search-input" id="announcementsSearch" placeholder="Поиск объявлений...">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="announcementsSearch" placeholder="Поиск объявлений...">
                     </div>
-                    <div class="table-filters">
+                    <div class="filters">
                         <select class="select" style="width: auto;" id="categoryFilter">
                             <option value="">Все категории</option>
                             <option value="all">Для всех</option>
@@ -1132,10 +354,7 @@
                             <option value="news">Новость</option>
                             <option value="event">Мероприятие</option>
                         </select>
-                        <button class="btn btn-primary" id="addAnnouncementBtn">
-                            <i class="fas fa-plus"></i>
-                            Добавить
-                        </button>
+                        <button class="btn btn-primary" id="addAnnouncementBtn"><i class="fas fa-plus"></i> Добавить</button>
                     </div>
                 </div>
 
@@ -1145,70 +364,39 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th style="width: 40px;">
-                                            <input type="checkbox" id="selectAll">
-                                        </th>
-                                        <th>Заголовок</th>
-                                        <th>Категория</th>
-                                        <th>Тип</th>
-                                        <th>Дата</th>
-                                        <th>Статус</th>
-                                        <th>Действия</th>
+                                        <th>Заголовок</th><th>Категория</th><th>Тип</th><th>Дата</th><th>Статус</th><th style="text-align: right;">Действия</th>
                                     </tr>
                                 </thead>
-                                <tbody id="announcementsTable">
-                                    <!-- Заполнится через JS -->
-                                </tbody>
+                                <tbody id="announcementsTable"></tbody>
                             </table>
                         </div>
-                        
-                        <div class="table-pagination">
-                            <div class="pagination-info">
-                                Показано <span id="announcementsFrom">1</span>-<span id="announcementsTo">10</span> из <span id="announcementsTotal">0</span>
-                            </div>
-                            <div class="pagination-controls">
-                                <button class="pagination-btn" id="announcementsPrev">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button class="pagination-btn active">1</button>
-                                <button class="pagination-btn">2</button>
-                                <button class="pagination-btn">3</button>
-                                <button class="pagination-btn" id="announcementsNext">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
+                        <div class="empty-state" id="emptyAnnouncements" style="display: none;">
+                            <i class="fas fa-bell"></i>
+                            <h3>Нет объявлений</h3>
+                            <p>Добавьте первое объявление для учеников, учителей или родителей</p>
+                            <button class="btn btn-primary mt-4" id="addFirstAnnouncementBtn"><i class="fas fa-plus"></i> Добавить объявление</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- РАСПИСАНИЕ -->
             <div id="scheduleTab" class="tab-content">
                 <div class="table-actions">
-                    <div class="table-search">
-                        <i class="fas fa-search table-search-icon"></i>
-                        <input type="text" class="table-search-input" id="scheduleSearch" placeholder="Поиск по расписанию...">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Поиск по предмету или учителю..." id="scheduleSearch">
                     </div>
-                    <div class="table-filters">
+                    <div class="filters">
                         <select class="select" style="width: auto;" id="classFilter">
                             <option value="">Все классы</option>
-                            <option value="11А">11А</option>
-                            <option value="10Б">10Б</option>
-                            <option value="9В">9В</option>
                         </select>
                         <select class="select" style="width: auto;" id="dayFilter">
                             <option value="">Все дни</option>
-                            <option value="monday">Понедельник</option>
-                            <option value="tuesday">Вторник</option>
-                            <option value="wednesday">Среда</option>
-                            <option value="thursday">Четверг</option>
-                            <option value="friday">Пятница</option>
-                            <option value="saturday">Суббота</option>
+                            <option value="monday">Понедельник</option><option value="tuesday">Вторник</option>
+                            <option value="wednesday">Среда</option><option value="thursday">Четверг</option>
+                            <option value="friday">Пятница</option><option value="saturday">Суббота</option>
                         </select>
-                        <button class="btn btn-primary" id="addScheduleBtn">
-                            <i class="fas fa-plus"></i>
-                            Добавить урок
-                        </button>
+                        <button class="btn btn-primary" id="addScheduleBtn"><i class="fas fa-plus"></i> Добавить урок</button>
                     </div>
                 </div>
 
@@ -1218,56 +406,35 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th style="width: 40px;">
-                                            <input type="checkbox" id="selectAllSchedule">
-                                        </th>
-                                        <th>Класс</th>
-                                        <th>День</th>
-                                        <th>Урок</th>
-                                        <th>Предмет</th>
-                                        <th>Учитель</th>
-                                        <th>Кабинет</th>
-                                        <th>Действия</th>
+                                        <th>Класс</th><th>День</th><th>Время</th><th>Предмет</th><th>Учитель</th><th>Кабинет</th><th style="text-align: right;">Действия</th>
                                     </tr>
                                 </thead>
-                                <tbody id="scheduleTable">
-                                    <!-- Заполнится через JS -->
-                                </tbody>
+                                <tbody id="scheduleTable"></tbody>
                             </table>
                         </div>
-                        
                         <div class="empty-state" id="emptySchedule" style="display: none;">
                             <i class="fas fa-calendar"></i>
                             <h3>Нет уроков</h3>
                             <p>Добавьте первый урок в расписание</p>
-                            <button class="btn btn-primary mt-4" id="addFirstScheduleBtn">
-                                <i class="fas fa-plus"></i>
-                                Добавить урок
-                            </button>
+                            <button class="btn btn-primary mt-4" id="addFirstScheduleBtn"><i class="fas fa-plus"></i> Добавить урок</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ПОЛЬЗОВАТЕЛИ -->
             <div id="usersTab" class="tab-content">
                 <div class="table-actions">
-                    <div class="table-search">
-                        <i class="fas fa-search table-search-icon"></i>
-                        <input type="text" class="table-search-input" id="usersSearch" placeholder="Поиск пользователей...">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="usersSearch" placeholder="Поиск пользователей...">
                     </div>
-                    <div class="table-filters">
+                    <div class="filters">
                         <select class="select" style="width: auto;" id="roleFilter">
                             <option value="">Все роли</option>
-                            <option value="admin">Администратор</option>
-                            <option value="teacher">Учитель</option>
-                            <option value="student">Ученик</option>
-                            <option value="parent">Родитель</option>
+                            <option value="director">Директор</option>
+                            <option value="deputy_director">Заместитель директора</option>
                         </select>
-                        <button class="btn btn-primary" id="addUserBtn">
-                            <i class="fas fa-plus"></i>
-                            Добавить пользователя
-                        </button>
+                        <button class="btn btn-primary" id="addUserBtn"><i class="fas fa-plus"></i> Добавить пользователя</button>
                     </div>
                 </div>
 
@@ -1277,38 +444,17 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th style="width: 40px;">
-                                            <input type="checkbox" id="selectAllUsers">
-                                        </th>
-                                        <th>Пользователь</th>
-                                        <th>Email</th>
-                                        <th>Роль</th>
-                                        <th>Телефон</th>
-                                        <th>Дата регистрации</th>
-                                        <th>Действия</th>
+                                        <th>Пользователь</th><th>Email</th><th>Роль</th><th>Телефон</th><th>Дата регистрации</th><th style="text-align: right;">Действия</th>
                                     </tr>
                                 </thead>
-                                <tbody id="usersTable">
-                                    <!-- Заполнится через JS -->
-                                </tbody>
+                                <tbody id="usersTable"></tbody>
                             </table>
                         </div>
-                        
-                        <div class="table-pagination">
-                            <div class="pagination-info">
-                                Показано <span id="usersFrom">1</span>-<span id="usersTo">10</span> из <span id="usersTotal">0</span>
-                            </div>
-                            <div class="pagination-controls">
-                                <button class="pagination-btn" id="usersPrev">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button class="pagination-btn active">1</button>
-                                <button class="pagination-btn">2</button>
-                                <button class="pagination-btn">3</button>
-                                <button class="pagination-btn" id="usersNext">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
+                        <div class="empty-state" id="emptyUsers" style="display: none;">
+                            <i class="fas fa-users"></i>
+                            <h3>Нет пользователей</h3>
+                            <p>Добавьте первого пользователя в систему</p>
+                            <button class="btn btn-primary mt-4" id="addFirstUserBtn"><i class="fas fa-plus"></i> Добавить пользователя</button>
                         </div>
                     </div>
                 </div>
@@ -1316,227 +462,230 @@
         </div>
     </main>
 
-    <!-- МОДАЛЬНЫЕ ОКНА -->
-    
-    <!-- Объявление -->
-    <div class="dialog-overlay" id="announcementModal">
-        <div class="dialog">
-            <div class="dialog-header">
-                <h2 class="dialog-title" id="announcementModalTitle">Новое объявление</h2>
-                <button class="dialog-close" onclick="closeModal('announcementModal')">&times;</button>
-            </div>
-            <form id="announcementForm">
-                <div class="dialog-body">
-                    <div class="form-grid">
-                        <div class="form-full">
-                            <div class="input-group">
-                                <label class="input-label input-label-required">Заголовок</label>
-                                <input type="text" class="input" id="announcementTitle" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-full">
-                            <div class="input-group">
-                                <label class="input-label input-label-required">Содержание</label>
-                                <textarea class="textarea" id="announcementContent" rows="4" required></textarea>
-                            </div>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label class="input-label input-label-required">Категория</label>
-                            <select class="select" id="announcementCategory" required>
-                                <option value="all">Для всех</option>
-                                <option value="students">Ученикам</option>
-                                <option value="teachers">Учителям</option>
-                                <option value="parents">Родителям</option>
-                            </select>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label class="input-label input-label-required">Тип</label>
-                            <select class="select" id="announcementType" required>
-                                <option value="announcement">Объявление</option>
-                                <option value="news">Новость</option>
-                                <option value="event">Мероприятие</option>
-                            </select>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label class="input-label">Приоритет</label>
-                            <select class="select" id="announcementPriority">
-                                <option value="normal">Обычный</option>
-                                <option value="high">Высокий</option>
-                                <option value="urgent">Срочный</option>
-                            </select>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label class="input-label input-label-required">Автор</label>
-                            <input type="text" class="input" id="announcementAuthor" required>
-                        </div>
-                        
-                        <div class="input-group form-full">
-                            <label class="switch">
-                                <input type="checkbox" class="switch-input" id="announcementPinned">
-                                <span class="switch-toggle"></span>
-                                <span class="switch-label">Закрепить объявление</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="dialog-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('announcementModal')">Отмена</button>
-                    <button type="submit" class="btn btn-primary" id="announcementSubmitBtn">
-                        Сохранить
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Расписание -->
-    <div class="dialog-overlay" id="scheduleModal">
-        <div class="dialog">
-            <div class="dialog-header">
-                <h2 class="dialog-title" id="scheduleModalTitle">Новый урок</h2>
-                <button class="dialog-close" onclick="closeModal('scheduleModal')">&times;</button>
+    <!-- Модалки -->
+    <div class="modal-backdrop" id="scheduleModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="scheduleModalTitle">Новый урок</h3>
+                <button class="modal-close" data-modal="scheduleModal">&times;</button>
             </div>
             <form id="scheduleForm">
-                <div class="dialog-body">
+                <div class="modal-body">
                     <div class="form-grid">
-                        <div class="input-group">
-                            <label class="input-label input-label-required">Класс</label>
-                            <input type="text" class="input" id="scheduleClass" required placeholder="11А">
+                        <div class="form-full">
+                            <div class="input-group">
+                                <label class="input-label input-label-required">Класс</label>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <select class="select" id="scheduleClass" required style="flex: 1;">
+                                        <option value="">Выберите класс</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary btn-sm" id="showAddClassBtn"><i class="fas fa-plus"></i></button>
+                                    <button type="button" class="btn btn-danger btn-sm" id="showDeleteClassBtn"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="add-class-section" id="addClassSection" style="display: none;">
+                                <div class="input-group">
+                                    <label class="input-label">Добавить новый класс</label>
+                                    <div style="display: flex; gap: 8px;">
+                                        <input type="text" class="input" id="newClassName" placeholder="Например: 7В" style="flex: 1;">
+                                        <button type="button" class="btn btn-success btn-sm" id="addClassBtn"><i class="fas fa-check"></i> Добавить</button>
+                                        <button type="button" class="btn btn-secondary btn-sm" id="cancelAddClassBtn"><i class="fas fa-times"></i> Отмена</button>
+                                    </div>
+                                    <div class="input-help">Формат: цифра + буква (например: 5А, 10Б)</div>
+                                </div>
+                            </div>
+                            <div class="delete-class-section" id="deleteClassSection" style="display: none;">
+                                <div class="input-group">
+                                    <label class="input-label">Выберите класс для удаления</label>
+                                    <div id="deleteClassList" style="display: grid; gap: 8px; margin-top: 10px;"></div>
+                                    <button type="button" class="btn btn-secondary btn-sm" id="cancelDeleteClassBtn" style="margin-top: 10px;"><i class="fas fa-times"></i> Отмена</button>
+                                </div>
+                            </div>
                         </div>
-                        
                         <div class="input-group">
                             <label class="input-label input-label-required">День недели</label>
                             <select class="select" id="scheduleDay" required>
-                                <option value="monday">Понедельник</option>
-                                <option value="tuesday">Вторник</option>
-                                <option value="wednesday">Среда</option>
-                                <option value="thursday">Четверг</option>
-                                <option value="friday">Пятница</option>
-                                <option value="saturday">Суббота</option>
+                                <option value="">Выберите день</option>
+                                <option value="monday">Понедельник</option><option value="tuesday">Вторник</option>
+                                <option value="wednesday">Среда</option><option value="thursday">Четверг</option>
+                                <option value="friday">Пятница</option><option value="saturday">Суббота</option>
                             </select>
                         </div>
-                        
-                        <div class="input-group">
-                            <label class="input-label input-label-required">Номер урока</label>
-                            <input type="number" class="input" id="scheduleLessonNumber" min="1" max="8" required>
+                        <div class="form-full">
+                            <div class="input-group">
+                                <label class="input-label input-label-required">Время урока</label>
+                                <div class="time-input-group">
+                                    <input type="time" class="input" id="scheduleStartTime" required style="flex: 1;">
+                                    <span>до</span>
+                                    <input type="time" class="input" id="scheduleEndTime" required style="flex: 1;">
+                                </div>
+                            </div>
                         </div>
-                        
                         <div class="input-group">
                             <label class="input-label input-label-required">Предмет</label>
-                            <input type="text" class="input" id="scheduleSubject" required>
+                            <input type="text" class="input" id="scheduleSubject" required placeholder="Например: Математика">
                         </div>
-                        
                         <div class="input-group">
-                            <label class="input-label">Учитель</label>
-                            <input type="text" class="input" id="scheduleTeacher">
+                            <label class="input-label input-label-required">Учитель</label>
+                            <input type="text" class="input" id="scheduleTeacher" required placeholder="ФИО учителя">
                         </div>
-                        
                         <div class="input-group">
                             <label class="input-label">Кабинет</label>
-                            <input type="text" class="input" id="scheduleRoom">
-                        </div>
-                        
-                        <div class="input-group">
-                            <label class="input-label input-label-required">Время начала</label>
-                            <input type="time" class="input" id="scheduleStartTime" required>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label class="input-label input-label-required">Время окончания</label>
-                            <input type="time" class="input" id="scheduleEndTime" required>
+                            <input type="text" class="input" id="scheduleRoom" placeholder="Например: 205">
                         </div>
                     </div>
+                    <div class="input-group">
+                        <label class="input-label">Примечания</label>
+                        <textarea class="textarea" id="scheduleNotes" placeholder="Дополнительная информация..." rows="2"></textarea>
+                    </div>
                 </div>
-                <div class="dialog-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('scheduleModal')">Отмена</button>
-                    <button type="submit" class="btn btn-primary" id="scheduleSubmitBtn">
-                        Сохранить
-                    </button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-modal="scheduleModal" id="scheduleCancelBtn">Отмена</button>
+                    <button type="submit" class="btn btn-primary" id="saveScheduleBtn"><i class="fas fa-save"></i> Сохранить урок</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Пользователь -->
-    <div class="dialog-overlay" id="userModal">
-        <div class="dialog">
-            <div class="dialog-header">
-                <h2 class="dialog-title" id="userModalTitle">Новый пользователь</h2>
-                <button class="dialog-close" onclick="closeModal('userModal')">&times;</button>
+    <div class="modal-backdrop" id="announcementModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="announcementModalTitle">Новое объявление</h3>
+                <button class="modal-close" data-modal="announcementModal">&times;</button>
             </div>
-            <form id="userForm">
-                <div class="dialog-body">
+            <form id="announcementForm">
+                <div class="modal-body">
+                    <div class="input-group">
+                        <label class="input-label input-label-required">Заголовок</label>
+                        <input type="text" class="input" id="announcementTitle" required placeholder="Введите заголовок">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label input-label-required">Содержание</label>
+                        <textarea class="textarea" id="announcementContent" rows="4" required placeholder="Введите текст..."></textarea>
+                    </div>
+                    
+                    <!-- Загрузка файлов -->
+                    <div class="input-group">
+                        <label class="input-label">Прикрепленные файлы</label>
+                        <div class="file-upload">
+                            <input type="file" class="file-input" id="announcementFiles" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                            <label for="announcementFiles" class="file-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Перетащите файлы сюда или кликните для выбора</span>
+                            </label>
+                            <div class="file-list" id="announcementFileList"></div>
+                        </div>
+                    </div>
+                    
                     <div class="form-grid">
                         <div class="input-group">
-                            <label class="input-label input-label-required">ФИО</label>
-                            <input type="text" class="input" id="userFullName" required>
+                            <label class="input-label input-label-required">Категория</label>
+                            <select class="select" id="announcementCategory" required>
+                                <option value="">Выберите категорию</option>
+                                <option value="all">Для всех</option><option value="students">Ученикам</option>
+                                <option value="teachers">Учителям</option><option value="parents">Родителям</option>
+                            </select>
                         </div>
-                        
+                        <div class="input-group">
+                            <label class="input-label input-label-required">Тип</label>
+                            <select class="select" id="announcementType" required>
+                                <option value="">Выберите тип</option>
+                                <option value="announcement">Объявление</option><option value="news">Новость</option><option value="event">Мероприятие</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Приоритет</label>
+                            <select class="select" id="announcementPriority">
+                                <option value="normal">Обычный</option><option value="high">Высокий</option><option value="urgent">Срочный</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label input-label-required">Автор</label>
+                            <input type="text" class="input" id="announcementAuthor" required placeholder="ФИО автора">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label class="switch">
+                            <input type="checkbox" class="switch-input" id="announcementPinned">
+                            <span class="switch-toggle"></span>
+                            <span class="switch-label">Закрепить объявление</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-modal="announcementModal" id="announcementCancelBtn">Отмена</button>
+                    <button type="submit" class="btn btn-primary" id="announcementSubmitBtn"><i class="fas fa-save"></i> Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="userModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="userModalTitle">Новый пользователь</h3>
+                <button class="modal-close" data-modal="userModal">&times;</button>
+            </div>
+            <form id="userForm">
+                <div class="modal-body">
+                    <div class="input-group">
+                        <label class="input-label input-label-required">ФИО</label>
+                        <input type="text" class="input" id="userFullName" required placeholder="Введите полное имя">
+                    </div>
+                    <div class="form-grid">
                         <div class="input-group">
                             <label class="input-label input-label-required">Email</label>
-                            <input type="email" class="input" id="userEmail" required>
+                            <input type="email" class="input" id="userEmail" required placeholder="email@example.com">
                         </div>
-                        
                         <div class="input-group">
                             <label class="input-label">Телефон</label>
-                            <input type="tel" class="input" id="userPhone">
+                            <input type="tel" class="input" id="userPhone" placeholder="+7 (999) 123-45-67">
                         </div>
-                        
+                    </div>
+                    <div class="form-grid">
                         <div class="input-group">
                             <label class="input-label input-label-required">Роль</label>
                             <select class="select" id="userRole" required>
-                                <option value="student">Ученик</option>
-                                <option value="teacher">Учитель</option>
-                                <option value="parent">Родитель</option>
-                                <option value="admin">Администратор</option>
+                                <option value="">Выберите роль</option>
+                                <option value="director">Директор</option>
+                                <option value="deputy_director">Заместитель директора</option>
                             </select>
                         </div>
-                        
                         <div class="input-group">
                             <label class="input-label input-label-required">Пароль</label>
-                            <input type="password" class="input" id="userPassword" required>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label class="input-label input-label-required">Подтверждение пароля</label>
-                            <input type="password" class="input" id="userPasswordConfirm" required>
+                            <input type="password" class="input" id="userPassword" required placeholder="Введите пароль">
                         </div>
                     </div>
+                    <div class="input-group">
+                        <label class="input-label input-label-required">Подтверждение пароля</label>
+                        <input type="password" class="input" id="userPasswordConfirm" required placeholder="Повторите пароль">
+                    </div>
                 </div>
-                <div class="dialog-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('userModal')">Отмена</button>
-                    <button type="submit" class="btn btn-primary" id="userSubmitBtn">
-                        Сохранить
-                    </button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-modal="userModal" id="userCancelBtn">Отмена</button>
+                    <button type="submit" class="btn btn-primary" id="userSubmitBtn"><i class="fas fa-save"></i> Сохранить</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Подтверждение удаления -->
-    <div class="dialog-overlay" id="confirmModal">
-        <div class="dialog" style="max-width: 400px;">
-            <div class="dialog-header">
-                <h2 class="dialog-title" id="confirmModalTitle">Подтверждение</h2>
-                <button class="dialog-close" onclick="closeModal('confirmModal')">&times;</button>
+    <div class="modal-backdrop" id="confirmModal">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Подтверждение</h3>
+                <button class="modal-close" data-modal="confirmModal">&times;</button>
             </div>
-            <div class="dialog-body">
+            <div class="modal-body">
                 <p id="confirmModalMessage">Вы уверены, что хотите удалить этот элемент? Это действие нельзя отменить.</p>
             </div>
-            <div class="dialog-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('confirmModal')">Отмена</button>
-                <button type="button" class="btn btn-danger" id="confirmModalDelete">Удалить</button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-modal="confirmModal" id="confirmCancelBtn">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmModalDelete"><i class="fas fa-trash"></i> Удалить</button>
             </div>
         </div>
     </div>
 
     <script>
-        // === КОНСТАНТЫ И ДАННЫЕ ===
         const mockData = {
             announcements: [
                 { 
@@ -1547,9 +696,10 @@
                     type: 'announcement', 
                     date: '25.01.2024', 
                     pinned: true, 
-                    urgent: false,
-                    author: 'Директор школы',
-                    priority: 'normal'
+                    urgent: false, 
+                    author: 'Директор школы', 
+                    priority: 'normal',
+                    files: []
                 },
                 { 
                     id: '2', 
@@ -1559,233 +709,172 @@
                     type: 'announcement', 
                     date: '24.01.2024', 
                     pinned: false, 
-                    urgent: true,
-                    author: 'Администрация',
-                    priority: 'urgent'
-                },
-                { 
-                    id: '3', 
-                    title: 'Олимпиада по математике', 
-                    content: 'Приглашаем учащихся 9-11 классов...', 
-                    category: 'students', 
-                    type: 'event', 
-                    date: '23.01.2024', 
-                    pinned: false, 
-                    urgent: false,
-                    author: 'Учитель математики',
-                    priority: 'normal'
-                },
-                { 
-                    id: '4', 
-                    title: 'Методический совет', 
-                    content: 'Совещание для учителей...', 
-                    category: 'teachers', 
-                    type: 'announcement', 
-                    date: '22.01.2024', 
-                    pinned: true, 
-                    urgent: false,
-                    author: 'Методист',
-                    priority: 'high'
+                    urgent: true, 
+                    author: 'Администрация', 
+                    priority: 'urgent',
+                    files: []
                 }
             ],
-            
             schedule: [
-                { 
-                    id: '1', 
-                    class: '11А', 
-                    day: 'Понедельник', 
-                    dayValue: 'monday',
-                    lessonNumber: 1, 
-                    subject: 'Математика', 
-                    teacher: 'Иванова И.И.', 
-                    room: '203',
-                    startTime: '08:30',
-                    endTime: '09:15'
-                },
-                { 
-                    id: '2', 
-                    class: '11А', 
-                    day: 'Понедельник', 
-                    dayValue: 'monday',
-                    lessonNumber: 2, 
-                    subject: 'Физика', 
-                    teacher: 'Петров П.П.', 
-                    room: '104',
-                    startTime: '09:25',
-                    endTime: '10:10'
-                },
-                { 
-                    id: '3', 
-                    class: '10Б', 
-                    day: 'Вторник', 
-                    dayValue: 'tuesday',
-                    lessonNumber: 3, 
-                    subject: 'Химия', 
-                    teacher: 'Сидорова С.С.', 
-                    room: '305',
-                    startTime: '10:20',
-                    endTime: '11:05'
-                },
-                { 
-                    id: '4', 
-                    class: '9В', 
-                    day: 'Среда', 
-                    dayValue: 'wednesday',
-                    lessonNumber: 4, 
-                    subject: 'Литература', 
-                    teacher: 'Кузнецова К.К.', 
-                    room: '212',
-                    startTime: '11:25',
-                    endTime: '12:10'
-                }
+                { id: '1', class: '11А', day: 'Понедельник', dayValue: 'monday', startTime: '08:30', endTime: '09:15', subject: 'Математика', teacher: 'Иванова И.И.', room: '203', notes: '' },
+                { id: '2', class: '11А', day: 'Понедельник', dayValue: 'monday', startTime: '09:25', endTime: '10:10', subject: 'Физика', teacher: 'Петров П.П.', room: '104', notes: '' }
             ],
-            
             users: [
-                { 
-                    id: '1', 
-                    name: 'Иванов Иван Иванович', 
-                    initials: 'ИИ',
-                    email: 'teacher@school.ru', 
-                    phone: '+7 (999) 123-45-67', 
-                    role: 'admin', 
-                    date: '15.01.2024' 
-                },
-                { 
-                    id: '2', 
-                    name: 'Петрова Анна Сергеевна', 
-                    initials: 'ПА',
-                    email: 'parent@mail.ru', 
-                    phone: '+7 (999) 987-65-43', 
-                    role: 'parent', 
-                    date: '16.01.2024' 
-                },
-                { 
-                    id: '3', 
-                    name: 'Сидоров Алексей', 
-                    initials: 'СА',
-                    email: 'student@gmail.com', 
-                    phone: '+7 (999) 555-44-33', 
-                    role: 'student', 
-                    date: '17.01.2024' 
-                },
-                { 
-                    id: '4', 
-                    name: 'Кузнецова Мария', 
-                    initials: 'КМ',
-                    email: 'teacher2@school.ru', 
-                    phone: '+7 (999) 222-33-44', 
-                    role: 'teacher', 
-                    date: '18.01.2024' 
-                }
+                { id: '1', name: 'Иванов Иван Иванович', initials: 'ИИ', email: 'director@school.ru', phone: '+7 (999) 123-45-67', role: 'director', date: '15.01.2024' },
+                { id: '2', name: 'Петрова Анна Сергеевна', initials: 'ПА', email: 'deputy@school.ru', phone: '+7 (999) 987-65-43', role: 'deputy_director', date: '16.01.2024' }
             ]
         };
 
-        // === СОСТОЯНИЕ ===
-        let state = {
-            currentTab: 'dashboard',
-            editingItem: null,
-            deleteCallback: null,
-            selectedItems: {
-                announcements: [],
-                schedule: [],
-                users: []
-            }
-        };
+        let state = { currentTab: 'announcements', editingItem: null, deleteCallback: null };
+        let classesData = ["11А", "10А", "10Б", "9А", "9Б", "8А", "8Б"];
+        let announcementFiles = [];
 
-        // === УТИЛИТЫ ===
         function showAlert(message, type = 'success', title = '', duration = 5000) {
             const container = document.getElementById('alertsContainer');
             const alertId = 'alert-' + Date.now();
-            
+            const icons = { success: 'check-circle', error: 'exclamation-circle', warning: 'exclamation-triangle', info: 'info-circle' };
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
             alert.id = alertId;
             alert.innerHTML = `
-                <div class="alert-icon">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
-                </div>
-                <div class="alert-content">
-                    ${title ? `<div class="alert-title">${title}</div>` : ''}
-                    <div>${message}</div>
-                </div>
-                <button class="alert-close" onclick="document.getElementById('${alertId}').remove()">
-                    <i class="fas fa-times"></i>
-                </button>
+                <div class="alert-icon"><i class="fas fa-${icons[type]}"></i></div>
+                <div class="alert-content">${title ? `<div class="alert-title">${title}</div>` : ''}<div class="alert-message">${message}</div></div>
+                <button class="alert-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
             `;
-            
             container.appendChild(alert);
-            
-            if (duration > 0) {
-                setTimeout(() => {
-                    const el = document.getElementById(alertId);
-                    if (el) el.remove();
-                }, duration);
-            }
-            
+            if (duration > 0) setTimeout(() => { const el = document.getElementById(alertId); if (el) { el.style.transform = 'translateX(100%)'; el.style.opacity = '0'; setTimeout(() => el.remove(), 300); } }, duration);
             return alertId;
         }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            document.getElementById(modalId).querySelector('form')?.reset();
+        function openModal(modalId) { 
+            document.getElementById(modalId).classList.add('active'); 
+            document.body.style.overflow = 'hidden'; 
+        }
+        
+        function closeModal(modalId) { 
+            document.getElementById(modalId).classList.remove('active'); 
+            document.body.style.overflow = 'auto';
+            const form = document.querySelector(`#${modalId} form`); 
+            if (form) form.reset();
+            document.getElementById('addClassSection').style.display = 'none';
+            document.getElementById('deleteClassSection').style.display = 'none';
             state.editingItem = null;
+            announcementFiles = [];
+            updateFileList();
         }
 
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
+        function getCategoryLabel(category) { 
+            const labels = {'all':'Для всех','students':'Ученикам','teachers':'Учителям','parents':'Родителям'}; 
+            return labels[category] || category; 
+        }
+        
+        function getTypeLabel(type) { 
+            const labels = {'announcement':'Объявление','news':'Новость','event':'Мероприятие'}; 
+            return labels[type] || type; 
+        }
+        
+        function getRoleLabel(role) { 
+            const labels = {'director':'Директор','deputy_director':'Заместитель директора'}; 
+            return labels[role] || role; 
         }
 
-        function formatDate(dateStr) {
-            return dateStr;
+        function confirmDelete(message, callback) { 
+            state.deleteCallback = callback; 
+            document.getElementById('confirmModalMessage').textContent = message; 
+            openModal('confirmModal'); 
         }
 
-        function getCategoryLabel(category) {
-            const labels = {
-                'all': 'Для всех',
-                'students': 'Ученикам',
-                'teachers': 'Учителям',
-                'parents': 'Родителям'
-            };
-            return labels[category] || category;
+        function updateClassSelect() {
+            const select = document.getElementById('scheduleClass');
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Выберите класс</option>';
+            classesData.sort().forEach(className => { 
+                const option = document.createElement('option'); 
+                option.value = className; 
+                option.textContent = className; 
+                select.appendChild(option); 
+            });
+            if (classesData.includes(currentValue)) select.value = currentValue;
+            document.getElementById('showDeleteClassBtn').disabled = classesData.length === 0;
         }
 
-        function getTypeLabel(type) {
-            const labels = {
-                'announcement': 'Объявление',
-                'news': 'Новость',
-                'event': 'Мероприятие'
-            };
-            return labels[type] || type;
+        function updateClassFilter() {
+            const filter = document.getElementById('classFilter');
+            filter.innerHTML = '<option value="">Все классы</option>';
+            classesData.sort().forEach(className => { 
+                const option = document.createElement('option'); 
+                option.value = className; 
+                option.textContent = className; 
+                filter.appendChild(option); 
+            });
         }
 
-        function getRoleLabel(role) {
-            const labels = {
-                'admin': 'Администратор',
-                'teacher': 'Учитель',
-                'student': 'Ученик',
-                'parent': 'Родитель'
-            };
-            return labels[role] || role;
+        function updateDeleteClassList() {
+            const container = document.getElementById('deleteClassList');
+            container.innerHTML = '';
+            classesData.sort().forEach(className => {
+                const div = document.createElement('div');
+                div.className = 'class-item';
+                div.innerHTML = `<span style="font-weight: 500;">${className}</span><button type="button" class="btn btn-danger btn-sm delete-class-btn" data-class="${className}"><i class="fas fa-trash"></i> Удалить</button>`;
+                container.appendChild(div);
+            });
         }
 
-        // === ИНИЦИАЛИЗАЦИЯ ===
+        // Функция для отображения списка файлов
+        function updateFileList() {
+            const fileList = document.getElementById('announcementFileList');
+            fileList.innerHTML = '';
+            
+            announcementFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <i class="fas fa-file"></i>
+                        <div>
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${formatFileSize(file.size)}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="file-remove" data-index="${index}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                fileList.appendChild(fileItem);
+            });
+            
+            // Добавляем обработчики для удаления файлов
+            fileList.querySelectorAll('.file-remove').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    announcementFiles.splice(index, 1);
+                    updateFileList();
+                });
+            });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Скрыть загрузку
-            setTimeout(() => {
-                document.getElementById('loadingScreen').style.display = 'none';
-            }, 800);
+            setTimeout(() => { document.getElementById('loadingScreen').style.display = 'none'; }, 800);
+            document.getElementById('scheduleStartTime').value = '08:30';
+            document.getElementById('scheduleEndTime').value = '09:15';
             
-            // Инициализировать табы
             initTabs();
-            
-            // Инициализировать таблицы
-            loadDashboard();
             loadAnnouncementsTable();
             loadScheduleTable();
             loadUsersTable();
-            
-            // Назначить обработчики
+            updateClassSelect();
+            updateClassFilter();
             initEventHandlers();
+            
+            document.querySelectorAll('.card').forEach(card => { card.classList.add('fade-in'); });
         });
 
         function initTabs() {
@@ -1793,462 +882,492 @@
                 btn.addEventListener('click', () => {
                     const tabId = btn.dataset.tab;
                     state.currentTab = tabId;
-                    
-                    // Обновить активные табы
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    
                     btn.classList.add('active');
-                    document.getElementById(tabId + 'Tab').classList.add('active');
+                    const tabContent = document.getElementById(tabId + 'Tab');
+                    tabContent.classList.add('active');
+                    tabContent.querySelectorAll('.card').forEach(card => { card.classList.add('fade-in'); });
                 });
             });
         }
 
         function initEventHandlers() {
-            // Кнопки добавления
-            document.getElementById('addAnnouncementBtn').addEventListener('click', () => {
-                document.getElementById('announcementModalTitle').textContent = 'Новое объявление';
-                openModal('announcementModal');
+            // Исправленные обработчики закрытия модалок
+            document.querySelectorAll('.modal-close').forEach(btn => { 
+                btn.addEventListener('click', function() { 
+                    const modalId = this.dataset.modal;
+                    closeModal(modalId); 
+                }); 
             });
             
-            document.getElementById('addScheduleBtn').addEventListener('click', () => {
-                document.getElementById('scheduleModalTitle').textContent = 'Новый урок';
-                openModal('scheduleModal');
+            // Кнопки отмены в модалках (исправлено)
+            document.getElementById('scheduleCancelBtn').addEventListener('click', function() { 
+                closeModal('scheduleModal'); 
             });
             
-            document.getElementById('addFirstScheduleBtn').addEventListener('click', () => {
-                document.getElementById('scheduleModalTitle').textContent = 'Новый урок';
-                openModal('scheduleModal');
+            document.getElementById('announcementCancelBtn').addEventListener('click', function() { 
+                closeModal('announcementModal'); 
             });
             
-            document.getElementById('addUserBtn').addEventListener('click', () => {
-                document.getElementById('userModalTitle').textContent = 'Новый пользователь';
-                openModal('userModal');
+            document.getElementById('userCancelBtn').addEventListener('click', function() { 
+                closeModal('userModal'); 
             });
             
-            // Формы
-            document.getElementById('announcementForm').addEventListener('submit', handleAnnouncementSubmit);
-            document.getElementById('scheduleForm').addEventListener('submit', handleScheduleSubmit);
-            document.getElementById('userForm').addEventListener('submit', handleUserSubmit);
+            document.getElementById('confirmCancelBtn').addEventListener('click', function() { 
+                closeModal('confirmModal'); 
+            });
             
-            // Кнопка выхода
-            document.getElementById('logoutBtn').addEventListener('click', () => {
-                if (confirm('Вы уверены, что хотите выйти?')) {
-                    showAlert('Выход из системы...', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 1000);
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => { 
+                backdrop.addEventListener('click', function(e) { 
+                    if (e.target === this) closeModal(this.id); 
+                }); 
+            });
+            
+            document.addEventListener('keydown', (e) => { 
+                if (e.key === 'Escape') document.querySelectorAll('.modal-backdrop.active').forEach(modal => { closeModal(modal.id); }); 
+            });
+            
+            // Остальные обработчики
+            document.getElementById('addAnnouncementBtn').addEventListener('click', () => { 
+                document.getElementById('announcementModalTitle').textContent = 'Новое объявление'; 
+                announcementFiles = [];
+                updateFileList();
+                openModal('announcementModal'); 
+            });
+            
+            document.getElementById('addFirstAnnouncementBtn').addEventListener('click', () => { 
+                document.getElementById('announcementModalTitle').textContent = 'Новое объявление'; 
+                announcementFiles = [];
+                updateFileList();
+                openModal('announcementModal'); 
+            });
+            
+            document.getElementById('addScheduleBtn').addEventListener('click', () => { 
+                document.getElementById('scheduleModalTitle').textContent = 'Добавить урок'; 
+                openModal('scheduleModal'); 
+                updateClassSelect(); 
+            });
+            
+            document.getElementById('addFirstScheduleBtn').addEventListener('click', () => { 
+                document.getElementById('scheduleModalTitle').textContent = 'Добавить урок'; 
+                openModal('scheduleModal'); 
+                updateClassSelect(); 
+            });
+            
+            document.getElementById('addUserBtn').addEventListener('click', () => { 
+                document.getElementById('userModalTitle').textContent = 'Новый пользователь'; 
+                openModal('userModal'); 
+            });
+            
+            document.getElementById('addFirstUserBtn').addEventListener('click', () => { 
+                document.getElementById('userModalTitle').textContent = 'Новый пользователь'; 
+                openModal('userModal'); 
+            });
+            
+            // Обработка загрузки файлов
+            const fileInput = document.getElementById('announcementFiles');
+            fileInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                announcementFiles.push(...files);
+                updateFileList();
+                fileInput.value = '';
+            });
+            
+            // Drag and drop для файлов
+            const fileLabel = document.querySelector('.file-label');
+            fileLabel.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.borderColor = 'var(--primary)';
+                this.style.background = 'var(--primary-light)';
+            });
+            
+            fileLabel.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '';
+                this.style.background = '';
+            });
+            
+            fileLabel.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '';
+                this.style.background = '';
+                
+                const files = Array.from(e.dataTransfer.files);
+                announcementFiles.push(...files);
+                updateFileList();
+            });
+            
+            document.getElementById('showAddClassBtn').addEventListener('click', function() { 
+                document.getElementById('addClassSection').style.display = 'block'; 
+                document.getElementById('deleteClassSection').style.display = 'none'; 
+                document.getElementById('newClassName').focus(); 
+            });
+            
+            document.getElementById('showDeleteClassBtn').addEventListener('click', function() { 
+                document.getElementById('deleteClassSection').style.display = 'block'; 
+                document.getElementById('addClassSection').style.display = 'none'; 
+                updateDeleteClassList(); 
+            });
+            
+            document.getElementById('addClassBtn').addEventListener('click', function() {
+                const className = document.getElementById('newClassName').value.trim().toUpperCase();
+                if (!className) { showAlert('Введите название класса', 'error', 'Ошибка'); return; }
+                if (!/^\d+[А-ЯЁ]$/.test(className)) { showAlert('Формат: "11А" (цифра + заглавная буква)', 'error', 'Ошибка'); return; }
+                if (classesData.includes(className)) { showAlert('Такой класс уже существует', 'warning', 'Внимание'); return; }
+                classesData.push(className); 
+                classesData.sort();
+                updateClassSelect(); 
+                updateClassFilter();
+                document.getElementById('scheduleClass').value = className;
+                document.getElementById('addClassSection').style.display = 'none';
+                document.getElementById('newClassName').value = '';
+                showAlert(`Класс "${className}" успешно добавлен!`, 'success', 'Успех');
+            });
+            
+            document.getElementById('cancelAddClassBtn').addEventListener('click', function() { 
+                document.getElementById('addClassSection').style.display = 'none'; 
+                document.getElementById('newClassName').value = ''; 
+            });
+            
+            document.getElementById('cancelDeleteClassBtn').addEventListener('click', function() { 
+                document.getElementById('deleteClassSection').style.display = 'none'; 
+            });
+            
+            document.getElementById('deleteClassList').addEventListener('click', function(e) {
+                if (e.target.closest('.delete-class-btn')) {
+                    const btn = e.target.closest('.delete-class-btn');
+                    const className = btn.dataset.class;
+                    confirmDelete(`Удалить класс "${className}"? Это также удалит все уроки этого класса.`, () => {
+                        classesData = classesData.filter(c => c !== className);
+                        updateClassSelect(); updateClassFilter(); updateDeleteClassList();
+                        mockData.schedule = mockData.schedule.filter(lesson => lesson.class !== className);
+                        loadScheduleTable();
+                        if (classesData.length === 0) document.getElementById('deleteClassSection').style.display = 'none';
+                        showAlert(`Класс "${className}" успешно удален! Все уроки этого класса также были удалены.`, 'success', 'Удалено');
+                    });
                 }
             });
             
-            // Подтверждение удаления
-            document.getElementById('confirmModalDelete').addEventListener('click', () => {
-                if (state.deleteCallback) {
-                    state.deleteCallback();
-                }
-                closeModal('confirmModal');
+            document.getElementById('confirmModalDelete').addEventListener('click', function() { 
+                if (state.deleteCallback) { state.deleteCallback(); state.deleteCallback = null; } 
+                closeModal('confirmModal'); 
             });
+            
+            document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = {
+                    id: state.editingItem ? state.editingItem.id : 'schedule-' + Date.now(),
+                    class: document.getElementById('scheduleClass').value,
+                    dayValue: document.getElementById('scheduleDay').value,
+                    day: document.getElementById('scheduleDay').selectedOptions[0].text,
+                    startTime: document.getElementById('scheduleStartTime').value,
+                    endTime: document.getElementById('scheduleEndTime').value,
+                    subject: document.getElementById('scheduleSubject').value,
+                    teacher: document.getElementById('scheduleTeacher').value,
+                    room: document.getElementById('scheduleRoom').value,
+                    notes: document.getElementById('scheduleNotes').value
+                };
+                if (state.editingItem) {
+                    const index = mockData.schedule.findIndex(item => item.id === state.editingItem.id);
+                    if (index !== -1) { mockData.schedule[index] = formData; showAlert('Урок обновлен!', 'success', 'Успех'); }
+                } else { mockData.schedule.push(formData); showAlert('Урок добавлен!', 'success', 'Успех'); }
+                loadScheduleTable(); closeModal('scheduleModal');
+            });
+            
+            document.getElementById('announcementForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = {
+                    id: state.editingItem ? state.editingItem.id : 'announcement-' + Date.now(),
+                    title: document.getElementById('announcementTitle').value,
+                    content: document.getElementById('announcementContent').value,
+                    category: document.getElementById('announcementCategory').value,
+                    type: document.getElementById('announcementType').value,
+                    date: new Date().toLocaleDateString('ru-RU'),
+                    pinned: document.getElementById('announcementPinned').checked,
+                    author: document.getElementById('announcementAuthor').value,
+                    priority: document.getElementById('announcementPriority').value,
+                    urgent: document.getElementById('announcementPriority').value === 'urgent',
+                    files: announcementFiles.map(file => ({ name: file.name, size: file.size, type: file.type }))
+                };
+                if (state.editingItem) {
+                    const index = mockData.announcements.findIndex(item => item.id === state.editingItem.id);
+                    if (index !== -1) { mockData.announcements[index] = formData; showAlert('Объявление обновлено!', 'success', 'Успех'); }
+                } else { mockData.announcements.unshift(formData); showAlert('Объявление добавлено!', 'success', 'Успех'); }
+                loadAnnouncementsTable(); closeModal('announcementModal');
+            });
+            
+            document.getElementById('userForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const password = document.getElementById('userPassword').value;
+                const confirmPassword = document.getElementById('userPasswordConfirm').value;
+                if (password !== confirmPassword) { showAlert('Пароли не совпадают!', 'error', 'Ошибка'); return; }
+                const name = document.getElementById('userFullName').value;
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+                const formData = {
+                    id: state.editingItem ? state.editingItem.id : 'user-' + Date.now(),
+                    name: name, initials: initials,
+                    email: document.getElementById('userEmail').value,
+                    phone: document.getElementById('userPhone').value,
+                    role: document.getElementById('userRole').value,
+                    date: new Date().toLocaleDateString('ru-RU')
+                };
+                if (state.editingItem) {
+                    const index = mockData.users.findIndex(item => item.id === state.editingItem.id);
+                    if (index !== -1) { mockData.users[index] = formData; showAlert('Пользователь обновлен!', 'success', 'Успех'); }
+                } else { mockData.users.push(formData); showAlert('Пользователь добавлен!', 'success', 'Успех'); }
+                loadUsersTable(); closeModal('userModal');
+            });
+            
+            document.getElementById('announcementsSearch').addEventListener('input', filterAnnouncements);
+            document.getElementById('categoryFilter').addEventListener('change', filterAnnouncements);
+            document.getElementById('typeFilter').addEventListener('change', filterAnnouncements);
+            document.getElementById('scheduleSearch').addEventListener('input', filterSchedule);
+            document.getElementById('classFilter').addEventListener('change', filterSchedule);
+            document.getElementById('dayFilter').addEventListener('change', filterSchedule);
+            document.getElementById('usersSearch').addEventListener('input', filterUsers);
+            document.getElementById('roleFilter').addEventListener('change', filterUsers);
+            
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                confirmDelete('Вы уверены, что хотите выйти?', function() {
+                    showAlert('Вы успешно вышли из системы', 'success', 'Выход');
+                    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+                });
+            });
+            
+            document.getElementById('announcementsTable').addEventListener('click', handleTableActions);
+            document.getElementById('scheduleTable').addEventListener('click', handleTableActions);
+            document.getElementById('usersTable').addEventListener('click', handleTableActions);
         }
 
-        function confirmDelete(message, callback) {
-            state.deleteCallback = callback;
-            document.getElementById('confirmModalMessage').textContent = message;
-            openModal('confirmModal');
-        }
-
-        // === ДАШБОРД ===
-        function loadDashboard() {
-            // Обновить статистику
-            document.getElementById('totalAnnouncements').textContent = mockData.announcements.length;
-            document.getElementById('totalLessons').textContent = mockData.schedule.length;
-            document.getElementById('totalUsers').textContent = mockData.users.length;
-            document.getElementById('activeUsers').textContent = Math.floor(Math.random() * 50) + 20;
+        function handleTableActions(e) {
+            const btn = e.target.closest('button'); if (!btn) return;
+            const row = btn.closest('tr'); const id = row.dataset.id; const tableType = row.closest('tbody').id;
             
-            // Последние объявления
-            const recentAnnouncements = document.getElementById('recentAnnouncementsTable');
-            recentAnnouncements.innerHTML = mockData.announcements.slice(0, 5).map(item => `
-                <tr>
-                    <td>${item.title}</td>
-                    <td><span class="badge badge-primary">${getCategoryLabel(item.category)}</span></td>
-                    <td>${item.date}</td>
-                </tr>
-            `).join('');
-            
-            // Последние пользователи
-            const recentUsers = document.getElementById('recentUsersTable');
-            recentUsers.innerHTML = mockData.users.slice(0, 5).map(user => `
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <div class="avatar">${user.initials}</div>
-                            ${user.name}
-                        </div>
-                    </td>
-                    <td><span class="badge ${user.role === 'admin' ? 'badge-danger' : user.role === 'teacher' ? 'badge-success' : 'badge-secondary'}">${getRoleLabel(user.role)}</span></td>
-                    <td>${user.date}</td>
-                </tr>
-            `).join('');
-        }
-
-        // === ОБЪЯВЛЕНИЯ ===
-        function loadAnnouncementsTable(filter = '') {
-            const table = document.getElementById('announcementsTable');
-            const filtered = mockData.announcements.filter(item => 
-                !filter || 
-                item.title.toLowerCase().includes(filter.toLowerCase()) ||
-                item.content.toLowerCase().includes(filter.toLowerCase()) ||
-                item.author.toLowerCase().includes(filter.toLowerCase())
-            );
-            
-            if (filtered.length === 0) {
-                table.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center" style="padding: 3rem;">
-                            <i class="fas fa-bell" style="font-size: 2rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
-                            <p>Нет объявлений</p>
-                        </td>
-                    </tr>
-                `;
-                return;
+            if (btn.classList.contains('edit-btn')) {
+                if (tableType === 'announcementsTable') {
+                    const item = mockData.announcements.find(a => a.id === id);
+                    if (item) {
+                        state.editingItem = item;
+                        document.getElementById('announcementModalTitle').textContent = 'Редактировать объявление';
+                        document.getElementById('announcementTitle').value = item.title;
+                        document.getElementById('announcementContent').value = item.content;
+                        document.getElementById('announcementCategory').value = item.category;
+                        document.getElementById('announcementType').value = item.type;
+                        document.getElementById('announcementPriority').value = item.priority || 'normal';
+                        document.getElementById('announcementAuthor').value = item.author;
+                        document.getElementById('announcementPinned').checked = item.pinned || false;
+                        announcementFiles = item.files || [];
+                        updateFileList();
+                        openModal('announcementModal');
+                    }
+                } else if (tableType === 'scheduleTable') {
+                    const item = mockData.schedule.find(s => s.id === id);
+                    if (item) {
+                        state.editingItem = item;
+                        document.getElementById('scheduleModalTitle').textContent = 'Редактировать урок';
+                        document.getElementById('scheduleClass').value = item.class;
+                        document.getElementById('scheduleDay').value = item.dayValue;
+                        document.getElementById('scheduleStartTime').value = item.startTime;
+                        document.getElementById('scheduleEndTime').value = item.endTime;
+                        document.getElementById('scheduleSubject').value = item.subject;
+                        document.getElementById('scheduleTeacher').value = item.teacher;
+                        document.getElementById('scheduleRoom').value = item.room || '';
+                        document.getElementById('scheduleNotes').value = item.notes || '';
+                        openModal('scheduleModal');
+                    }
+                } else if (tableType === 'usersTable') {
+                    const item = mockData.users.find(u => u.id === id);
+                    if (item) {
+                        state.editingItem = item;
+                        document.getElementById('userModalTitle').textContent = 'Редактировать пользователя';
+                        document.getElementById('userFullName').value = item.name;
+                        document.getElementById('userEmail').value = item.email;
+                        document.getElementById('userPhone').value = item.phone || '';
+                        document.getElementById('userRole').value = item.role;
+                        document.getElementById('userPassword').required = false;
+                        document.getElementById('userPasswordConfirm').required = false;
+                        openModal('userModal');
+                    }
+                }
+            } else if (btn.classList.contains('delete-btn')) {
+                let message = 'Вы уверены, что хотите удалить этот элемент?'; let callback;
+                if (tableType === 'announcementsTable') {
+                    message = 'Удалить это объявление?'; callback = () => { mockData.announcements = mockData.announcements.filter(a => a.id !== id); loadAnnouncementsTable(); showAlert('Объявление удалено!', 'success', 'Удалено'); };
+                } else if (tableType === 'scheduleTable') {
+                    message = 'Удалить этот урок из расписания?'; callback = () => { mockData.schedule = mockData.schedule.filter(s => s.id !== id); loadScheduleTable(); showAlert('Урок удален!', 'success', 'Удалено'); };
+                } else if (tableType === 'usersTable') {
+                    message = 'Удалить этого пользователя? Все связанные данные будут удалены.'; callback = () => { mockData.users = mockData.users.filter(u => u.id !== id); loadUsersTable(); showAlert('Пользователь удален!', 'success', 'Удалено'); };
+                }
+                confirmDelete(message, callback);
             }
-            
-            table.innerHTML = filtered.map(item => `
-                <tr>
+        }
+
+        function loadAnnouncementsTable() {
+            const tbody = document.getElementById('announcementsTable'); const emptyState = document.getElementById('emptyAnnouncements');
+            tbody.innerHTML = '';
+            if (mockData.announcements.length === 0) { tbody.style.display = 'none'; emptyState.style.display = 'block'; return; }
+            tbody.style.display = ''; emptyState.style.display = 'none';
+            mockData.announcements.forEach(item => {
+                const row = document.createElement('tr'); row.dataset.id = item.id;
+                row.innerHTML = `
                     <td>
-                        <input type="checkbox" class="select-item" data-id="${item.id}" data-type="announcement">
-                    </td>
-                    <td>
-                        <div>
-                            <div style="font-weight: 500;">${item.title}</div>
-                            <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">${item.author}</div>
+                        <div style="font-weight: 500;">${item.title}</div>
+                        <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem;">
+                            ${item.content.substring(0,60)}${item.content.length > 60 ? '...' : ''}
+                            ${item.files && item.files.length > 0 ? `<br><i class="fas fa-paperclip" style="margin-right: 4px;"></i>${item.files.length} файл(ов)` : ''}
                         </div>
                     </td>
-                    <td><span class="badge badge-primary">${getCategoryLabel(item.category)}</span></td>
+                    <td><span class="badge badge-secondary">${getCategoryLabel(item.category)}</span></td>
                     <td>${getTypeLabel(item.type)}</td>
-                    <td>${item.date}</td>
-                    <td>
-                        ${item.pinned ? '<span class="badge badge-warning">📌</span>' : ''}
-                        ${item.urgent ? '<span class="badge badge-danger">⚠️</span>' : ''}
-                    </td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="action-btn edit" onclick="editAnnouncement('${item.id}')" title="Редактировать">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn delete" onclick="deleteAnnouncement('${item.id}', '${item.title}')" title="Удалить">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-            
-            // Обновить пагинацию
-            document.getElementById('announcementsTotal').textContent = filtered.length;
-            document.getElementById('announcementsFrom').textContent = 1;
-            document.getElementById('announcementsTo').textContent = Math.min(filtered.length, 10);
-        }
-
-        function editAnnouncement(id) {
-            const item = mockData.announcements.find(a => a.id === id);
-            if (!item) return;
-            
-            state.editingItem = item;
-            
-            // Заполнить форму
-            document.getElementById('announcementModalTitle').textContent = 'Редактировать объявление';
-            document.getElementById('announcementTitle').value = item.title;
-            document.getElementById('announcementContent').value = item.content;
-            document.getElementById('announcementCategory').value = item.category;
-            document.getElementById('announcementType').value = item.type;
-            document.getElementById('announcementPriority').value = item.priority;
-            document.getElementById('announcementAuthor').value = item.author;
-            document.getElementById('announcementPinned').checked = item.pinned;
-            
-            openModal('announcementModal');
-        }
-
-        function deleteAnnouncement(id, title) {
-            confirmDelete(`Вы уверены, что хотите удалить объявление "${title}"?`, () => {
-                // Здесь бы отправили запрос на сервер
-                mockData.announcements = mockData.announcements.filter(a => a.id !== id);
-                loadAnnouncementsTable();
-                loadDashboard();
-                showAlert('Объявление удалено', 'success');
+                    <td>${item.date} ${item.pinned ? '<i class="fas fa-thumbtack" style="color: var(--warning); margin-left: 0.5rem;" title="Закреплено"></i>' : ''}</td>
+                    <td><span class="badge ${item.urgent ? 'badge-danger' : 'badge-success'}">${item.urgent ? 'Срочное' : 'Активно'}</span></td>
+                    <td class="text-right"><div class="action-buttons"><button class="action-btn edit-btn" title="Редактировать"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" title="Удалить"><i class="fas fa-trash"></i></button></div></td>
+                `;
+                tbody.appendChild(row);
             });
         }
 
-        function handleAnnouncementSubmit(e) {
-            e.preventDefault();
-            
-            const formData = {
-                title: document.getElementById('announcementTitle').value,
-                content: document.getElementById('announcementContent').value,
-                category: document.getElementById('announcementCategory').value,
-                type: document.getElementById('announcementType').value,
-                priority: document.getElementById('announcementPriority').value,
-                author: document.getElementById('announcementAuthor').value,
-                pinned: document.getElementById('announcementPinned').checked,
-                urgent: document.getElementById('announcementPriority').value === 'urgent',
-                date: new Date().toLocaleDateString('ru-RU')
-            };
-            
-            if (state.editingItem) {
-                // Редактирование
-                const index = mockData.announcements.findIndex(a => a.id === state.editingItem.id);
-                if (index !== -1) {
-                    mockData.announcements[index] = { ...mockData.announcements[index], ...formData };
-                }
-                showAlert('Объявление обновлено', 'success');
-            } else {
-                // Создание
-                formData.id = Date.now().toString();
-                mockData.announcements.unshift(formData);
-                showAlert('Объявление создано', 'success');
-            }
-            
-            closeModal('announcementModal');
-            loadAnnouncementsTable();
-            loadDashboard();
-        }
-
-        // === РАСПИСАНИЕ ===
-        function loadScheduleTable(filter = '') {
-            const table = document.getElementById('scheduleTable');
-            const emptyState = document.getElementById('emptySchedule');
-            const filtered = mockData.schedule.filter(item => 
-                !filter || 
-                item.class.toLowerCase().includes(filter.toLowerCase()) ||
-                item.subject.toLowerCase().includes(filter.toLowerCase()) ||
-                item.teacher.toLowerCase().includes(filter.toLowerCase())
-            );
-            
-            if (filtered.length === 0) {
-                table.innerHTML = '';
-                emptyState.style.display = 'block';
-                return;
-            }
-            
-            emptyState.style.display = 'none';
-            table.innerHTML = filtered.map(item => `
-                <tr>
-                    <td>
-                        <input type="checkbox" class="select-item" data-id="${item.id}" data-type="schedule">
-                    </td>
-                    <td>${item.class}</td>
+        function loadScheduleTable() {
+            const tbody = document.getElementById('scheduleTable'); const emptyState = document.getElementById('emptySchedule');
+            tbody.innerHTML = '';
+            if (mockData.schedule.length === 0) { tbody.style.display = 'none'; emptyState.style.display = 'block'; return; }
+            tbody.style.display = ''; emptyState.style.display = 'none';
+            mockData.schedule.forEach(item => {
+                const row = document.createElement('tr'); row.dataset.id = item.id;
+                row.innerHTML = `
+                    <td><span class="badge badge-primary">${item.class}</span></td>
                     <td>${item.day}</td>
-                    <td>${item.lessonNumber}</td>
-                    <td>${item.subject}</td>
+                    <td>${item.startTime} - ${item.endTime}</td>
+                    <td><strong>${item.subject}</strong></td>
                     <td>${item.teacher}</td>
-                    <td>${item.room}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="action-btn edit" onclick="editSchedule('${item.id}')" title="Редактировать">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn delete" onclick="deleteSchedule('${item.id}', '${item.subject}')" title="Удалить">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function editSchedule(id) {
-            const item = mockData.schedule.find(s => s.id === id);
-            if (!item) return;
-            
-            state.editingItem = item;
-            
-            document.getElementById('scheduleModalTitle').textContent = 'Редактировать урок';
-            document.getElementById('scheduleClass').value = item.class;
-            document.getElementById('scheduleDay').value = item.dayValue;
-            document.getElementById('scheduleLessonNumber').value = item.lessonNumber;
-            document.getElementById('scheduleSubject').value = item.subject;
-            document.getElementById('scheduleTeacher').value = item.teacher;
-            document.getElementById('scheduleRoom').value = item.room;
-            document.getElementById('scheduleStartTime').value = item.startTime;
-            document.getElementById('scheduleEndTime').value = item.endTime;
-            
-            openModal('scheduleModal');
-        }
-
-        function deleteSchedule(id, subject) {
-            confirmDelete(`Вы уверены, что хотите удалить урок "${subject}"?`, () => {
-                mockData.schedule = mockData.schedule.filter(s => s.id !== id);
-                loadScheduleTable();
-                loadDashboard();
-                showAlert('Урок удален', 'success');
+                    <td>${item.room || '—'}</td>
+                    <td class="text-right"><div class="action-buttons"><button class="action-btn edit-btn" title="Редактировать"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" title="Удалить"><i class="fas fa-trash"></i></button></div></td>
+                `;
+                tbody.appendChild(row);
             });
         }
 
-        function handleScheduleSubmit(e) {
-            e.preventDefault();
-            
-            const formData = {
-                class: document.getElementById('scheduleClass').value,
-                dayValue: document.getElementById('scheduleDay').value,
-                day: document.getElementById('scheduleDay').selectedOptions[0].text,
-                lessonNumber: parseInt(document.getElementById('scheduleLessonNumber').value),
-                subject: document.getElementById('scheduleSubject').value,
-                teacher: document.getElementById('scheduleTeacher').value,
-                room: document.getElementById('scheduleRoom').value,
-                startTime: document.getElementById('scheduleStartTime').value,
-                endTime: document.getElementById('scheduleEndTime').value
-            };
-            
-            if (state.editingItem) {
-                const index = mockData.schedule.findIndex(s => s.id === state.editingItem.id);
-                if (index !== -1) {
-                    mockData.schedule[index] = { ...mockData.schedule[index], ...formData };
-                }
-                showAlert('Урок обновлен', 'success');
-            } else {
-                formData.id = Date.now().toString();
-                mockData.schedule.push(formData);
-                showAlert('Урок создан', 'success');
-            }
-            
-            closeModal('scheduleModal');
-            loadScheduleTable();
-            loadDashboard();
-        }
-
-        // === ПОЛЬЗОВАТЕЛИ ===
-        function loadUsersTable(filter = '') {
-            const table = document.getElementById('usersTable');
-            const filtered = mockData.users.filter(user => 
-                !filter || 
-                user.name.toLowerCase().includes(filter.toLowerCase()) ||
-                user.email.toLowerCase().includes(filter.toLowerCase()) ||
-                user.role.toLowerCase().includes(filter.toLowerCase())
-            );
-            
-            table.innerHTML = filtered.map(user => `
-                <tr>
-                    <td>
-                        <input type="checkbox" class="select-item" data-id="${user.id}" data-type="user">
-                    </td>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div class="avatar">${user.initials}</div>
-                            <div>
-                                <div style="font-weight: 500;">${user.name}</div>
-                                <div style="font-size: 0.75rem; color: #64748b;">ID: ${user.id}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>${user.email}</td>
-                    <td><span class="badge ${user.role === 'admin' ? 'badge-danger' : user.role === 'teacher' ? 'badge-success' : user.role === 'student' ? 'badge-primary' : 'badge-secondary'}">${getRoleLabel(user.role)}</span></td>
-                    <td>${user.phone}</td>
-                    <td>${user.date}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="action-btn edit" onclick="editUser('${user.id}')" title="Редактировать">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn delete" onclick="deleteUser('${user.id}', '${user.name}')" title="Удалить">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-            
-            // Обновить пагинацию
-            document.getElementById('usersTotal').textContent = filtered.length;
-            document.getElementById('usersFrom').textContent = 1;
-            document.getElementById('usersTo').textContent = Math.min(filtered.length, 10);
-        }
-
-        function editUser(id) {
-            const user = mockData.users.find(u => u.id === id);
-            if (!user) return;
-            
-            state.editingItem = user;
-            
-            document.getElementById('userModalTitle').textContent = 'Редактировать пользователя';
-            document.getElementById('userFullName').value = user.name;
-            document.getElementById('userEmail').value = user.email;
-            document.getElementById('userPhone').value = user.phone;
-            document.getElementById('userRole').value = user.role;
-            
-            // Очистить поля пароля при редактировании
-            document.getElementById('userPassword').required = false;
-            document.getElementById('userPasswordConfirm').required = false;
-            document.getElementById('userPassword').value = '';
-            document.getElementById('userPasswordConfirm').value = '';
-            
-            openModal('userModal');
-        }
-
-        function deleteUser(id, name) {
-            confirmDelete(`Вы уверены, что хотите удалить пользователя "${name}"?`, () => {
-                mockData.users = mockData.users.filter(u => u.id !== id);
-                loadUsersTable();
-                loadDashboard();
-                showAlert('Пользователь удален', 'success');
+        function loadUsersTable() {
+            const tbody = document.getElementById('usersTable'); const emptyState = document.getElementById('emptyUsers');
+            tbody.innerHTML = '';
+            if (mockData.users.length === 0) { tbody.style.display = 'none'; emptyState.style.display = 'block'; return; }
+            tbody.style.display = ''; emptyState.style.display = 'none';
+            const roleColors = {'director':'danger','deputy_director':'warning'};
+            mockData.users.forEach(item => {
+                const row = document.createElement('tr'); row.dataset.id = item.id;
+                row.innerHTML = `
+                    <td><div style="display: flex; align-items: center; gap: 0.75rem;"><div class="avatar">${item.initials}</div><div><div style="font-weight: 500;">${item.name}</div></div></div></td>
+                    <td>${item.email}</td>
+                    <td><span class="badge badge-${roleColors[item.role] || 'secondary'}">${getRoleLabel(item.role)}</span></td>
+                    <td>${item.phone || '—'}</td>
+                    <td>${item.date}</td>
+                    <td class="text-right"><div class="action-buttons"><button class="action-btn edit-btn" title="Редактировать"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" title="Удалить"><i class="fas fa-trash"></i></button></div></td>
+                `;
+                tbody.appendChild(row);
             });
         }
 
-        function handleUserSubmit(e) {
-            e.preventDefault();
-            
-            const password = document.getElementById('userPassword').value;
-            const confirmPassword = document.getElementById('userPasswordConfirm').value;
-            
-            if (password && password !== confirmPassword) {
-                showAlert('Пароли не совпадают', 'error');
-                return;
-            }
-            
-            const formData = {
-                name: document.getElementById('userFullName').value,
-                initials: document.getElementById('userFullName').value.split(' ').map(n => n[0]).join('').toUpperCase(),
-                email: document.getElementById('userEmail').value,
-                phone: document.getElementById('userPhone').value,
-                role: document.getElementById('userRole').value,
-                date: state.editingItem ? state.editingItem.date : new Date().toLocaleDateString('ru-RU')
-            };
-            
-            if (state.editingItem) {
-                const index = mockData.users.findIndex(u => u.id === state.editingItem.id);
-                if (index !== -1) {
-                    mockData.users[index] = { ...mockData.users[index], ...formData };
-                }
-                showAlert('Пользователь обновлен', 'success');
-            } else {
-                formData.id = Date.now().toString();
-                mockData.users.push(formData);
-                showAlert('Пользователь создан', 'success');
-            }
-            
-            closeModal('userModal');
-            loadUsersTable();
-            loadDashboard();
+        function filterAnnouncements() {
+            const searchTerm = document.getElementById('announcementsSearch').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            const filtered = mockData.announcements.filter(item => {
+                const matchesSearch = !searchTerm || item.title.toLowerCase().includes(searchTerm) || item.content.toLowerCase().includes(searchTerm) || item.author.toLowerCase().includes(searchTerm);
+                const matchesCategory = !category || item.category === category;
+                const matchesType = !type || item.type === type;
+                return matchesSearch && matchesCategory && matchesType;
+            });
+            renderFilteredAnnouncements(filtered);
         }
 
-        // === ГЛОБАЛЬНЫЕ ФУНКЦИИ ===
-        window.editAnnouncement = editAnnouncement;
-        window.deleteAnnouncement = deleteAnnouncement;
-        window.editSchedule = editSchedule;
-        window.deleteSchedule = deleteSchedule;
-        window.editUser = editUser;
-        window.deleteUser = deleteUser;
+        function renderFilteredAnnouncements(items) {
+            const tbody = document.getElementById('announcementsTable'); const emptyState = document.getElementById('emptyAnnouncements');
+            tbody.innerHTML = '';
+            if (items.length === 0) { tbody.style.display = 'none'; emptyState.style.display = 'block'; return; }
+            tbody.style.display = ''; emptyState.style.display = 'none';
+            items.forEach(item => {
+                const row = document.createElement('tr'); row.dataset.id = item.id;
+                row.innerHTML = `
+                    <td><div style="font-weight: 500;">${item.title}</div><div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem;">${item.content.substring(0,60)}${item.content.length > 60 ? '...' : ''}</div></td>
+                    <td><span class="badge badge-secondary">${getCategoryLabel(item.category)}</span></td>
+                    <td>${getTypeLabel(item.type)}</td>
+                    <td>${item.date} ${item.pinned ? '<i class="fas fa-thumbtack" style="color: var(--warning); margin-left: 0.5rem;"></i>' : ''}</td>
+                    <td><span class="badge ${item.urgent ? 'badge-danger' : 'badge-success'}">${item.urgent ? 'Срочное' : 'Активно'}</span></td>
+                    <td class="text-right"><div class="action-buttons"><button class="action-btn edit-btn"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn"><i class="fas fa-trash"></i></button></div></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
 
-        // Поиск
-        document.getElementById('announcementsSearch').addEventListener('input', (e) => {
-            loadAnnouncementsTable(e.target.value);
-        });
+        function filterSchedule() {
+            const searchTerm = document.getElementById('scheduleSearch').value.toLowerCase();
+            const selectedClass = document.getElementById('classFilter').value;
+            const selectedDay = document.getElementById('dayFilter').value;
+            const filtered = mockData.schedule.filter(item => {
+                const matchesSearch = !searchTerm || item.subject.toLowerCase().includes(searchTerm) || item.teacher.toLowerCase().includes(searchTerm) || item.class.toLowerCase().includes(searchTerm);
+                const matchesClass = !selectedClass || item.class === selectedClass;
+                const matchesDay = !selectedDay || item.dayValue === selectedDay;
+                return matchesSearch && matchesClass && matchesDay;
+            });
+            renderFilteredSchedule(filtered);
+        }
 
-        document.getElementById('scheduleSearch').addEventListener('input', (e) => {
-            loadScheduleTable(e.target.value);
-        });
+        function renderFilteredSchedule(items) {
+            const tbody = document.getElementById('scheduleTable'); const emptyState = document.getElementById('emptySchedule');
+            tbody.innerHTML = '';
+            if (items.length === 0) { tbody.style.display = 'none'; emptyState.style.display = 'block'; return; }
+            tbody.style.display = ''; emptyState.style.display = 'none';
+            items.forEach(item => {
+                const row = document.createElement('tr'); row.dataset.id = item.id;
+                row.innerHTML = `
+                    <td><span class="badge badge-primary">${item.class}</span></td>
+                    <td>${item.day}</td>
+                    <td>${item.startTime} - ${item.endTime}</td>
+                    <td><strong>${item.subject}</strong></td>
+                    <td>${item.teacher}</td>
+                    <td>${item.room || '—'}</td>
+                    <td class="text-right"><div class="action-buttons"><button class="action-btn edit-btn"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn"><i class="fas fa-trash"></i></button></div></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
 
-        document.getElementById('usersSearch').addEventListener('input', (e) => {
-            loadUsersTable(e.target.value);
-        });
+        function filterUsers() {
+            const searchTerm = document.getElementById('usersSearch').value.toLowerCase();
+            const selectedRole = document.getElementById('roleFilter').value;
+            const filtered = mockData.users.filter(item => {
+                const matchesSearch = !searchTerm || item.name.toLowerCase().includes(searchTerm) || item.email.toLowerCase().includes(searchTerm) || item.phone?.toLowerCase().includes(searchTerm);
+                const matchesRole = !selectedRole || item.role === selectedRole;
+                return matchesSearch && matchesRole;
+            });
+            renderFilteredUsers(filtered);
+        }
+
+        function renderFilteredUsers(items) {
+            const tbody = document.getElementById('usersTable'); const emptyState = document.getElementById('emptyUsers');
+            tbody.innerHTML = '';
+            if (items.length === 0) { tbody.style.display = 'none'; emptyState.style.display = 'block'; return; }
+            tbody.style.display = ''; emptyState.style.display = 'none';
+            const roleColors = {'director':'danger','deputy_director':'warning'};
+            items.forEach(item => {
+                const row = document.createElement('tr'); row.dataset.id = item.id;
+                row.innerHTML = `
+                    <td><div style="display: flex; align-items: center; gap: 0.75rem;"><div class="avatar">${item.initials}</div><div><div style="font-weight: 500;">${item.name}</div></div></div></td>
+                    <td>${item.email}</td>
+                    <td><span class="badge badge-${roleColors[item.role] || 'secondary'}">${getRoleLabel(item.role)}</span></td>
+                    <td>${item.phone || '—'}</td>
+                    <td>${item.date}</td>
+                    <td class="text-right"><div class="action-buttons"><button class="action-btn edit-btn"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn"><i class="fas fa-trash"></i></button></div></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function initFilters() { filterAnnouncements(); filterSchedule(); filterUsers(); }
+        initFilters();
+        
+        setTimeout(() => { showAlert('Добро пожаловать в административную панель!', 'info', 'Приветствие', 7000); }, 1000);
     </script>
 </body>
 </html>

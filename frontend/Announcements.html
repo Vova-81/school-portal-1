@@ -3,21 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Объявления - Школьный портал</title>
+    <title>Объявления</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* === БАЗОВЫЕ СТИЛИ === */
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --secondary: #64748b;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #f1f5f9 100%);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
             min-height: 100vh;
-            color: #334155;
         }
         
         .container {
@@ -26,466 +41,240 @@
             padding: 0 20px;
         }
         
-        /* === КОМПОНЕНТ: CARD === */
-        .card {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover:hover {
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-            border-color: #3b82f6;
-        }
-        
-        /* === КОМПОНЕНТ: BADGE === */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-        
-        .badge-pinned {
-            background: #fef3c7;
-            color: #d97706;
-        }
-        
-        .badge-urgent {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-        
-        .badge-category {
-            background: #e0e7ff;
-            color: #3730a3;
-        }
-        
-        .badge-category-students {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .badge-category-teachers {
-            background: #fef3c7;
-            color: #92400e;
-        }
-        
-        .badge-category-parents {
-            background: #f3e8ff;
-            color: #7c3aed;
-        }
-        
-        .badge-type {
-            background: #e5e7eb;
-            color: #374151;
-        }
-        
-        /* === КОМПОНЕНТ: BUTTON === */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.625rem 1.25rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-            gap: 0.5rem;
-            white-space: nowrap;
-        }
-        
-        .btn-primary {
-            background-color: #3b82f6;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #2563eb;
-        }
-        
-        .btn-secondary {
-            background-color: white;
-            color: #374151;
-            border-color: #d1d5db;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #f9fafb;
-            border-color: #9ca3af;
-        }
-        
-        .btn-outline {
-            background-color: transparent;
-            color: #374151;
-            border-color: #d1d5db;
-        }
-        
-        .btn-outline:hover {
-            background-color: #f9fafb;
-            border-color: #9ca3af;
-        }
-        
-        .btn-sm {
-            padding: 0.375rem 0.75rem;
-            font-size: 0.75rem;
-        }
-        
-        .btn-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        
-        .btn-filter {
-            position: relative;
-        }
-        
-        .btn-filter.active {
-            background-color: #eff6ff;
-            color: #1d4ed8;
-            border-color: #3b82f6;
-        }
-        
-        .btn-filter.active::after {
-            content: '•';
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            color: #3b82f6;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-        
-        /* === КОМПОНЕНТ: DIALOG (MODAL) === */
-        .dialog-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            padding: 20px;
-        }
-        
-        .dialog-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .dialog {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
-        }
-        
-        .dialog-overlay.active .dialog {
-            transform: scale(1);
-        }
-        
-        .dialog-header {
-            padding: 1.5rem 1.5rem 1rem;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 1;
-        }
-        
-        .dialog-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1e293b;
-            line-height: 1.3;
-            padding-right: 2rem;
-        }
-        
-        .dialog-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #6b7280;
-            cursor: pointer;
-            width: 2.5rem;
-            height: 2.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.5rem;
-            flex-shrink: 0;
-            margin-left: auto;
-        }
-        
-        .dialog-close:hover {
-            background-color: #f3f4f6;
-        }
-        
-        .dialog-body {
-            padding: 1.5rem;
-        }
-        
-        .dialog-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-            background-color: #f9fafb;
-        }
-        
-        /* === ХЕДЕР СТРАНИЦЫ === */
+        /* === HEADER === */
         .page-header {
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+            margin-bottom: 30px;
         }
         
         .header-content {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
-            padding: 1rem 0;
+            gap: 20px;
         }
         
         .page-title {
-            font-size: 1.5rem;
+            font-size: 24px;
             font-weight: 700;
-            color: #1e293b;
+            color: var(--primary);
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-        
-        .page-title i {
-            color: #3b82f6;
-            font-size: 1.5rem;
-        }
-        
-        .search-container {
-            flex: 1;
-            max-width: 640px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        /* === ФИЛЬТРЫ КАК КНОПКИ (вместо Select) === */
-        .filters-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin: 1rem 0;
+            gap: 10px;
         }
         
         .search-wrapper {
             position: relative;
             flex: 1;
+            max-width: 400px;
         }
         
         .search-icon {
             position: absolute;
-            left: 12px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: #94a3b8;
-            pointer-events: none;
+            color: var(--text-light);
+            font-size: 14px;
         }
         
         .search-input {
             width: 100%;
-            padding: 10px 16px 10px 40px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            background: white;
-            transition: all 0.3s;
+            padding: 12px 16px 12px 40px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            background: var(--surface);
+            transition: var(--transition);
         }
         
         .search-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
         
-        .mobile-filter-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            color: #64748b;
-            transition: all 0.3s;
-        }
-        
-        .mobile-filter-btn:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-        
-        @media (min-width: 768px) {
-            .mobile-filter-btn {
-                display: none;
-            }
-        }
-        
-        /* === ОСНОВНОЙ КОНТЕНТ === */
-        .content-wrapper {
-            padding: 1.5rem 0;
-            display: flex;
-            gap: 1.5rem;
-        }
-        
-        /* === БОКОВАЯ ПАНЕЛЬ ФИЛЬТРОВ === */
-        .filters-sidebar {
-            width: 256px;
-            flex-shrink: 0;
-            display: none;
-        }
-        
-        @media (min-width: 768px) {
-            .filters-sidebar {
-                display: block;
-            }
-        }
-        
-        .filters-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.25rem;
-            border: 1px solid #e5e7eb;
-            position: sticky;
-            top: 88px;
+        /* === ФИЛЬТРЫ === */
+        .filters-section {
+            margin-bottom: 30px;
         }
         
         .filters-title {
-            font-size: 1rem;
+            font-size: 12px;
             font-weight: 600;
-            color: #475569;
-            margin-bottom: 1rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .filter-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .filter-group h4 {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #64748b;
-            margin-bottom: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            color: var(--text-light);
+            margin-bottom: 12px;
         }
         
-        .filter-options {
+        .filters-container {
             display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
         }
         
-        /* === КАРТОЧКА ОБЪЯВЛЕНИЯ (AnnouncementCard) === */
+        .filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+        
+        .filter-pill:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+        
+        .filter-pill.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+        
+        /* === КАТЕГОРИИ И ТИПЫ === */
+        .category-student {
+            background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+            border-color: #bae6fd;
+            color: #0369a1;
+        }
+        
+        .category-teacher {
+            background: linear-gradient(135deg, #fef3c7, #fefce8);
+            border-color: #fde68a;
+            color: #92400e;
+        }
+        
+        .category-parent {
+            background: linear-gradient(135deg, #f3e8ff, #faf5ff);
+            border-color: #e9d5ff;
+            color: #7c3aed;
+        }
+        
+        .type-announcement {
+            background: linear-gradient(135deg, #dcfce7, #f0fdf4);
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+        
+        .type-news {
+            background: linear-gradient(135deg, #fef3c7, #fefce8);
+            border-color: #fde68a;
+            color: #92400e;
+        }
+        
+        .type-event {
+            background: linear-gradient(135deg, #fce7f3, #fdf2f8);
+            border-color: #fbcfe8;
+            color: #be185d;
+        }
+        
+        .status-pinned {
+            background: linear-gradient(135deg, #fef3c7, #fefce8);
+            color: #92400e;
+            border: none;
+        }
+        
+        .status-urgent {
+            background: linear-gradient(135deg, #fee2e2, #fef2f2);
+            color: #dc2626;
+            border: none;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        
+        /* === КАРТОЧКИ === */
         .announcements-grid {
-            flex: 1;
-        }
-        
-        .announcements-list {
             display: grid;
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
         }
         
-        @media (min-width: 768px) {
-            .announcements-list {
-                grid-template-columns: repeat(2, 1fr);
+        @media (max-width: 768px) {
+            .announcements-grid {
+                grid-template-columns: 1fr;
             }
         }
         
         .announcement-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: var(--transition);
+            border: 1px solid var(--border);
             cursor: pointer;
-            animation: fadeIn 0.4s ease-out;
         }
         
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .announcement-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
         }
         
         .announcement-card.urgent {
-            border-color: #fca5a5;
-            border-width: 2px;
+            border: 2px solid #ef4444;
         }
         
         .announcement-card.pinned {
-            border-color: #f59e0b;
-            border-width: 2px;
+            border: 2px solid #f59e0b;
         }
         
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 0.75rem;
+            margin-bottom: 16px;
+            gap: 12px;
         }
         
         .card-title {
+            font-size: 18px;
             font-weight: 600;
-            color: #1e293b;
-            font-size: 1.1rem;
+            color: var(--text);
             line-height: 1.4;
             flex: 1;
         }
         
-        .card-badges {
+        .card-tags {
             display: flex;
+            gap: 8px;
             flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-left: 0.75rem;
+        }
+        
+        .card-tag {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
         
         .card-content {
-            color: #64748b;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 1rem;
+            color: var(--text-light);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
@@ -496,199 +285,257 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
-            color: #94a3b8;
-            padding-top: 1rem;
-            border-top: 1px solid #f1f5f9;
-        }
-        
-        .card-meta {
-            display: flex;
-            gap: 1rem;
-        }
-        
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-        }
-        
-        .meta-item i {
-            font-size: 0.875rem;
-        }
-        
-        .card-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .action-btn {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            cursor: pointer;
-            padding: 0.25rem;
-            border-radius: 0.25rem;
-            transition: all 0.2s;
-        }
-        
-        .action-btn:hover {
-            color: #64748b;
-            background: #f1f5f9;
-        }
-        
-        /* === СЕКЦИИ === */
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e5e7eb;
-        }
-        
-        .section-title:first-child {
-            margin-top: 0;
-            padding-top: 0;
-            border-top: none;
-        }
-        
-        .title-icon {
-            width: 1.5rem;
-            height: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f59e0b;
-            color: white;
-            border-radius: 0.375rem;
-        }
-        
-        /* === СОСТОЯНИЯ === */
-        .loading-skeleton {
-            display: grid;
-            gap: 1rem;
-        }
-        
-        @media (min-width: 768px) {
-            .loading-skeleton {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        .skeleton-card {
-            height: 12rem;
-            background: #f1f5f9;
-            border-radius: 0.75rem;
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 4rem 1.25rem;
-        }
-        
-        .empty-state i {
-            font-size: 4rem;
-            color: #cbd5e1;
-            margin-bottom: 1rem;
-        }
-        
-        .empty-state h3 {
-            font-size: 1.25rem;
-            font-weight: 500;
-            color: #64748b;
-            margin-bottom: 0.5rem;
-        }
-        
-        .empty-state p {
-            color: #94a3b8;
-        }
-        
-        /* === МОДАЛЬНОЕ ОКНО ФИЛЬТРОВ (mobile) === */
-        .mobile-filters-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 50;
-            align-items: flex-end;
-        }
-        
-        .mobile-filters-modal.active {
-            display: flex;
-        }
-        
-        .mobile-filters-content {
-            background: white;
-            border-radius: 20px 20px 0 0;
-            padding: 1.5rem;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s ease;
-        }
-        
-        @keyframes slideUp {
-            from {
-                transform: translateY(100%);
-            }
-            to {
-                transform: translateY(0);
-            }
-        }
-        
-        /* === АДАПТИВНОСТЬ === */
-        @media (max-width: 767px) {
-            .header-content {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.75rem;
-            }
-            
-            .search-container {
-                max-width: 100%;
-            }
-            
-            .filters-container {
-                justify-content: center;
-            }
-        }
-        
-        /* === АВАТАР АВТОРА === */
-        .avatar {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 2rem;
-            height: 2rem;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            color: white;
-            font-weight: 600;
-            font-size: 0.75rem;
-            flex-shrink: 0;
+            padding-top: 16px;
+            border-top: 1px solid rgba(226, 232, 240, 0.5);
         }
         
         .author-info {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 12px;
+        }
+        
+        .author-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .author-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .author-details p {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .card-date {
+            font-size: 13px;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        /* === МОДАЛЬНОЕ ОКНО === */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: var(--surface);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .modal-header {
+            padding: 28px 28px 24px;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: none;
+            background: #f3f4f6;
+            color: #6b7280;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: var(--transition);
+            z-index: 10;
+        }
+        
+        .modal-close:hover {
+            background: #ef4444;
+            color: white;
+            transform: rotate(90deg);
+        }
+        
+        .modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.3;
+            margin-bottom: 16px;
+            padding-right: 50px;
+        }
+        
+        .modal-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .modal-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .modal-author .author-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 14px;
+        }
+        
+        .modal-author-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .modal-author-info p {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        
+        .modal-date {
+            font-size: 14px;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .modal-tags {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .modal-content {
+            padding: 28px;
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-light);
+        }
+        
+        .modal-content p {
+            margin-bottom: 16px;
+        }
+        
+        .modal-content p:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* === СЕКЦИИ === */
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 40px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .section-title i {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        
+        /* === ПУСТОЕ СОСТОЯНИЕ === */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            color: var(--border);
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        
+        .empty-state p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        
+        /* === СКРОЛЛБАР === */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
@@ -698,220 +545,126 @@
         <div class="container">
             <div class="header-content">
                 <h1 class="page-title">
-                    <i class="fas fa-bell"></i>
+                    <i class="fas fa-bullhorn"></i>
                     Объявления
                 </h1>
                 
-                <div class="search-container">
-                    <div class="search-wrapper">
-                        <i class="fas fa-search search-icon"></i>
-                        <input 
-                            type="text" 
-                            class="search-input" 
-                            id="searchInput"
-                            placeholder="Поиск по объявлениям..."
-                        >
-                    </div>
-                    
-                    <button class="mobile-filter-btn" id="mobileFilterBtn">
-                        <i class="fas fa-filter"></i>
-                    </button>
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="searchInput"
+                        placeholder="Поиск объявлений..."
+                    >
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- ФИЛЬТРЫ КАК КНОПКИ -->
-    <div class="container">
-        <div class="filters-container" id="filtersButtons">
-            <div class="btn-group">
-                <button class="btn btn-filter btn-sm active" data-filter="all">
-                    Все
-                </button>
-                <button class="btn btn-filter btn-sm" data-filter="category:students">
-                    <i class="fas fa-graduation-cap"></i>
-                    Ученикам
-                </button>
-                <button class="btn btn-filter btn-sm" data-filter="category:teachers">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                    Учителям
-                </button>
-                <button class="btn btn-filter btn-sm" data-filter="category:parents">
-                    <i class="fas fa-users"></i>
-                    Родителям
-                </button>
-            </div>
-            
-            <div class="btn-group">
-                <button class="btn btn-filter btn-sm" data-filter="type:announcement">
-                    Объявления
-                </button>
-                <button class="btn btn-filter btn-sm" data-filter="type:news">
-                    Новости
-                </button>
-                <button class="btn btn-filter btn-sm" data-filter="type:event">
-                    Мероприятия
-                </button>
-                <button class="btn btn-filter btn-sm" data-filter="urgent">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Срочные
-                </button>
-                <button class="btn btn-filter btn-sm" data-filter="pinned">
-                    <i class="fas fa-thumbtack"></i>
-                    Закреплённые
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- ОСНОВНОЙ КОНТЕНТ -->
     <main class="container">
-        <div class="content-wrapper">
-            <!-- БОКОВАЯ ПАНЕЛЬ ФИЛЬТРОВ -->
-            <aside class="filters-sidebar">
-                <div class="filters-card card">
-                    <h3 class="filters-title">Фильтры</h3>
-                    
-                    <div class="filter-group">
-                        <h4>Категория</h4>
-                        <div class="filter-options" id="categoryFilters">
-                            <label class="filter-option">
-                                <input type="radio" name="category" value="all" checked>
-                                <span>Все</span>
-                            </label>
-                            <label class="filter-option">
-                                <input type="radio" name="category" value="students">
-                                <span><i class="fas fa-graduation-cap"></i> Ученикам</span>
-                            </label>
-                            <label class="filter-option">
-                                <input type="radio" name="category" value="teachers">
-                                <span><i class="fas fa-chalkboard-teacher"></i> Учителям</span>
-                            </label>
-                            <label class="filter-option">
-                                <input type="radio" name="category" value="parents">
-                                <span><i class="fas fa-users"></i> Родителям</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <h4>Тип</h4>
-                        <div class="filter-options" id="typeFilters">
-                            <label class="filter-option">
-                                <input type="radio" name="type" value="all" checked>
-                                <span>Все</span>
-                            </label>
-                            <label class="filter-option">
-                                <input type="radio" name="type" value="announcement">
-                                <span>Объявление</span>
-                            </label>
-                            <label class="filter-option">
-                                <input type="radio" name="type" value="news">
-                                <span>Новость</span>
-                            </label>
-                            <label class="filter-option">
-                                <input type="radio" name="type" value="event">
-                                <span>Мероприятие</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <h4>Дополнительно</h4>
-                        <div class="filter-options">
-                            <label class="filter-option">
-                                <input type="checkbox" id="filterUrgent">
-                                <span>Только срочные</span>
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" id="filterPinned">
-                                <span>Только закреплённые</span>
-                            </label>
-                        </div>
-                    </div>
+        <!-- ФИЛЬТРЫ -->
+        <section class="filters-section">
+            <div class="filters-title">Фильтры</div>
+            <div class="filters-container">
+                <div class="filter-pill active" data-filter="all">
+                    <i class="fas fa-layer-group"></i>
+                    Все
                 </div>
-            </aside>
+                <div class="filter-pill category-student" data-filter="category:students">
+                    <i class="fas fa-graduation-cap"></i>
+                    Ученикам
+                </div>
+                <div class="filter-pill category-teacher" data-filter="category:teachers">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    Учителям
+                </div>
+                <div class="filter-pill category-parent" data-filter="category:parents">
+                    <i class="fas fa-users"></i>
+                    Родителям
+                </div>
+                <div class="filter-pill type-announcement" data-filter="type:announcement">
+                    <i class="fas fa-bullhorn"></i>
+                    Объявления
+                </div>
+                <div class="filter-pill type-news" data-filter="type:news">
+                    <i class="fas fa-newspaper"></i>
+                    Новости
+                </div>
+                <div class="filter-pill type-event" data-filter="type:event">
+                    <i class="fas fa-calendar-alt"></i>
+                    Мероприятия
+                </div>
+                <div class="filter-pill status-pinned" data-filter="pinned">
+                    <i class="fas fa-thumbtack"></i>
+                    Закреплённые
+                </div>
+                <div class="filter-pill status-urgent" data-filter="urgent">
+                    <i class="fas fa-bolt"></i>
+                    Срочные
+                </div>
+            </div>
+        </section>
 
-            <!-- ОБЪЯВЛЕНИЯ -->
-            <section class="announcements-grid">
-                <!-- Закреплённые -->
-                <div id="pinnedSection">
-                    <h2 class="section-title">
-                        <span class="title-icon"><i class="fas fa-thumbtack"></i></span>
-                        Закреплённые
-                    </h2>
-                    <div class="announcements-list" id="pinnedList"></div>
-                </div>
-                
-                <!-- Все объявления -->
-                <h2 class="section-title">
-                    <span class="title-icon"><i class="fas fa-bell"></i></span>
-                    Все объявления
-                </h2>
-                <div class="announcements-list" id="announcementsList"></div>
-                
-                <!-- Состояние загрузки -->
-                <div class="loading-skeleton" id="loadingSkeleton">
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                </div>
-                
-                <!-- Пустое состояние -->
-                <div class="empty-state card" id="emptyState" style="display: none;">
-                    <i class="fas fa-bell"></i>
-                    <h3>Объявления не найдены</h3>
-                    <p>Попробуйте изменить фильтры или поисковый запрос</p>
-                </div>
-            </section>
+        <!-- ЗАКРЕПЛЁННЫЕ -->
+        <h2 class="section-title">
+            <i class="fas fa-thumbtack"></i>
+            Закреплённые
+        </h2>
+        <div class="announcements-grid" id="pinnedList"></div>
+
+        <!-- ВСЕ ОБЪЯВЛЕНИЯ -->
+        <h2 class="section-title">
+            <i class="fas fa-list"></i>
+            Все объявления
+        </h2>
+        <div class="announcements-grid" id="announcementsList"></div>
+
+        <!-- ПУСТОЕ СОСТОЯНИЕ -->
+        <div id="emptyState" style="display: none;">
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>Ничего не найдено</h3>
+                <p>Попробуйте изменить параметры поиска</p>
+            </div>
         </div>
     </main>
 
-    <!-- МОДАЛЬНОЕ ОКНО ФИЛЬТРОВ (mobile) -->
-    <div class="mobile-filters-modal" id="mobileFiltersModal">
-        <div class="mobile-filters-content">
-            <div class="filters-card card">
-                <h3 class="filters-title">Фильтры</h3>
-                <!-- Тот же контент что и в sidebar -->
-            </div>
-        </div>
-    </div>
-
-    <!-- МОДАЛЬНОЕ ОКНО ПРОСМОТРА ОБЪЯВЛЕНИЯ -->
-    <div class="dialog-overlay" id="announcementModal">
-        <div class="dialog">
-            <div class="dialog-header">
-                <h2 class="dialog-title" id="modalTitle">Заголовок объявления</h2>
-                <button class="dialog-close" id="closeModalBtn">&times;</button>
-            </div>
-            <div class="dialog-body">
-                <div class="card-badges" id="modalBadges"></div>
+    <!-- МОДАЛЬНОЕ ОКНО -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <button class="modal-close" id="modalClose">&times;</button>
                 
-                <div class="author-info" style="margin-bottom: 1.5rem;">
-                    <div class="avatar" id="modalAvatar">АИ</div>
-                    <div>
-                        <div style="font-weight: 500; color: #1e293b;" id="modalAuthor">Автор</div>
-                        <div style="font-size: 0.875rem; color: #64748b;" id="modalDate">Дата</div>
+                <h2 class="modal-title" id="modalTitle">Заголовок объявления</h2>
+                
+                <div class="modal-meta">
+                    <div class="modal-author">
+                        <div class="author-avatar" id="modalAvatar">АВ</div>
+                        <div class="modal-author-info">
+                            <h4 id="modalAuthor">Автор</h4>
+                            <p id="modalPosition">Должность</p>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-date">
+                        <i class="far fa-calendar"></i>
+                        <span id="modalDate">Дата</span>
                     </div>
                 </div>
                 
-                <div class="modal-content" id="modalContent" style="line-height: 1.6; color: #475569;"></div>
+                <div class="modal-tags" id="modalTags"></div>
             </div>
-            <div class="dialog-footer">
-                <button class="btn btn-secondary btn-sm" id="shareBtn">
-                    <i class="fas fa-share"></i>
-                    Поделиться
-                </button>
-                <button class="btn btn-primary btn-sm" id="closeModalBtn2">
-                    Закрыть
-                </button>
+            
+            <div class="modal-content" id="modalContent">
+                <p>Содержимое объявления...</p>
             </div>
         </div>
     </div>
 
     <script>
-        // === ДАННЫЕ ===
+        // ДАННЫЕ
         const announcementsData = [
             {
                 id: 1,
@@ -919,241 +672,189 @@
                 content: "Уважаемые родители! Приглашаем вас на родительское собрание, которое состоится 25 января в 18:00 в актовом зале школы. Будут обсуждаться вопросы успеваемости, подготовка к выпускным экзаменам и планы на следующий учебный год.",
                 category: "parents",
                 type: "announcement",
-                author: "Директор школы",
-                authorInitials: "ДШ",
+                author: "Иванова М.А.",
+                position: "Директор школы",
+                authorInitials: "МИ",
                 date: "20 января 2024",
                 pinned: true,
-                urgent: false,
-                read: false
+                urgent: false
             },
             {
                 id: 2,
-                title: "СРОЧНО: Отмена занятий",
-                content: "В связи с ухудшением погодных условий и предупреждением МЧС, занятия 25 января отменяются. Дистанционное обучение не проводится. Следите за обновлениями в школьном портале.",
+                title: "Отмена занятий",
+                content: "В связи с ухудшением погодных условий, занятия 25 января отменяются. Информация о возобновлении занятий будет размещена дополнительно.",
                 category: "students",
                 type: "announcement",
-                author: "Администрация",
-                authorInitials: "АД",
+                author: "Петров С.И.",
+                position: "Заместитель директора",
+                authorInitials: "ПС",
                 date: "24 января 2024",
                 pinned: false,
-                urgent: true,
-                read: true
+                urgent: true
             },
             {
                 id: 3,
                 title: "Олимпиада по математике",
-                content: "Приглашаем учащихся 9-11 классов принять участие в школьном этапе олимпиады по математике. Олимпиада пройдёт 30 января в кабинете 203. Регистрация до 28 января у учителя математики.",
+                content: "Приглашаем учащихся 9-11 классов принять участие в школьном этапе олимпиады по математике. Олимпиада пройдёт 30 января в кабинете 203.",
                 category: "students",
                 type: "event",
-                author: "Учитель математики",
-                authorInitials: "УМ",
+                author: "Сидорова Е.В.",
+                position: "Учитель математики",
+                authorInitials: "ЕС",
                 date: "22 января 2024",
                 pinned: false,
-                urgent: false,
-                read: false
+                urgent: false
             },
             {
                 id: 4,
                 title: "Методический совет",
-                content: "Совещание для учителей начальных классов состоится 26 января в 15:00 в учительской. Тема: 'Обновление учебных планов на 2024-2025 учебный год'. При себе иметь ноутбуки.",
+                content: "Совещание для учителей начальных классов состоится 26 января в 15:00 в учительской. Тема: 'Обновление учебных планов на 2024-2025 учебный год'.",
                 category: "teachers",
                 type: "announcement",
-                author: "Методист",
-                authorInitials: "МС",
+                author: "Козлова Т.П.",
+                position: "Методист",
+                authorInitials: "ТК",
                 date: "23 января 2024",
                 pinned: true,
-                urgent: false,
-                read: true
+                urgent: false
             },
             {
                 id: 5,
                 title: "Конкурс чтецов",
-                content: "Школьный этап конкурса 'Живая классика' состоится 15 февраля в актовом зале. Регистрация участников до 10 февраля. Подробности у учителей литературы.",
+                content: "Школьный этап конкурса 'Живая классика' состоится 15 февраля в актовом зале. Регистрация участников до 10 февраля.",
                 category: "students",
                 type: "event",
-                author: "Учитель литературы",
-                authorInitials: "УЛ",
+                author: "Николаева Л.М.",
+                position: "Учитель литературы",
+                authorInitials: "ЛН",
                 date: "21 января 2024",
                 pinned: false,
-                urgent: false,
-                read: false
+                urgent: false
             },
             {
                 id: 6,
                 title: "Новое расписание",
-                content: "С 1 февраля вводится новое расписание уроков. Расписание доступно в соответствующем разделе портала. Просьба ознакомиться всем учителям и ученикам.",
+                content: "С 1 февраля вводится новое расписание уроков. Расписание доступно в соответствующем разделе портала.",
                 category: "teachers",
                 type: "news",
-                author: "Завуч",
-                authorInitials: "ЗВ",
+                author: "Васильев А.С.",
+                position: "Завуч",
+                authorInitials: "АВ",
                 date: "19 января 2024",
                 pinned: false,
-                urgent: false,
-                read: false
+                urgent: false
             }
         ];
 
-        // === СОСТОЯНИЕ ===
+        // СОСТОЯНИЕ
         let state = {
-            filters: {
-                category: 'all',
-                type: 'all',
-                urgent: false,
-                pinned: false
-            },
-            search: '',
-            activeButtonFilters: []
+            category: 'all',
+            type: 'all',
+            urgent: false,
+            pinned: false,
+            search: ''
         };
 
-        // === ЭЛЕМЕНТЫ DOM ===
+        // ЭЛЕМЕНТЫ
         const elements = {
             searchInput: document.getElementById('searchInput'),
-            filtersButtons: document.getElementById('filtersButtons'),
+            filterPills: document.querySelectorAll('.filter-pill'),
             pinnedList: document.getElementById('pinnedList'),
             announcementsList: document.getElementById('announcementsList'),
-            loadingSkeleton: document.getElementById('loadingSkeleton'),
             emptyState: document.getElementById('emptyState'),
-            mobileFiltersModal: document.getElementById('mobileFiltersModal'),
-            mobileFilterBtn: document.getElementById('mobileFilterBtn'),
-            announcementModal: document.getElementById('announcementModal'),
-            closeModalBtn: document.getElementById('closeModalBtn'),
-            closeModalBtn2: document.getElementById('closeModalBtn2'),
+            modalOverlay: document.getElementById('modalOverlay'),
+            modalClose: document.getElementById('modalClose'),
             modalTitle: document.getElementById('modalTitle'),
-            modalBadges: document.getElementById('modalBadges'),
             modalAvatar: document.getElementById('modalAvatar'),
             modalAuthor: document.getElementById('modalAuthor'),
+            modalPosition: document.getElementById('modalPosition'),
             modalDate: document.getElementById('modalDate'),
-            modalContent: document.getElementById('modalContent'),
-            shareBtn: document.getElementById('shareBtn')
+            modalTags: document.getElementById('modalTags'),
+            modalContent: document.getElementById('modalContent')
         };
 
-        // === ИНИЦИАЛИЗАЦИЯ ===
+        // ИНИЦИАЛИЗАЦИЯ
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                elements.loadingSkeleton.style.display = 'none';
-                renderAnnouncements();
-            }, 800);
+            renderAnnouncements();
             
             // Поиск
             elements.searchInput.addEventListener('input', function(e) {
-                state.search = e.target.value.toLowerCase();
+                state.search = e.target.value.toLowerCase().trim();
                 renderAnnouncements();
             });
             
-            // Кнопки-фильтры
-            elements.filtersButtons.addEventListener('click', function(e) {
-                const button = e.target.closest('.btn-filter');
-                if (!button) return;
-                
-                const filter = button.dataset.filter;
-                
-                // Обработка фильтров
-                if (filter === 'all') {
-                    resetAllFilters();
-                    updateActiveButtons(['all']);
-                } else if (filter.startsWith('category:')) {
-                    const category = filter.split(':')[1];
-                    state.filters.category = category;
-                    updateActiveButtons([filter]);
-                } else if (filter.startsWith('type:')) {
-                    const type = filter.split(':')[1];
-                    state.filters.type = type;
-                    updateActiveButtons([filter]);
-                } else if (filter === 'urgent') {
-                    state.filters.urgent = !state.filters.urgent;
-                    button.classList.toggle('active', state.filters.urgent);
-                } else if (filter === 'pinned') {
-                    state.filters.pinned = !state.filters.pinned;
-                    button.classList.toggle('active', state.filters.pinned);
-                }
-                
-                renderAnnouncements();
+            // Фильтры
+            elements.filterPills.forEach(pill => {
+                pill.addEventListener('click', function() {
+                    const filter = this.dataset.filter;
+                    
+                    if (filter === 'all') {
+                        elements.filterPills.forEach(p => p.classList.remove('active'));
+                        this.classList.add('active');
+                        resetFilters();
+                    } else {
+                        document.querySelector('[data-filter="all"]').classList.remove('active');
+                        this.classList.toggle('active');
+                        
+                        if (filter.startsWith('category:')) {
+                            state.category = this.classList.contains('active') ? filter.split(':')[1] : 'all';
+                        } else if (filter.startsWith('type:')) {
+                            state.type = this.classList.contains('active') ? filter.split(':')[1] : 'all';
+                        } else if (filter === 'urgent') {
+                            state.urgent = this.classList.contains('active');
+                        } else if (filter === 'pinned') {
+                            state.pinned = this.classList.contains('active');
+                        }
+                    }
+                    
+                    renderAnnouncements();
+                });
             });
             
-            // Модальные окна
-            elements.mobileFilterBtn.addEventListener('click', () => {
-                elements.mobileFiltersModal.classList.add('active');
+            // Модальное окно
+            elements.modalClose.addEventListener('click', closeModal);
+            elements.modalOverlay.addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
             });
             
-            elements.closeModalBtn.addEventListener('click', closeModal);
-            elements.closeModalBtn2.addEventListener('click', closeModal);
-            
-            elements.announcementModal.addEventListener('click', (e) => {
-                if (e.target === elements.announcementModal) {
-                    closeModal();
-                }
-            });
-            
-            elements.shareBtn.addEventListener('click', shareAnnouncement);
-            
-            // Закрытие мобильных фильтров при клике вне
-            elements.mobileFiltersModal.addEventListener('click', (e) => {
-                if (e.target === elements.mobileFiltersModal) {
-                    elements.mobileFiltersModal.classList.remove('active');
-                }
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeModal();
             });
         });
 
-        // === ФУНКЦИИ ===
-        function resetAllFilters() {
-            state.filters = {
+        // ФУНКЦИИ
+        function resetFilters() {
+            state = {
                 category: 'all',
                 type: 'all',
                 urgent: false,
-                pinned: false
+                pinned: false,
+                search: ''
             };
-            
-            // Сбросить все кнопки
-            document.querySelectorAll('.btn-filter').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Активировать кнопку "Все"
-            const allBtn = document.querySelector('.btn-filter[data-filter="all"]');
-            if (allBtn) allBtn.classList.add('active');
-        }
-
-        function updateActiveButtons(filters) {
-            // Сбросить все кнопки
-            document.querySelectorAll('.btn-filter').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Активировать выбранные
-            filters.forEach(filter => {
-                const button = document.querySelector(`.btn-filter[data-filter="${filter}"]`);
-                if (button) button.classList.add('active');
-            });
         }
 
         function filterAnnouncements() {
             return announcementsData.filter(announcement => {
-                // Поиск
                 if (state.search) {
-                    const searchLower = state.search.toLowerCase();
-                    if (!announcement.title.toLowerCase().includes(searchLower) && 
-                        !announcement.content.toLowerCase().includes(searchLower)) {
-                        return false;
-                    }
+                    const searchQuery = state.search.toLowerCase();
+                    const matches = announcement.title.toLowerCase().includes(searchQuery) ||
+                                   announcement.content.toLowerCase().includes(searchQuery);
+                    if (!matches) return false;
                 }
                 
-                // Категория
-                if (state.filters.category !== 'all' && announcement.category !== state.filters.category) {
+                if (state.category !== 'all' && announcement.category !== state.category) {
                     return false;
                 }
                 
-                // Тип
-                if (state.filters.type !== 'all' && announcement.type !== state.filters.type) {
+                if (state.type !== 'all' && announcement.type !== state.type) {
                     return false;
                 }
                 
-                // Срочные
-                if (state.filters.urgent && !announcement.urgent) {
+                if (state.urgent && !announcement.urgent) {
                     return false;
                 }
                 
-                // Закреплённые
-                if (state.filters.pinned && !announcement.pinned) {
+                if (state.pinned && !announcement.pinned) {
                     return false;
                 }
                 
@@ -1163,16 +864,12 @@
 
         function renderAnnouncements() {
             const filtered = filterAnnouncements();
-            
-            // Отделяем закреплённые
             const pinned = filtered.filter(a => a.pinned);
             const regular = filtered.filter(a => !a.pinned);
             
-            // Очищаем контейнеры
             elements.pinnedList.innerHTML = '';
             elements.announcementsList.innerHTML = '';
             
-            // Показываем пустое состояние если нет результатов
             if (filtered.length === 0) {
                 elements.emptyState.style.display = 'block';
                 return;
@@ -1180,59 +877,52 @@
             
             elements.emptyState.style.display = 'none';
             
-            // Рендерим закреплённые
-            if (pinned.length > 0) {
-                elements.pinnedList.innerHTML = pinned.map(createAnnouncementCardHTML).join('');
-            } else {
-                document.querySelector('#pinnedSection').style.display = 'none';
-            }
+            pinned.forEach(announcement => {
+                elements.pinnedList.innerHTML += createCardHTML(announcement);
+            });
             
-            // Рендерим обычные
-            elements.announcementsList.innerHTML = regular.map(createAnnouncementCardHTML).join('');
+            regular.forEach(announcement => {
+                elements.announcementsList.innerHTML += createCardHTML(announcement);
+            });
             
-            // Добавляем обработчики
-            addCardEventListeners();
+            addCardListeners();
         }
 
-        function createAnnouncementCardHTML(announcement) {
-            const cardClass = `announcement-card card card-hover ${announcement.urgent ? 'urgent' : ''} ${announcement.pinned ? 'pinned' : ''}`;
-            const categoryBadgeClass = `badge badge-category-${announcement.category}`;
+        function createCardHTML(announcement) {
+            const cardClass = `announcement-card ${announcement.pinned ? 'pinned' : ''} ${announcement.urgent ? 'urgent' : ''}`;
+            const categoryClass = `card-tag category-${announcement.category}`;
+            const typeClass = `card-tag type-${announcement.type}`;
+            
+            const shortContent = announcement.content.length > 120 
+                ? announcement.content.substring(0, 120) + '...' 
+                : announcement.content;
             
             return `
-                <article class="${cardClass}" data-id="${announcement.id}">
+                <div class="${cardClass}" data-id="${announcement.id}">
                     <div class="card-header">
                         <h3 class="card-title">${announcement.title}</h3>
-                        <div class="card-badges">
-                            ${announcement.pinned ? '<span class="badge badge-pinned"><i class="fas fa-thumbtack"></i></span>' : ''}
-                            ${announcement.urgent ? '<span class="badge badge-urgent"><i class="fas fa-exclamation-triangle"></i></span>' : ''}
-                            <span class="${categoryBadgeClass}">
-                                ${getCategoryIcon(announcement.category)} ${getCategoryLabel(announcement.category)}
-                            </span>
-                            <span class="badge badge-type">
-                                ${getTypeLabel(announcement.type)}
-                            </span>
+                        <div class="card-tags">
+                            ${announcement.pinned ? '<span class="card-tag status-pinned"><i class="fas fa-thumbtack"></i></span>' : ''}
+                            ${announcement.urgent ? '<span class="card-tag status-urgent"><i class="fas fa-bolt"></i></span>' : ''}
+                            <span class="${categoryClass}">${getCategoryLabel(announcement.category)}</span>
+                            <span class="${typeClass}">${getTypeLabel(announcement.type)}</span>
                         </div>
                     </div>
-                    <p class="card-content">${announcement.content}</p>
+                    <p class="card-content">${shortContent}</p>
                     <div class="card-footer">
-                        <div class="card-meta">
-                            <div class="author-info">
-                                <div class="avatar">${announcement.authorInitials}</div>
-                                <span>${announcement.author}</span>
+                        <div class="author-info">
+                            <div class="author-avatar">${announcement.authorInitials}</div>
+                            <div class="author-details">
+                                <h4>${announcement.author}</h4>
+                                <p>${announcement.position}</p>
                             </div>
-                            <span class="meta-item">
-                                <i class="fas fa-calendar"></i>
-                                ${announcement.date}
-                            </span>
                         </div>
-                        <div class="card-actions">
-                            <button class="action-btn" title="Поделиться" data-id="${announcement.id}">
-                                <i class="fas fa-share"></i>
-                            </button>
-                            ${announcement.read ? '' : '<span class="badge" style="background: #3b82f6; color: white;">NEW</span>'}
+                        <div class="card-date">
+                            <i class="far fa-calendar"></i>
+                            ${announcement.date}
                         </div>
                     </div>
-                </article>
+                </div>
             `;
         }
 
@@ -1245,15 +935,6 @@
             return labels[category] || category;
         }
 
-        function getCategoryIcon(category) {
-            const icons = {
-                'students': '<i class="fas fa-graduation-cap"></i>',
-                'teachers': '<i class="fas fa-chalkboard-teacher"></i>',
-                'parents': '<i class="fas fa-users"></i>'
-            };
-            return icons[category] || '';
-        }
-
         function getTypeLabel(type) {
             const labels = {
                 'announcement': 'Объявление',
@@ -1263,93 +944,110 @@
             return labels[type] || type;
         }
 
-        function addCardEventListeners() {
-            // Клик по карточке
+        function addCardListeners() {
             document.querySelectorAll('.announcement-card').forEach(card => {
-                card.addEventListener('click', function(e) {
-                    // Игнорируем клики по кнопкам действий
-                    if (e.target.closest('.action-btn') || e.target.closest('.card-actions')) {
-                        return;
-                    }
-                    
-                    const id = parseInt(this.getAttribute('data-id'));
+                card.addEventListener('click', function() {
+                    const id = parseInt(this.dataset.id);
                     const announcement = announcementsData.find(a => a.id === id);
-                    
                     if (announcement) {
-                        openAnnouncementModal(announcement);
-                        // Помечаем как прочитанное
-                        announcement.read = true;
-                    }
-                });
-            });
-            
-            // Кнопки поделиться
-            document.querySelectorAll('.action-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const id = parseInt(this.getAttribute('data-id'));
-                    const announcement = announcementsData.find(a => a.id === id);
-                    
-                    if (announcement) {
-                        shareAnnouncement(announcement);
+                        openModal(announcement);
                     }
                 });
             });
         }
 
-        function openAnnouncementModal(announcement) {
-            // Заполняем модальное окно
+        function openModal(announcement) {
             elements.modalTitle.textContent = announcement.title;
             elements.modalAvatar.textContent = announcement.authorInitials;
             elements.modalAuthor.textContent = announcement.author;
+            elements.modalPosition.textContent = announcement.position;
             elements.modalDate.textContent = announcement.date;
-            elements.modalContent.textContent = announcement.content;
+            elements.modalContent.innerHTML = `<p>${announcement.content}</p>`;
             
-            // Бейджи
-            let badgesHTML = '';
+            let tagsHTML = '';
+            tagsHTML += `<span class="card-tag category-${announcement.category}">${getCategoryLabel(announcement.category)}</span>`;
+            tagsHTML += `<span class="card-tag type-${announcement.type}">${getTypeLabel(announcement.type)}</span>`;
             if (announcement.pinned) {
-                badgesHTML += '<span class="badge badge-pinned"><i class="fas fa-thumbtack"></i> Закреплено</span>';
+                tagsHTML += '<span class="card-tag status-pinned"><i class="fas fa-thumbtack"></i></span>';
             }
             if (announcement.urgent) {
-                badgesHTML += '<span class="badge badge-urgent"><i class="fas fa-exclamation-triangle"></i> Срочно</span>';
+                tagsHTML += '<span class="card-tag status-urgent"><i class="fas fa-bolt"></i></span>';
             }
-            badgesHTML += `<span class="badge badge-category-${announcement.category}">${getCategoryIcon(announcement.category)} ${getCategoryLabel(announcement.category)}</span>`;
-            badgesHTML += `<span class="badge badge-type">${getTypeLabel(announcement.type)}</span>`;
+            elements.modalTags.innerHTML = tagsHTML;
             
-            elements.modalBadges.innerHTML = badgesHTML;
-            
-            // Показываем модальное окно
-            elements.announcementModal.classList.add('active');
+            elements.modalOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
-            elements.announcementModal.classList.remove('active');
+            elements.modalOverlay.classList.remove('active');
             document.body.style.overflow = 'auto';
         }
+        // Добавь этот код в файл announcements.html в тег <script>
 
-        function shareAnnouncement(announcement = null) {
-            if (!announcement) {
-                // Берем текущее объявление из модального окна
-                const title = elements.modalTitle.textContent;
-                const content = elements.modalContent.textContent;
-                const url = window.location.href;
-                
-                const shareText = `${title}\n\n${content.substring(0, 100)}...\n\n${url}`;
-                
-                if (navigator.share) {
-                    navigator.share({
-                        title: title,
-                        text: content.substring(0, 100),
-                        url: url
-                    });
-                } else {
-                    navigator.clipboard.writeText(shareText).then(() => {
-                        alert('Ссылка на объявление скопирована в буфер обмена');
-                    });
+document.addEventListener('DOMContentLoaded', function() {
+    // Получаем параметр фильтра из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const filterParam = urlParams.get('filter');
+    
+    if (filterParam) {
+        console.log('Фильтр из URL:', filterParam);
+        
+        // Автоматически активируем соответствующую кнопку фильтра
+        const filterButtons = document.querySelectorAll('.filter-pill');
+        
+        filterButtons.forEach(button => {
+            if (button.getAttribute('data-filter') === filterParam) {
+                // Сначала сбросим все фильтры
+                if (filterParam !== 'all') {
+                    document.querySelector('[data-filter="all"]').classList.remove('active');
                 }
+                
+                // Активируем нужную кнопку
+                button.classList.add('active');
+                
+                // Применяем фильтр
+                if (filterParam.startsWith('category:')) {
+                    const category = filterParam.split(':')[1];
+                    state.category = category;
+                } else if (filterParam.startsWith('type:')) {
+                    const type = filterParam.split(':')[1];
+                    state.type = type;
+                } else if (filterParam === 'urgent') {
+                    state.urgent = true;
+                } else if (filterParam === 'pinned') {
+                    state.pinned = true;
+                }
+                
+                // Применяем фильтр к объявлениям
+                setTimeout(() => {
+                    renderAnnouncements();
+                    
+                    // Прокручиваем к фильтрам
+                    const filtersSection = document.querySelector('.filters-section');
+                    if (filtersSection) {
+                        filtersSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 100);
             }
+        });
+    }
+    
+    // Также обрабатываем старый формат параметров (если у тебя был ?category=...)
+    const categoryParam = urlParams.get('category');
+    if (categoryParam && !filterParam) {
+        const categoryMap = {
+            'students': 'category:students',
+            'teachers': 'category:teachers', 
+            'parents': 'category:parents'
+        };
+        
+        if (categoryMap[categoryParam]) {
+            // Перенаправляем на новый формат
+            window.location.href = `announcements.html?filter=${categoryMap[categoryParam]}`;
         }
+    }
+});
     </script>
 </body>
 </html>
