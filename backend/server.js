@@ -1,379 +1,563 @@
 const express = require('express');
-const { Pool } = require('pg');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const PORT = 3000;
 
-// Подключение к PostgreSQL
-const pool = new Pool({
-  host: 'localhost',
-  port: 5432,
-  database: 'school_portal',
-  user: 'postgres',
-  password: 'postgres' // ТВОЙ ПАРОЛЬ
-});
-
-// Проверка подключения
-pool.connect()
-  .then(() => console.log('✅ Подключились к PostgreSQL'))
-  .catch(err => {
-    console.error('❌ Ошибка подключения:', err.message);
-    process.exit(1);
-  });
-
-// Middleware
+// ========== БАЗОВЫЕ НАСТРОЙКИ ==========
 app.use(cors());
 app.use(express.json());
-app.use(express.static('C:/Users/smile300822/Desktop/school-portal/frontend')); // Раздаём статические файлы
 
-// ============ API ДЛЯ ОБЪЯВЛЕНИЙ ============
+// ========== СТАТИЧЕСКИЕ ФАЙЛЫ ==========
+const FRONTEND_PATH = path.join(__dirname, '..', 'frontend');
+console.log('📁 Путь к фронтенду:', FRONTEND_PATH);
 
-// 1. Получить ВСЕ объявления
-app.get('/api/announcements', async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM announcements ORDER BY created_at DESC'
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Ошибка GET:', err);
-    res.status(500).json({ error: 'Не удалось загрузить объявления' });
-  }
+app.use(express.static(FRONTEND_PATH));
+
+// ========== ПУСТЫЕ МАССИВЫ ДАННЫХ ==========
+let users = [];
+let announcements = [];
+let schedules = [];
+
+// ========== МИДЛВЭР ДЛЯ ЛОГИРОВАНИЯ ==========
+app.use((req, res, next) => {
+    console.log(`📨 ${req.method} ${req.path}`, req.body || '');
+    next();
 });
 
-// 2. Создать новое объявление
-app.post('/api/announcements', async (req, res) => {
-  try {
-    const { 
-      title, 
-      content, 
-      category = 'students', 
-      type = 'announcement',
-      author = 'Администрация',
-      pinned = false,
-      urgent = false
-    } = req.body;
+// ========== API ДЛЯ ПРОВЕРКИ СЕРВЕРА ==========
+app.get('/api/health', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        message: 'Сервер работает',
+        hasUsers: users.length > 0,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// ========== API ДЛЯ ПРОВЕРКИ, НУЖЕН ЛИ ПЕРВЫЙ АДМИН ==========
+app.get('/api/setup/check', (req, res) => {
+    res.json({ 
+        needsSetup: users.length === 0,
+        message: users.length === 0 ? 'Требуется создание первого администратора' : 'Система настроена'
+    });
+});
+
+// ========== API АВТОРИЗАЦИИ ==========
+app.post('/api/auth/login', (req, res) => {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Введите логин и пароль' 
+        });
+    }
+    
+    const user = users.find(u => u.username === username);
+    if (!user) {
+        return res.status(401).json({ 
+            success: false, 
+            error: 'Неверный логин или пароль' 
+        });
+    }
+    
+    if (user.password !== password) {
+        return res.status(401).json({ 
+            success: false, 
+            error: 'Неверный логин или пароль' 
+        });
+    }
+    
+    user.last_login = new Date().toISOString();
+    
+    const token = `token-${user.id}-${Date.now()}`;
+    
+    const { password: _, ...userWithoutPassword } = user;
+    
+    res.json({
+        success: true,
+        token,
+        user: userWithoutPassword
+    });
+});
+
+// ========== СОЗДАНИЕ ПЕРВОГО АДМИНИСТРАТОРА ==========
+app.post('/api/setup/first-admin', (req, res) => {
+    if (users.length > 0) {
+        return res.status(400).json({
+            success: false,
+            error: 'Администратор уже создан'
+        });
+    }
+    
+    const { username, password, full_name } = req.body;
+    
+    if (!username || !password || !full_name) {
+        return res.status(400).json({
+            success: false,
+            error: 'Заполните все поля'
+        });
+    }
+    
+    if (password.length < 6) {
+        return res.status(400).json({
+            success: false,
+            error: 'Пароль должен быть не менее 6 символов'
+        });
+    }
+    
+    const firstAdmin = {
+        id: 1,
+        username,
+        full_name,
+        role: 'director',
+        password,
+        created_at: new Date().toISOString(),
+        last_login: null
+    };
+    
+    users.push(firstAdmin);
+    
+    const { password: _, ...adminWithoutPassword } = firstAdmin;
+    
+    res.json({
+        success: true,
+        message: 'Первый администратор создан успешно',
+        user: adminWithoutPassword
+    });
+});
+
+// ========== МИДЛВЭР ДЛЯ ПРОВЕРКИ АВТОРИЗАЦИИ ==========
+const requireAuth = (req, res, next) => {
+    console.log('🔐 Проверка авторизации для:', req.path);
+    
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+        console.log('❌ Нет заголовка Authorization');
+        return res.status(401).json({ 
+            success: false, 
+            error: 'Требуется авторизация. Пожалуйста, войдите в систему.' 
+        });
+    }
+    
+    // Удаляем "Bearer " если есть
+    const token = authHeader.replace('Bearer ', '');
+    
+    console.log('📝 Полученный токен:', token.substring(0, 20) + '...');
+    
+    if (!token.startsWith('token-')) {
+        console.log('❌ Неверный формат токена');
+        return res.status(401).json({ 
+            success: false, 
+            error: 'Неверный токен' 
+        });
+    }
+    
+    const tokenParts = token.split('-');
+    if (tokenParts.length < 3) {
+        console.log('❌ Токен поврежден');
+        return res.status(401).json({ 
+            success: false, 
+            error: 'Токен поврежден' 
+        });
+    }
+    
+    const userId = parseInt(tokenParts[1]);
+    const user = users.find(u => u.id === userId);
+    
+    if (!user) {
+        console.log('❌ Пользователь не найден по токену, ID:', userId);
+        return res.status(401).json({ 
+            success: false, 
+            error: 'Пользователь не найден' 
+        });
+    }
+    
+    // Проверяем роль (только director или deputy могут в админку)
+    if (!['director', 'deputy'].includes(user.role)) {
+        console.log('❌ Недостаточно прав, роль:', user.role);
+        return res.status(403).json({ 
+            success: false, 
+            error: 'Недостаточно прав' 
+        });
+    }
+    
+    console.log('✅ Авторизация успешна для:', user.username, 'роль:', user.role);
+    
+    req.user = user;
+    next();
+};
+
+// ========== API АДМИНИСТРАТИВНЫХ ПОЛЬЗОВАТЕЛЕЙ ==========
+app.get('/api/admin/users', requireAuth, (req, res) => {
+    console.log('👥 GET /api/admin/users - запрос от:', req.user.username);
+    
+    const usersWithoutPasswords = users.map(user => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+    });
+    
+    res.json({ 
+        success: true, 
+        users: usersWithoutPasswords 
+    });
+});
+
+app.post('/api/admin/users', requireAuth, (req, res) => {
+    console.log('➕ POST /api/admin/users - запрос от:', req.user.username);
+    
+    const { username, password, full_name, role } = req.body;
+    
+    if (!username || !password || !full_name || !role) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Заполните все поля' 
+        });
+    }
+    
+    if (!['director', 'deputy'].includes(role)) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Недопустимая роль' 
+        });
+    }
+    
+    if (users.find(u => u.username === username)) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Логин уже занят' 
+        });
+    }
+    
+    const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
+    
+    const newUser = {
+        id: newId,
+        username,
+        full_name,
+        role,
+        password,
+        created_at: new Date().toISOString(),
+        last_login: null
+    };
+    
+    users.push(newUser);
+    
+    const { password: _, ...userWithoutPassword } = newUser;
+    
+    res.json({ 
+        success: true, 
+        user: userWithoutPassword 
+    });
+});
+
+app.put('/api/admin/users/:id', requireAuth, (req, res) => {
+    const { id } = req.params;
+    const { full_name, role } = req.body;
+    
+    const userIndex = users.findIndex(u => u.id == id);
+    if (userIndex === -1) {
+        return res.status(404).json({ 
+            success: false, 
+            error: 'Пользователь не найден' 
+        });
+    }
+    
+    users[userIndex].full_name = full_name;
+    users[userIndex].role = role;
+    
+    const { password: _, ...userWithoutPassword } = users[userIndex];
+    
+    res.json({ 
+        success: true, 
+        user: userWithoutPassword 
+    });
+});
+
+app.post('/api/admin/users/:id/reset-password', requireAuth, (req, res) => {
+    const { id } = req.params;
+    const { newPassword } = req.body;
+    
+    const user = users.find(u => u.id == id);
+    if (!user) {
+        return res.status(404).json({ 
+            success: false, 
+            error: 'Пользователь не найден' 
+        });
+    }
+    
+    if (newPassword.length < 6) {
+        return res.status(400).json({
+            success: false,
+            error: 'Пароль должен быть не менее 6 символов'
+        });
+    }
+    
+    user.password = newPassword;
+    
+    res.json({ 
+        success: true, 
+        message: 'Пароль успешно изменен'
+    });
+});
+
+app.delete('/api/admin/users/:id', requireAuth, (req, res) => {
+    const { id } = req.params;
+    
+    if (id == req.user.id) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Нельзя удалить самого себя' 
+        });
+    }
+    
+    const userIndex = users.findIndex(u => u.id == id);
+    if (userIndex === -1) {
+        return res.status(404).json({ 
+            success: false, 
+            error: 'Пользователь не найден' 
+        });
+    }
+    
+    users.splice(userIndex, 1);
+    
+    res.json({ 
+        success: true, 
+        message: 'Пользователь удален'
+    });
+});
+
+// ========== API ОБЪЯВЛЕНИЙ ==========
+app.get('/api/announcements', (req, res) => {
+    res.json(announcements);
+});
+
+app.post('/api/announcements', requireAuth, (req, res) => {
+    const { title, content, category, type, pinned, urgent } = req.body;
     
     if (!title || !content) {
-      return res.status(400).json({ error: 'Нужны заголовок и текст' });
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Заполните заголовок и содержание' 
+        });
     }
     
-    const result = await pool.query(
-      `INSERT INTO announcements 
-       (title, content, category, type, author, pinned, urgent) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7) 
-       RETURNING *`,
-      [title, content, category, type, author, pinned, urgent]
-    );
+    const newId = announcements.length > 0 ? Math.max(...announcements.map(a => a.id)) + 1 : 1;
+    
+    const newAnnouncement = {
+        id: newId,
+        title,
+        content,
+        category: category || 'all',
+        type: type || 'announcement',
+        author: req.user.full_name || req.user.username,
+        pinned: Boolean(pinned),
+        urgent: Boolean(urgent),
+        created_at: new Date().toISOString()
+    };
+    
+    announcements.push(newAnnouncement);
     
     res.json({ 
-      success: true, 
-      announcement: result.rows[0] 
+        success: true, 
+        announcement: newAnnouncement 
     });
-  } catch (err) {
-    console.error('Ошибка POST:', err);
-    res.status(500).json({ error: 'Не удалось создать объявление' });
-  }
 });
 
-// 3. Обновить объявление
-app.put('/api/announcements/:id', async (req, res) => {
-  try {
+app.put('/api/announcements/:id', requireAuth, (req, res) => {
     const { id } = req.params;
-    const { 
-      title, 
-      content, 
-      category, 
-      type,
-      author,
-      pinned,
-      urgent
-    } = req.body;
+    const { title, content, category, type, pinned, urgent } = req.body;
     
-    const result = await pool.query(
-      `UPDATE announcements 
-       SET title = $1, 
-           content = $2, 
-           category = $3, 
-           type = $4,
-           author = $5,
-           pinned = $6,
-           urgent = $7,
-           updated_at = NOW()
-       WHERE id = $8 
-       RETURNING *`,
-      [title, content, category, type, author, pinned, urgent, id]
-    );
-    
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Объявление не найдено' });
+    const annIndex = announcements.findIndex(a => a.id == id);
+    if (annIndex === -1) {
+        return res.status(404).json({ 
+            success: false, 
+            error: 'Объявление не найдено' 
+        });
     }
     
+    announcements[annIndex] = {
+        ...announcements[annIndex],
+        title: title || announcements[annIndex].title,
+        content: content || announcements[annIndex].content,
+        category: category || announcements[annIndex].category,
+        type: type || announcements[annIndex].type,
+        pinned: pinned !== undefined ? Boolean(pinned) : announcements[annIndex].pinned,
+        urgent: urgent !== undefined ? Boolean(urgent) : announcements[annIndex].urgent
+    };
+    
     res.json({ 
-      success: true, 
-      announcement: result.rows[0] 
+        success: true, 
+        announcement: announcements[annIndex] 
     });
-  } catch (err) {
-    console.error('Ошибка PUT:', err);
-    res.status(500).json({ error: 'Не удалось обновить объявление' });
-  }
 });
 
-// 4. Удалить объявление
-app.delete('/api/announcements/:id', async (req, res) => {
-  try {
+app.delete('/api/announcements/:id', requireAuth, (req, res) => {
     const { id } = req.params;
     
-    const result = await pool.query(
-      'DELETE FROM announcements WHERE id = $1 RETURNING id',
-      [id]
-    );
-    
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Объявление не найдено' });
+    const annIndex = announcements.findIndex(a => a.id == id);
+    if (annIndex === -1) {
+        return res.status(404).json({ 
+            success: false, 
+            error: 'Объявление не найдено' 
+        });
     }
+    
+    announcements.splice(annIndex, 1);
     
     res.json({ 
-      success: true, 
-      message: 'Объявление удалено' 
+        success: true, 
+        message: 'Объявление удалено' 
     });
-  } catch (err) {
-    console.error('Ошибка DELETE:', err);
-    res.status(500).json({ error: 'Не удалось удалить объявление' });
-  }
 });
 
-// В твой server.js ДОБАВЛЯЕМ после API для объявлений:
+// ========== API РАСПИСАНИЯ ==========
+app.get('/api/schedules', (req, res) => {
+    res.json(schedules);
+});
 
-// ============ API ДЛЯ РАСПИСАНИЙ ============
-
-// 1. Получить все расписания (с фильтрацией по классу)
-app.get('/api/schedules', async (req, res) => {
-  try {
-    const { class_number, class_letter, day } = req.query;
-    let query = 'SELECT * FROM schedules';
-    const params = [];
+app.post('/api/schedules', requireAuth, (req, res) => {
+    const { class_number, class_letter, day_of_week, start_time, end_time, subject, teacher, room } = req.body;
     
-    if (class_number || class_letter || day) {
-      const conditions = [];
-      
-      if (class_number) {
-        params.push(class_number);
-        conditions.push(`class_number = $${params.length}`);
-      }
-      
-      if (class_letter) {
-        params.push(class_letter);
-        conditions.push(`class_letter = $${params.length}`);
-      }
-      
-      if (day) {
-        params.push(day);
-        conditions.push(`day_of_week = $${params.length}`);
-      }
-      
-      query += ' WHERE ' + conditions.join(' AND ');
+    if (!class_number || !class_letter || !day_of_week || !start_time || !end_time || !subject || !teacher) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Заполните все обязательные поля' 
+        });
     }
     
-    query += ' ORDER BY class_number, class_letter, day_of_week, lesson_number';
+    const newId = schedules.length > 0 ? Math.max(...schedules.map(s => s.id)) + 1 : 1;
     
-    const result = await pool.query(query, params);
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Ошибка GET расписаний:', err);
-    res.status(500).json({ error: 'Не удалось загрузить расписание' });
-  }
-});
-
-// 2. Получить список всех классов (для фильтров)
-app.get('/api/schedules/classes', async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT DISTINCT class_number, class_letter FROM schedules ORDER BY class_number, class_letter'
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Ошибка GET классов:', err);
-    res.status(500).json({ error: 'Не удалось загрузить классы' });
-  }
-});
-
-// 3. Создать новый урок
-app.post('/api/schedules', async (req, res) => {
-  try {
-    const { 
-      class_number, 
-      class_letter, 
-      day_of_week, 
-      lesson_number, 
-      start_time, 
-      end_time, 
-      subject, 
-      teacher, 
-      room 
-    } = req.body;
+    const newSchedule = {
+        id: newId,
+        class_number: parseInt(class_number),
+        class_letter,
+        day_of_week,
+        start_time: start_time.includes(':') ? start_time : start_time + ':00',
+        end_time: end_time.includes(':') ? end_time : end_time + ':00',
+        subject,
+        teacher,
+        room: room || '',
+        created_at: new Date().toISOString()
+    };
     
-    // Проверка обязательных полей
-    if (!class_number || !class_letter || !day_of_week || !lesson_number || 
-        !start_time || !end_time || !subject || !teacher) {
-      return res.status(400).json({ error: 'Заполните все обязательные поля' });
-    }
-    
-    const result = await pool.query(
-      `INSERT INTO schedules 
-       (class_number, class_letter, day_of_week, lesson_number, start_time, end_time, subject, teacher, room) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
-       RETURNING *`,
-      [class_number, class_letter, day_of_week, lesson_number, 
-       start_time, end_time, subject, teacher, room || null]
-    );
+    schedules.push(newSchedule);
     
     res.json({ 
-      success: true, 
-      data: result.rows[0] 
+        success: true, 
+        schedule: newSchedule 
     });
-  } catch (err) {
-    console.error('Ошибка POST расписания:', err);
+});
+
+app.put('/api/schedules/:id', requireAuth, (req, res) => {
+    const { id } = req.params;
+    const { class_number, class_letter, day_of_week, start_time, end_time, subject, teacher, room } = req.body;
     
-    // Проверка на дублирование урока
-    if (err.code === '23505') { // Код уникального ограничения в PostgreSQL
-      res.status(400).json({ 
-        error: 'У этого класса уже есть урок в это время и день недели' 
-      });
+    const scheduleIndex = schedules.findIndex(s => s.id == id);
+    if (scheduleIndex === -1) {
+        return res.status(404).json({ 
+            success: false, 
+            error: 'Урок не найден' 
+        });
+    }
+    
+    schedules[scheduleIndex] = {
+        ...schedules[scheduleIndex],
+        class_number: class_number || schedules[scheduleIndex].class_number,
+        class_letter: class_letter || schedules[scheduleIndex].class_letter,
+        day_of_week: day_of_week || schedules[scheduleIndex].day_of_week,
+        start_time: start_time || schedules[scheduleIndex].start_time,
+        end_time: end_time || schedules[scheduleIndex].end_time,
+        subject: subject || schedules[scheduleIndex].subject,
+        teacher: teacher || schedules[scheduleIndex].teacher,
+        room: room || schedules[scheduleIndex].room
+    };
+    
+    res.json({ 
+        success: true, 
+        schedule: schedules[scheduleIndex] 
+    });
+});
+
+app.delete('/api/schedules/:id', requireAuth, (req, res) => {
+    const { id } = req.params;
+    
+    const scheduleIndex = schedules.findIndex(s => s.id == id);
+    if (scheduleIndex === -1) {
+        return res.status(404).json({ 
+            success: false, 
+            error: 'Урок не найден' 
+        });
+    }
+    
+    schedules.splice(scheduleIndex, 1);
+    
+    res.json({ 
+        success: true, 
+        message: 'Урок удален' 
+    });
+});
+
+// ========== ДЕБАГ ЭНДПОИНТЫ ==========
+app.get('/api/debug/users', (req, res) => {
+    console.log('🔍 DEBUG: Все пользователи в памяти:', users);
+    
+    res.json({
+        success: true,
+        users_count: users.length,
+        users: users.map(u => ({
+            id: u.id,
+            username: u.username,
+            full_name: u.full_name,
+            role: u.role,
+            created_at: u.created_at,
+            last_login: u.last_login,
+            has_password: !!u.password
+        })),
+        announcements_count: announcements.length,
+        schedules_count: schedules.length
+    });
+});
+
+app.get('/api/debug/token-test', requireAuth, (req, res) => {
+    res.json({
+        success: true,
+        message: 'Токен работает!',
+        user: req.user
+    });
+});
+
+// ========== ОБРАБОТКА 404 ==========
+app.use('*', (req, res) => {
+    if (req.originalUrl.startsWith('/api/')) {
+        res.status(404).json({ 
+            success: false, 
+            error: 'API endpoint не найден' 
+        });
     } else {
-      res.status(500).json({ error: 'Не удалось создать урок' });
+        res.sendFile(path.join(FRONTEND_PATH, 'index.html'));
     }
-  }
 });
 
-// 4. Обновить урок
-app.put('/api/schedules/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { 
-      class_number, 
-      class_letter, 
-      day_of_week, 
-      lesson_number, 
-      start_time, 
-      end_time, 
-      subject, 
-      teacher, 
-      room 
-    } = req.body;
-    
-    const result = await pool.query(
-      `UPDATE schedules 
-       SET class_number = $1, 
-           class_letter = $2, 
-           day_of_week = $3, 
-           lesson_number = $4,
-           start_time = $5,
-           end_time = $6,
-           subject = $7,
-           teacher = $8,
-           room = $9,
-           updated_at = NOW()
-       WHERE id = $10 
-       RETURNING *`,
-      [class_number, class_letter, day_of_week, lesson_number, 
-       start_time, end_time, subject, teacher, room || null, id]
-    );
-    
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Урок не найден' });
-    }
-    
-    res.json({ 
-      success: true, 
-      data: result.rows[0] 
-    });
-  } catch (err) {
-    console.error('Ошибка PUT расписания:', err);
-    res.status(500).json({ error: 'Не удалось обновить урок' });
-  }
-});
-
-// 5. Удалить урок
-app.delete('/api/schedules/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    const result = await pool.query(
-      'DELETE FROM schedules WHERE id = $1 RETURNING id',
-      [id]
-    );
-    
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Урок не найден' });
-    }
-    
-    res.json({ 
-      success: true, 
-      message: 'Урок удален' 
-    });
-  } catch (err) {
-    console.error('Ошибка DELETE расписания:', err);
-    res.status(500).json({ error: 'Не удалось удалить урок' });
-  }
-});
-
-// 6. Получить расписание для класса (для публичного сайта)
-app.get('/api/schedules/class/:class_number/:class_letter', async (req, res) => {
-  try {
-    const { class_number, class_letter } = req.params;
-    
-    const result = await pool.query(
-      `SELECT * FROM schedules 
-       WHERE class_number = $1 AND class_letter = $2 
-       ORDER BY 
-         CASE day_of_week 
-           WHEN 'monday' THEN 1
-           WHEN 'tuesday' THEN 2
-           WHEN 'wednesday' THEN 3
-           WHEN 'thursday' THEN 4
-           WHEN 'friday' THEN 5
-           WHEN 'saturday' THEN 6
-           ELSE 7
-         END,
-         lesson_number`,
-      [class_number, class_letter]
-    );
-    
-    // Группируем по дням недели для удобного отображения
-    const groupedByDay = {};
-    const daysInOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    
-    result.rows.forEach(lesson => {
-      const day = lesson.day_of_week;
-      if (!groupedByDay[day]) {
-        groupedByDay[day] = [];
-      }
-      groupedByDay[day].push(lesson);
-    });
-    
-    // Сортируем дни в правильном порядке
-    const sortedSchedule = {};
-    daysInOrder.forEach(day => {
-      if (groupedByDay[day]) {
-        sortedSchedule[day] = groupedByDay[day];
-      }
-    });
-    
-    res.json(sortedSchedule);
-  } catch (err) {
-    console.error('Ошибка GET расписания класса:', err);
-    res.status(500).json({ error: 'Не удалось загрузить расписание' });
-  }
-});
-
-// Запуск сервера
+// ========== ЗАПУСК СЕРВЕРА ==========
 app.listen(PORT, () => {
-  console.log(`🚀 Сервер запущен: http://localhost:${PORT}`);
-  console.log(`📡 API объявления: http://localhost:${PORT}/api/announcements`);
-  console.log(`📡 API расписание: http://localhost:${PORT}/api/schedules`);
-  console.log(`🌐 Сайт: http://localhost:${PORT}/announcements.html`);
-  console.log(`📅 Расписание: http://localhost:${PORT}/schedule.html`);
-  console.log(`🔧 Админка: http://localhost:${PORT}/admin.html`);
+    console.log(`
+🚀 Сервер запущен: http://localhost:${PORT}
+📁 Обслуживает файлы из: ${FRONTEND_PATH}
+
+📊 Состояние системы:
+   • Пользователи: ${users.length}
+   • Объявления: ${announcements.length}
+   • Уроки: ${schedules.length}
+
+🔐 Админ API защищены авторизацией
+🌐 Открывайте: http://localhost:${PORT}/login.html
+
+📋 Дебаг эндпоинты:
+   • GET /api/debug/users      - Все пользователи (без защиты)
+   • GET /api/debug/token-test - Тест токена (с защитой)
+`);
 });
