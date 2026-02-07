@@ -56,19 +56,6 @@
         .select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
         .textarea { width: 100%; padding: 0.625rem 0.875rem; border: 2px solid var(--gray-300); border-radius: 0.5rem; font-size: 0.875rem; font-family: inherit; resize: vertical; min-height: 100px; }
         
-        /* Загрузка файлов */
-        .file-upload { position: relative; }
-        .file-input { width: 0.1px; height: 0.1px; opacity: 0; overflow: hidden; position: absolute; z-index: -1; }
-        .file-label { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 1rem; border: 2px dashed var(--gray-300); border-radius: 0.5rem; background: var(--gray-50); cursor: pointer; transition: all 0.15s; }
-        .file-label:hover { border-color: var(--primary); background: var(--primary-light); }
-        .file-list { margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
-        .file-item { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem; background: var(--gray-50); border-radius: 0.375rem; }
-        .file-info { display: flex; align-items: center; gap: 0.5rem; }
-        .file-name { font-size: 0.875rem; font-weight: 500; }
-        .file-size { font-size: 0.75rem; color: var(--gray-500); }
-        .file-remove { color: var(--danger); cursor: pointer; padding: 0.25rem; border-radius: 0.25rem; transition: all 0.15s; }
-        .file-remove:hover { background: var(--danger); color: white; }
-        
         .modal-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .modal-backdrop.active { opacity: 1; visibility: visible; }
         .modal { background: white; border-radius: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -76,27 +63,24 @@
         .modal-header { padding: 1.5rem 1.5rem 1rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: flex-start; }
         .modal-title { font-size: 1.25rem; font-weight: 600; color: var(--gray-900); }
         .modal-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: var(--gray-400);
-    cursor: pointer;
-    width: 2.5rem;
-    height: 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.5rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-}
-
-.modal-close:hover {
-    background: var(--gray-100);
-    color: var(--danger);
-    transform: rotate(90deg) scale(1.1);
-}
-        .modal-close:hover::before, .modal-close:hover::after { width: 70%; height: 3px; }
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-400);
+            cursor: pointer;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal-close:hover {
+            background: var(--gray-100);
+            color: var(--danger);
+            transform: rotate(90deg) scale(1.1);
+        }
         .modal-body { padding: 1.5rem; }
         .modal-footer { padding: 1.25rem 1.5rem; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 0.75rem; background: var(--gray-50); border-radius: 0 0 1.5rem 1.5rem; }
         .alert-container { position: fixed; top: 1rem; right: 1rem; z-index: 1100; max-width: 400px; width: 100%; display: flex; flex-direction: column; gap: 0.75rem; }
@@ -127,8 +111,6 @@
         .spinner { width: 1.5rem; height: 1.5rem; border: 2px solid var(--gray-300); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .empty-state { text-align: center; padding: 3rem 1.5rem; }
-        .add-class-section, .delete-class-section { margin-top: 10px; padding: 15px; background: var(--gray-50); border-radius: 8px; border: 1px solid var(--gray-200); }
-        .class-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; transition: all 0.3s; }
         .time-input-group { display: flex; align-items: center; gap: 10px; }
         .switch { display: inline-flex; align-items: center; cursor: pointer; }
         .switch-input { display: none; }
@@ -137,169 +119,42 @@
         .switch-input:checked + .switch-toggle { background-color: var(--primary); }
         .switch-input:checked + .switch-toggle::after { transform: translateX(1.5rem); }
         .switch-label { margin-left: 0.75rem; font-size: 0.875rem; color: var(--gray-700); }
-        /* === УЛУЧШЕННЫЕ КНОПКИ ХЕДЕРА === */
-.admin-actions {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-}
-
-.btn-secondary.btn-sm, #logoutBtn {
-    position: relative;
-    overflow: hidden;
-    border: none !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.5px !important;
-    text-transform: uppercase;
-    font-size: 0.75rem !important;
-    padding: 0.75rem 1.5rem !important;
-    border-radius: 50px !important;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    min-width: 140px;
-    height: 48px;
-    cursor: pointer;
-}
-
-/* Кнопка "На сайт" */
-.btn-secondary.btn-sm {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
-    color: white !important;
-}
-
-.btn-secondary.btn-sm::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-    transition: left 0.8s ease;
-}
-
-.btn-secondary.btn-sm:hover::before {
-    left: 100%;
-}
-
-.btn-secondary.btn-sm:hover {
-    transform: translateY(-4px) scale(1.08);
-    box-shadow: 0 12px 25px rgba(99, 102, 241, 0.35) !important;
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
-    letter-spacing: 1px !important;
-}
-
-.btn-secondary.btn-sm i {
-    font-size: 1.1rem;
-    transition: all 0.4s ease;
-}
-
-.btn-secondary.btn-sm:hover i {
-    transform: translateX(4px) rotate(15deg);
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-}
-
-/* Кнопка "Выйти" */
-#logoutBtn {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-    color: white !important;
-}
-
-#logoutBtn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.5s, height 0.5s;
-}
-
-#logoutBtn:hover::before {
-    width: 150%;
-    height: 150%;
-}
-
-#logoutBtn:hover {
-    transform: translateY(-4px) scale(1.08);
-    box-shadow: 0 12px 25px rgba(239, 68, 68, 0.35) !important;
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
-    letter-spacing: 1px !important;
-}
-
-#logoutBtn i {
-    font-size: 1.1rem;
-    transition: all 0.4s ease;
-}
-
-#logoutBtn:hover i {
-    transform: translateX(-4px) rotate(-20deg);
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-}
-
-/* Анимация пульсации для кнопки "Выйти" */
-@keyframes logoutPulse {
-    0% {
-        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4),
-                    0 0 0 0 rgba(239, 68, 68, 0.4);
-    }
-    70% {
-        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4),
-                    0 0 0 12px rgba(239, 68, 68, 0);
-    }
-    100% {
-        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4),
-                    0 0 0 0 rgba(239, 68, 68, 0);
-    }
-}
-
-#logoutBtn {
-    animation: logoutPulse 3s infinite;
-}
-
-#logoutBtn:hover {
-    animation: none;
-}
-
-/* Эффект нажатия */
-.btn-secondary.btn-sm:active, #logoutBtn:active {
-    transform: translateY(-1px) scale(1.02);
-    transition: all 0.1s ease !important;
-}
-
-/* Адаптивность для кнопок */
-@media (max-width: 768px) {
-    .admin-actions {
-        width: 100%;
-        justify-content: space-between;
-        gap: 0.75rem;
-    }
-    
-    .btn-secondary.btn-sm, #logoutBtn {
-        min-width: 120px;
-        padding: 0.625rem 1.25rem !important;
-        font-size: 0.7rem !important;
-    }
-}
-
-/* Эффект свечения при фокусе */
-.btn-secondary.btn-sm:focus, #logoutBtn:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3),
-                0 12px 25px rgba(99, 102, 241, 0.35) !important;
-}
-
-#logoutBtn:focus {
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3),
-                0 12px 25px rgba(239, 68, 68, 0.35) !important;
-}
+        .admin-actions { display: flex; align-items: center; gap: 1.25rem; }
+        .btn-secondary.btn-sm, #logoutBtn {
+            position: relative;
+            overflow: hidden;
+            border: none !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.5px !important;
+            text-transform: uppercase;
+            font-size: 0.75rem !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 50px !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            min-width: 140px;
+            height: 48px;
+            cursor: pointer;
+        }
+        .btn-secondary.btn-sm {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+            color: white !important;
+        }
+        #logoutBtn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            color: white !important;
+        }
+        .btn-secondary.btn-sm:hover, #logoutBtn:hover {
+            transform: translateY(-4px) scale(1.08);
+            box-shadow: 0 12px 25px rgba(99, 102, 241, 0.35) !important;
+        }
+        #logoutBtn:hover {
+            box-shadow: 0 12px 25px rgba(239, 68, 68, 0.35) !important;
+        }
     </style>
 </head>
 <body>
@@ -389,6 +244,13 @@
                     <div class="filters">
                         <select class="select" style="width: auto;" id="classFilter">
                             <option value="">Все классы</option>
+                            <option value="5">5 класс</option>
+                            <option value="6">6 класс</option>
+                            <option value="7">7 класс</option>
+                            <option value="8">8 класс</option>
+                            <option value="9">9 класс</option>
+                            <option value="10">10 класс</option>
+                            <option value="11">11 класс</option>
                         </select>
                         <select class="select" style="width: auto;" id="dayFilter">
                             <option value="">Все дни</option>
@@ -462,7 +324,8 @@
         </div>
     </main>
 
-    <!-- Модалки -->
+    <!-- Модалка расписания -->
+        <!-- Модалки -->
     <div class="modal-backdrop" id="scheduleModal">
         <div class="modal">
             <div class="modal-header">
@@ -506,9 +369,12 @@
                             <label class="input-label input-label-required">День недели</label>
                             <select class="select" id="scheduleDay" required>
                                 <option value="">Выберите день</option>
-                                <option value="monday">Понедельник</option><option value="tuesday">Вторник</option>
-                                <option value="wednesday">Среда</option><option value="thursday">Четверг</option>
-                                <option value="friday">Пятница</option><option value="saturday">Суббота</option>
+                                <option value="monday">Понедельник</option>
+                                <option value="tuesday">Вторник</option>
+                                <option value="wednesday">Среда</option>
+                                <option value="thursday">Четверг</option>
+                                <option value="friday">Пятница</option>
+                                <option value="saturday">Суббота</option>
                             </select>
                         </div>
                         <div class="form-full">
@@ -547,6 +413,7 @@
         </div>
     </div>
 
+    <!-- Модалка для объявлений -->
     <div class="modal-backdrop" id="announcementModal">
         <div class="modal">
             <div class="modal-header">
@@ -564,39 +431,32 @@
                         <textarea class="textarea" id="announcementContent" rows="4" required placeholder="Введите текст..."></textarea>
                     </div>
                     
-                    <!-- Загрузка файлов -->
-                    <div class="input-group">
-                        <label class="input-label">Прикрепленные файлы</label>
-                        <div class="file-upload">
-                            <input type="file" class="file-input" id="announcementFiles" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                            <label for="announcementFiles" class="file-label">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <span>Перетащите файлы сюда или кликните для выбора</span>
-                            </label>
-                            <div class="file-list" id="announcementFileList"></div>
-                        </div>
-                    </div>
-                    
                     <div class="form-grid">
                         <div class="input-group">
                             <label class="input-label input-label-required">Категория</label>
                             <select class="select" id="announcementCategory" required>
                                 <option value="">Выберите категорию</option>
-                                <option value="all">Для всех</option><option value="students">Ученикам</option>
-                                <option value="teachers">Учителям</option><option value="parents">Родителям</option>
+                                <option value="all">Для всех</option>
+                                <option value="students">Ученикам</option>
+                                <option value="teachers">Учителям</option>
+                                <option value="parents">Родителям</option>
                             </select>
                         </div>
                         <div class="input-group">
                             <label class="input-label input-label-required">Тип</label>
                             <select class="select" id="announcementType" required>
                                 <option value="">Выберите тип</option>
-                                <option value="announcement">Объявление</option><option value="news">Новость</option><option value="event">Мероприятие</option>
+                                <option value="announcement">Объявление</option>
+                                <option value="news">Новость</option>
+                                <option value="event">Мероприятие</option>
                             </select>
                         </div>
                         <div class="input-group">
                             <label class="input-label">Приоритет</label>
                             <select class="select" id="announcementPriority">
-                                <option value="normal">Обычный</option><option value="high">Высокий</option><option value="urgent">Срочный</option>
+                                <option value="normal">Обычный</option>
+                                <option value="high">Высокий</option>
+                                <option value="urgent">Срочный</option>
                             </select>
                         </div>
                         <div class="input-group">
@@ -613,13 +473,14 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-modal="announcementModal" id="announcementCancelBtn">Отмена</button>
-                    <button type="submit" class="btn btn-primary" id="announcementSubmitBtn"><i class="fas fa-save"></i> Сохранить</button>
+                    <button type="button" class="btn btn-secondary" data-modal="announcementModal">Отмена</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Сохранить</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- Модалка для пользователей -->
     <div class="modal-backdrop" id="userModal">
         <div class="modal">
             <div class="modal-header">
@@ -662,13 +523,14 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-modal="userModal" id="userCancelBtn">Отмена</button>
-                    <button type="submit" class="btn btn-primary" id="userSubmitBtn"><i class="fas fa-save"></i> Сохранить</button>
+                    <button type="button" class="btn btn-secondary" data-modal="userModal">Отмена</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Сохранить</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- Модалка подтверждения -->
     <div class="modal-backdrop" id="confirmModal">
         <div class="modal" style="max-width: 400px;">
             <div class="modal-header">
@@ -679,695 +541,765 @@
                 <p id="confirmModalMessage">Вы уверены, что хотите удалить этот элемент? Это действие нельзя отменить.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-modal="confirmModal" id="confirmCancelBtn">Отмена</button>
+                <button type="button" class="btn btn-secondary" data-modal="confirmModal">Отмена</button>
                 <button type="button" class="btn btn-danger" id="confirmModalDelete"><i class="fas fa-trash"></i> Удалить</button>
             </div>
         </div>
     </div>
 
     <script>
-        const mockData = {
-            announcements: [
-                { 
-                    id: '1', 
-                    title: 'Родительское собрание', 
-                    content: 'Приглашаем родителей на собрание...', 
-                    category: 'parents', 
-                    type: 'announcement', 
-                    date: '25.01.2024', 
-                    pinned: true, 
-                    urgent: false, 
-                    author: 'Директор школы', 
-                    priority: 'normal',
-                    files: []
-                },
-                { 
-                    id: '2', 
-                    title: 'СРОЧНО: Отмена занятий', 
-                    content: 'В связи с погодными условиями...', 
-                    category: 'students', 
-                    type: 'announcement', 
-                    date: '24.01.2024', 
-                    pinned: false, 
-                    urgent: true, 
-                    author: 'Администрация', 
-                    priority: 'urgent',
-                    files: []
-                }
-            ],
-            schedule: [
-                { id: '1', class: '11А', day: 'Понедельник', dayValue: 'monday', startTime: '08:30', endTime: '09:15', subject: 'Математика', teacher: 'Иванова И.И.', room: '203', notes: '' },
-                { id: '2', class: '11А', day: 'Понедельник', dayValue: 'monday', startTime: '09:25', endTime: '10:10', subject: 'Физика', teacher: 'Петров П.П.', room: '104', notes: '' }
-            ],
-            users: [
-                { id: '1', name: 'Иванов Иван Иванович', initials: 'ИИ', email: 'director@school.ru', phone: '+7 (999) 123-45-67', role: 'director', date: '15.01.2024' },
-                { id: '2', name: 'Петрова Анна Сергеевна', initials: 'ПА', email: 'deputy@school.ru', phone: '+7 (999) 987-65-43', role: 'deputy_director', date: '16.01.2024' }
-            ]
-        };
+        // ========== API КОНФИГУРАЦИЯ ==========
+const API_BASE_URL = 'http://localhost:3000';
+let currentEditId = null;
+let currentEditScheduleId = null;
+let allSchedules = [];
+let availableClasses = ['5А', '5Б', '5В', '6А', '6Б', '6В', '7А', '7Б', '7В', '8А', '8Б', '8В', '9А', '9Б', '9В', '10А', '10Б', '10В', '11А', '11Б', '11В'];
 
-        let state = { currentTab: 'announcements', editingItem: null, deleteCallback: null };
-        let classesData = ["11А", "10А", "10Б", "9А", "9Б", "8А", "8Б"];
-        let announcementFiles = [];
+// ========== ФУНКЦИИ МОДАЛЬНЫХ ОКОН ==========
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
 
-        function showAlert(message, type = 'success', title = '', duration = 5000) {
-            const container = document.getElementById('alertsContainer');
-            const alertId = 'alert-' + Date.now();
-            const icons = { success: 'check-circle', error: 'exclamation-circle', warning: 'exclamation-triangle', info: 'info-circle' };
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.id = alertId;
-            alert.innerHTML = `
-                <div class="alert-icon"><i class="fas fa-${icons[type]}"></i></div>
-                <div class="alert-content">${title ? `<div class="alert-title">${title}</div>` : ''}<div class="alert-message">${message}</div></div>
-                <button class="alert-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
-            `;
-            container.appendChild(alert);
-            if (duration > 0) setTimeout(() => { const el = document.getElementById(alertId); if (el) { el.style.transform = 'translateX(100%)'; el.style.opacity = '0'; setTimeout(() => el.remove(), 300); } }, duration);
-            return alertId;
-        }
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
 
-        function openModal(modalId) { 
-            document.getElementById(modalId).classList.add('active'); 
-            document.body.style.overflow = 'hidden'; 
+// ========== ПОКАЗ УВЕДОМЛЕНИЙ ==========
+function showAlert(message, type = 'success') {
+    const container = document.getElementById('alertsContainer');
+    container.innerHTML = '';
+    
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+    
+    container.appendChild(alert);
+    
+    setTimeout(() => alert.remove(), 2000);
+}
+
+// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+function getCategoryLabel(category) {
+    const labels = {
+        'students': 'Ученикам',
+        'teachers': 'Учителям',
+        'parents': 'Родителям',
+        'all': 'Для всех'
+    };
+    return labels[category] || category;
+}
+
+function getTypeLabel(type) {
+    const labels = {
+        'announcement': 'Объявление',
+        'news': 'Новость',
+        'event': 'Мероприятие'
+    };
+    return labels[type] || type;
+}
+
+function getDayLabel(day) {
+    const days = {
+        'monday': 'Понедельник',
+        'tuesday': 'Вторник',
+        'wednesday': 'Среда',
+        'thursday': 'Четверг',
+        'friday': 'Пятница',
+        'saturday': 'Суббота'
+    };
+    return days[day] || day;
+}
+
+// ========== ОБЪЯВЛЕНИЯ ==========
+
+// Загрузка объявлений
+async function loadAdminAnnouncements() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/announcements`);
+        const announcements = await response.json();
+        
+        const tbody = document.getElementById('announcementsTable');
+        const emptyState = document.getElementById('emptyAnnouncements');
+        
+        if (announcements.length === 0) {
+            tbody.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
         }
         
-        function closeModal(modalId) { 
-            document.getElementById(modalId).classList.remove('active'); 
-            document.body.style.overflow = 'auto';
-            const form = document.querySelector(`#${modalId} form`); 
-            if (form) form.reset();
-            document.getElementById('addClassSection').style.display = 'none';
-            document.getElementById('deleteClassSection').style.display = 'none';
-            state.editingItem = null;
-            announcementFiles = [];
-            updateFileList();
-        }
-
-        function getCategoryLabel(category) { 
-            const labels = {'all':'Для всех','students':'Ученикам','teachers':'Учителям','parents':'Родителям'}; 
-            return labels[category] || category; 
-        }
-        
-        function getTypeLabel(type) { 
-            const labels = {'announcement':'Объявление','news':'Новость','event':'Мероприятие'}; 
-            return labels[type] || type; 
-        }
-        
-        function getRoleLabel(role) { 
-            const labels = {'director':'Директор','deputy_director':'Заместитель директора'}; 
-            return labels[role] || role; 
-        }
-
-        function confirmDelete(message, callback) { 
-            state.deleteCallback = callback; 
-            document.getElementById('confirmModalMessage').textContent = message; 
-            openModal('confirmModal'); 
-        }
-
-        function updateClassSelect() {
-            const select = document.getElementById('scheduleClass');
-            const currentValue = select.value;
-            select.innerHTML = '<option value="">Выберите класс</option>';
-            classesData.sort().forEach(className => { 
-                const option = document.createElement('option'); 
-                option.value = className; 
-                option.textContent = className; 
-                select.appendChild(option); 
-            });
-            if (classesData.includes(currentValue)) select.value = currentValue;
-            document.getElementById('showDeleteClassBtn').disabled = classesData.length === 0;
-        }
-
-        function updateClassFilter() {
-            const filter = document.getElementById('classFilter');
-            filter.innerHTML = '<option value="">Все классы</option>';
-            classesData.sort().forEach(className => { 
-                const option = document.createElement('option'); 
-                option.value = className; 
-                option.textContent = className; 
-                filter.appendChild(option); 
-            });
-        }
-
-        function updateDeleteClassList() {
-            const container = document.getElementById('deleteClassList');
-            container.innerHTML = '';
-            classesData.sort().forEach(className => {
-                const div = document.createElement('div');
-                div.className = 'class-item';
-                div.innerHTML = `<span style="font-weight: 500;">${className}</span><button type="button" class="btn btn-danger btn-sm delete-class-btn" data-class="${className}"><i class="fas fa-trash"></i> Удалить</button>`;
-                container.appendChild(div);
-            });
-        }
-
-        // Функция для отображения списка файлов
-        function updateFileList() {
-            const fileList = document.getElementById('announcementFileList');
-            fileList.innerHTML = '';
-            
-            announcementFiles.forEach((file, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.innerHTML = `
-                    <div class="file-info">
-                        <i class="fas fa-file"></i>
-                        <div>
-                            <div class="file-name">${file.name}</div>
-                            <div class="file-size">${formatFileSize(file.size)}</div>
-                        </div>
+        tbody.innerHTML = announcements.map(ann => `
+            <tr data-id="${ann.id}">
+                <td>
+                    <div style="font-weight: 500;">${ann.title}</div>
+                    <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem;">
+                        ${ann.content.substring(0,60)}${ann.content.length > 60 ? '...' : ''}
                     </div>
-                    <button type="button" class="file-remove" data-index="${index}">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                fileList.appendChild(fileItem);
-            });
+                </td>
+                <td><span class="badge badge-secondary">${getCategoryLabel(ann.category)}</span></td>
+                <td>${getTypeLabel(ann.type)}</td>
+                <td>${new Date(ann.created_at).toLocaleDateString('ru-RU')}</td>
+                <td><span class="badge ${ann.urgent ? 'badge-danger' : 'badge-success'}">
+                    ${ann.urgent ? 'Срочное' : 'Активно'}</span></td>
+                <td class="text-right">
+                    <div class="action-buttons">
+                        <button class="action-btn edit-btn" onclick="editAnnouncement(${ann.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteAnnouncement(${ann.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+        
+        emptyState.style.display = 'none';
+        
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+        showAlert('Не удалось загрузить объявления', 'error');
+    }
+}
+
+// Создание объявления
+async function createAnnouncement(formData) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/announcements`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showAlert('✅ Объявление создано!');
+            closeModal('announcementModal');
+            document.getElementById('announcementForm').reset();
+            loadAdminAnnouncements();
+        } else {
+            showAlert('❌ Ошибка: ' + result.error, 'error');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showAlert('❌ Ошибка сети', 'error');
+    }
+}
+
+// Редактирование объявления
+async function editAnnouncement(id) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/announcements`);
+        const announcements = await response.json();
+        const announcement = announcements.find(a => a.id === id);
+        
+        if (!announcement) {
+            showAlert('Объявление не найдено', 'error');
+            return;
+        }
+        
+        currentEditId = id;
+        
+        document.getElementById('announcementModalTitle').textContent = 'Редактировать объявление';
+        document.getElementById('announcementTitle').value = announcement.title;
+        document.getElementById('announcementContent').value = announcement.content;
+        document.getElementById('announcementCategory').value = announcement.category || 'students';
+        document.getElementById('announcementType').value = announcement.type || 'announcement';
+        document.getElementById('announcementPriority').value = announcement.urgent ? 'urgent' : 'normal';
+        document.getElementById('announcementAuthor').value = announcement.author || '';
+        document.getElementById('announcementPinned').checked = announcement.pinned || false;
+        
+        openModal('announcementModal');
+        
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showAlert('Не удалось загрузить данные', 'error');
+    }
+}
+
+// Обновление объявления
+async function updateAnnouncement(formData) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/announcements/${currentEditId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showAlert('✅ Объявление обновлено!');
+            closeModal('announcementModal');
+            document.getElementById('announcementForm').reset();
+            currentEditId = null;
+            loadAdminAnnouncements();
+        } else {
+            showAlert('❌ Ошибка: ' + result.error, 'error');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showAlert('❌ Ошибка сети', 'error');
+    }
+}
+
+// Удаление объявления
+async function deleteAnnouncement(id) {
+    if (!confirm('Удалить это объявление?')) return;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/announcements/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showAlert('✅ Объявление удалено!');
+            loadAdminAnnouncements();
+        } else {
+            showAlert('❌ Ошибка: ' + result.error, 'error');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showAlert('❌ Ошибка сети', 'error');
+    }
+}
+
+// ========== РАСПИСАНИЕ ==========
+
+// Загрузка расписаний
+async function loadAdminSchedules() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/schedules`);
+        allSchedules = await response.json();
+        
+        const tbody = document.getElementById('scheduleTable');
+        const emptyState = document.getElementById('emptySchedule');
+        
+        if (allSchedules.length === 0) {
+            tbody.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+        
+        tbody.innerHTML = allSchedules.map(schedule => `
+            <tr data-id="${schedule.id}">
+                <td>${schedule.class_number}${schedule.class_letter}</td>
+                <td>${getDayLabel(schedule.day_of_week)}</td>
+                <td>${schedule.start_time.slice(0,5)} - ${schedule.end_time.slice(0,5)}</td>
+                <td>${schedule.subject}</td>
+                <td>${schedule.teacher}</td>
+                <td>${schedule.room || '-'}</td>
+                <td class="text-right">
+                    <div class="action-buttons">
+                        <button class="action-btn edit-btn" onclick="editSchedule(${schedule.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteSchedule(${schedule.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+        
+        emptyState.style.display = 'none';
+        
+    } catch (error) {
+        console.error('Ошибка загрузки расписания:', error);
+        showAlert('Не удалось загрузить расписание', 'error');
+    }
+}
+
+// Создание урока
+async function createSchedule(formData) {
+    try {
+        console.log('Отправляем данные:', formData);
+        
+        const response = await fetch(`${API_BASE_URL}/api/schedules`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        console.log('Ответ сервера:', result);
+        
+        if (result.success) {
+            showAlert('✅ Урок добавлен!');
+            closeModal('scheduleModal');
+            document.getElementById('scheduleForm').reset();
             
-            // Добавляем обработчики для удаления файлов
-            fileList.querySelectorAll('.file-remove').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.dataset.index);
-                    announcementFiles.splice(index, 1);
-                    updateFileList();
-                });
-            });
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => { document.getElementById('loadingScreen').style.display = 'none'; }, 800);
+            // Сбрасываем время на стандартное
             document.getElementById('scheduleStartTime').value = '08:30';
             document.getElementById('scheduleEndTime').value = '09:15';
             
-            initTabs();
-            loadAnnouncementsTable();
-            loadScheduleTable();
-            loadUsersTable();
-            updateClassSelect();
-            updateClassFilter();
-            initEventHandlers();
-            
-            document.querySelectorAll('.card').forEach(card => { card.classList.add('fade-in'); });
+            loadAdminSchedules();
+        } else {
+            showAlert(`❌ Ошибка: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('Ошибка создания урока:', error);
+        showAlert('❌ Ошибка сети', 'error');
+    }
+}
+
+// Редактирование урока
+async function editSchedule(id) {
+    const schedule = allSchedules.find(s => s.id === id);
+    
+    if (!schedule) {
+        showAlert('Урок не найден', 'error');
+        return;
+    }
+    
+    currentEditScheduleId = id;
+    
+    // Формируем полное название класса (например "5А")
+    const fullClassName = `${schedule.class_number}${schedule.class_letter}`;
+    
+    document.getElementById('scheduleModalTitle').textContent = 'Редактировать урок';
+    document.getElementById('scheduleClass').value = fullClassName;
+    document.getElementById('scheduleDay').value = schedule.day_of_week;
+    document.getElementById('scheduleStartTime').value = schedule.start_time.slice(0,5);
+    document.getElementById('scheduleEndTime').value = schedule.end_time.slice(0,5);
+    document.getElementById('scheduleSubject').value = schedule.subject;
+    document.getElementById('scheduleTeacher').value = schedule.teacher;
+    document.getElementById('scheduleRoom').value = schedule.room || '';
+    
+    openModal('scheduleModal');
+}
+
+// Обновление урока
+async function updateSchedule(formData) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/schedules/${currentEditScheduleId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
         });
-
-        function initTabs() {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const tabId = btn.dataset.tab;
-                    state.currentTab = tabId;
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    btn.classList.add('active');
-                    const tabContent = document.getElementById(tabId + 'Tab');
-                    tabContent.classList.add('active');
-                    tabContent.querySelectorAll('.card').forEach(card => { card.classList.add('fade-in'); });
-                });
-            });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showAlert('✅ Урок обновлен!');
+            closeModal('scheduleModal');
+            document.getElementById('scheduleForm').reset();
+            
+            // Сбрасываем время на стандартное
+            document.getElementById('scheduleStartTime').value = '08:30';
+            document.getElementById('scheduleEndTime').value = '09:15';
+            
+            loadAdminSchedules();
+            currentEditScheduleId = null;
+        } else {
+            showAlert(`❌ Ошибка: ${result.error}`, 'error');
         }
+    } catch (error) {
+        console.error('Ошибка обновления урока:', error);
+        showAlert('❌ Ошибка сети', 'error');
+    }
+}
 
-        function initEventHandlers() {
-            // Исправленные обработчики закрытия модалок
-            document.querySelectorAll('.modal-close').forEach(btn => { 
-                btn.addEventListener('click', function() { 
-                    const modalId = this.dataset.modal;
-                    closeModal(modalId); 
-                }); 
+// Удаление урока
+async function deleteSchedule(id) {
+    if (!confirm('Удалить этот урок?')) return;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/schedules/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showAlert('✅ Урок удален!');
+            loadAdminSchedules();
+        } else {
+            showAlert(`❌ Ошибка: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        console.error('Ошибка удаления урока:', error);
+        showAlert('❌ Ошибка сети', 'error');
+    }
+}
+
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
+document.addEventListener('DOMContentLoaded', function() {
+    // Загружаем объявления
+    loadAdminAnnouncements();
+    
+    // Заполняем список классов
+    initializeClassList();
+    
+    // Обработчик формы объявлений
+    const announcementForm = document.getElementById('announcementForm');
+    if (announcementForm) {
+        announcementForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                title: document.getElementById('announcementTitle').value.trim(),
+                content: document.getElementById('announcementContent').value.trim(),
+                category: document.getElementById('announcementCategory').value,
+                type: document.getElementById('announcementType').value,
+                author: document.getElementById('announcementAuthor').value.trim(),
+                pinned: document.getElementById('announcementPinned').checked,
+                urgent: document.getElementById('announcementPriority').value === 'urgent'
+            };
+            
+            if (!formData.title || !formData.content) {
+                showAlert('❌ Заполните заголовок и текст', 'error');
+                return;
+            }
+            
+            if (currentEditId) {
+                await updateAnnouncement(formData);
+            } else {
+                await createAnnouncement(formData);
+            }
+        });
+    }
+    
+    // Кнопка добавления объявления
+    const addAnnouncementBtn = document.getElementById('addAnnouncementBtn');
+    if (addAnnouncementBtn) {
+        addAnnouncementBtn.addEventListener('click', function() {
+            currentEditId = null;
+            document.getElementById('announcementModalTitle').textContent = 'Новое объявление';
+            document.getElementById('announcementForm').reset();
+            openModal('announcementModal');
+        });
+    }
+    
+    // Кнопка в пустом состоянии
+    const addFirstAnnouncementBtn = document.getElementById('addFirstAnnouncementBtn');
+    if (addFirstAnnouncementBtn) {
+        addFirstAnnouncementBtn.addEventListener('click', function() {
+            currentEditId = null;
+            document.getElementById('announcementModalTitle').textContent = 'Новое объявление';
+            document.getElementById('announcementForm').reset();
+            openModal('announcementModal');
+        });
+    }
+    
+    // Обработчик формы расписания
+    const scheduleForm = document.getElementById('scheduleForm');
+    if (scheduleForm) {
+        scheduleForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Получаем значение класса (например "5А")
+            const classValue = document.getElementById('scheduleClass').value;
+            
+            // Проверяем формат класса (цифра + буква)
+            if (!classValue || classValue.length < 2) {
+                showAlert('❌ Выберите или добавьте класс', 'error');
+                return;
+            }
+            
+            // Разделяем на цифру и букву
+            const classNumber = parseInt(classValue.match(/\d+/)?.[0]);
+            const classLetter = classValue.match(/[А-Яа-яA-Za-z]+/)?.[0];
+            
+            if (!classNumber || !classLetter) {
+                showAlert('❌ Неверный формат класса', 'error');
+                return;
+            }
+            
+            const formData = {
+                class_number: classNumber,
+                class_letter: classLetter,
+                day_of_week: document.getElementById('scheduleDay').value,
+                lesson_number: 1,
+                start_time: document.getElementById('scheduleStartTime').value + ':00',
+                end_time: document.getElementById('scheduleEndTime').value + ':00',
+                subject: document.getElementById('scheduleSubject').value.trim(),
+                teacher: document.getElementById('scheduleTeacher').value.trim(),
+                room: document.getElementById('scheduleRoom').value.trim()
+            };
+            
+            console.log('Данные формы:', formData);
+            
+            // ПРОВЕРКА ПОЛЕЙ
+            if (!formData.class_number || !formData.day_of_week || !formData.start_time || 
+                !formData.end_time || !formData.subject || !formData.teacher) {
+                showAlert('❌ Заполните все обязательные поля', 'error');
+                return;
+            }
+            
+            if (currentEditScheduleId) {
+                await updateSchedule(formData);
+            } else {
+                await createSchedule(formData);
+            }
+        });
+    }
+    
+    // Кнопка добавления класса
+    const showAddClassBtn = document.getElementById('showAddClassBtn');
+    if (showAddClassBtn) {
+        showAddClassBtn.addEventListener('click', function() {
+            document.getElementById('addClassSection').style.display = 'block';
+            document.getElementById('deleteClassSection').style.display = 'none';
+        });
+    }
+    
+    // Кнопка отмены добавления класса
+    const cancelAddClassBtn = document.getElementById('cancelAddClassBtn');
+    if (cancelAddClassBtn) {
+        cancelAddClassBtn.addEventListener('click', function() {
+            document.getElementById('addClassSection').style.display = 'none';
+            document.getElementById('newClassName').value = '';
+        });
+    }
+    
+    // Кнопка добавления класса в список
+    const addClassBtn = document.getElementById('addClassBtn');
+    if (addClassBtn) {
+        addClassBtn.addEventListener('click', function() {
+            const newClassName = document.getElementById('newClassName').value.trim();
+            
+            if (!newClassName || newClassName.length < 2) {
+                showAlert('❌ Введите название класса (например: 5А)', 'error');
+                return;
+            }
+            
+            // Проверяем формат
+            const hasNumber = /\d/.test(newClassName);
+            const hasLetter = /[А-Яа-яA-Za-z]/.test(newClassName);
+            
+            if (!hasNumber || !hasLetter) {
+                showAlert('❌ Формат: цифра + буква (например: 5А)', 'error');
+                return;
+            }
+            
+            // Добавляем в выпадающий список
+            const scheduleClassSelect = document.getElementById('scheduleClass');
+            const optionExists = Array.from(scheduleClassSelect.options)
+                .some(opt => opt.value === newClassName);
+            
+            if (!optionExists) {
+                const newOption = document.createElement('option');
+                newOption.value = newClassName;
+                newOption.textContent = newClassName;
+                scheduleClassSelect.appendChild(newOption);
+            }
+            
+            // Выбираем новый класс
+            scheduleClassSelect.value = newClassName;
+            
+            // Скрываем секцию добавления
+            document.getElementById('addClassSection').style.display = 'none';
+            document.getElementById('newClassName').value = '';
+            
+            showAlert(`✅ Класс ${newClassName} добавлен`, 'success');
+        });
+    }
+    
+    // Кнопка удаления класса
+    const showDeleteClassBtn = document.getElementById('showDeleteClassBtn');
+    if (showDeleteClassBtn) {
+        showDeleteClassBtn.addEventListener('click', function() {
+            const scheduleClassSelect = document.getElementById('scheduleClass');
+            const deleteClassList = document.getElementById('deleteClassList');
+            
+            // Очищаем список
+            deleteClassList.innerHTML = '';
+            
+            // Добавляем все классы кроме пустого
+            Array.from(scheduleClassSelect.options).forEach(option => {
+                if (option.value) {
+                    const classItem = document.createElement('div');
+                    classItem.className = 'class-item';
+                    classItem.innerHTML = `
+                        <span>${option.textContent}</span>
+                        <button class="btn btn-danger btn-sm delete-class-item-btn" data-value="${option.value}">
+                            <i class="fas fa-trash"></i> Удалить
+                        </button>
+                    `;
+                    deleteClassList.appendChild(classItem);
+                }
             });
             
-            // Кнопки отмены в модалках (исправлено)
-            document.getElementById('scheduleCancelBtn').addEventListener('click', function() { 
-                closeModal('scheduleModal'); 
-            });
+            // Показываем секцию удаления
+            document.getElementById('deleteClassSection').style.display = 'block';
+            document.getElementById('addClassSection').style.display = 'none';
+        });
+    }
+    
+    // Кнопка отмены удаления класса
+    const cancelDeleteClassBtn = document.getElementById('cancelDeleteClassBtn');
+    if (cancelDeleteClassBtn) {
+        cancelDeleteClassBtn.addEventListener('click', function() {
+            document.getElementById('deleteClassSection').style.display = 'none';
+        });
+    }
+    
+    // Обработчик удаления класса из списка
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.delete-class-item-btn')) {
+            const button = e.target.closest('.delete-class-item-btn');
+            const classValue = button.getAttribute('data-value');
+            const scheduleClassSelect = document.getElementById('scheduleClass');
             
-            document.getElementById('announcementCancelBtn').addEventListener('click', function() { 
-                closeModal('announcementModal'); 
-            });
+            // Удаляем опцию
+            const optionToRemove = Array.from(scheduleClassSelect.options)
+                .find(opt => opt.value === classValue);
             
-            document.getElementById('userCancelBtn').addEventListener('click', function() { 
-                closeModal('userModal'); 
-            });
-            
-            document.getElementById('confirmCancelBtn').addEventListener('click', function() { 
-                closeModal('confirmModal'); 
-            });
-            
-            document.querySelectorAll('.modal-backdrop').forEach(backdrop => { 
-                backdrop.addEventListener('click', function(e) { 
-                    if (e.target === this) closeModal(this.id); 
-                }); 
-            });
-            
-            document.addEventListener('keydown', (e) => { 
-                if (e.key === 'Escape') document.querySelectorAll('.modal-backdrop.active').forEach(modal => { closeModal(modal.id); }); 
-            });
-            
-            // Остальные обработчики
-            document.getElementById('addAnnouncementBtn').addEventListener('click', () => { 
-                document.getElementById('announcementModalTitle').textContent = 'Новое объявление'; 
-                announcementFiles = [];
-                updateFileList();
-                openModal('announcementModal'); 
-            });
-            
-            document.getElementById('addFirstAnnouncementBtn').addEventListener('click', () => { 
-                document.getElementById('announcementModalTitle').textContent = 'Новое объявление'; 
-                announcementFiles = [];
-                updateFileList();
-                openModal('announcementModal'); 
-            });
-            
-            document.getElementById('addScheduleBtn').addEventListener('click', () => { 
-                document.getElementById('scheduleModalTitle').textContent = 'Добавить урок'; 
-                openModal('scheduleModal'); 
-                updateClassSelect(); 
-            });
-            
-            document.getElementById('addFirstScheduleBtn').addEventListener('click', () => { 
-                document.getElementById('scheduleModalTitle').textContent = 'Добавить урок'; 
-                openModal('scheduleModal'); 
-                updateClassSelect(); 
-            });
-            
-            document.getElementById('addUserBtn').addEventListener('click', () => { 
-                document.getElementById('userModalTitle').textContent = 'Новый пользователь'; 
-                openModal('userModal'); 
-            });
-            
-            document.getElementById('addFirstUserBtn').addEventListener('click', () => { 
-                document.getElementById('userModalTitle').textContent = 'Новый пользователь'; 
-                openModal('userModal'); 
-            });
-            
-            // Обработка загрузки файлов
-            const fileInput = document.getElementById('announcementFiles');
-            fileInput.addEventListener('change', function(e) {
-                const files = Array.from(e.target.files);
-                announcementFiles.push(...files);
-                updateFileList();
-                fileInput.value = '';
-            });
-            
-            // Drag and drop для файлов
-            const fileLabel = document.querySelector('.file-label');
-            fileLabel.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                this.style.borderColor = 'var(--primary)';
-                this.style.background = 'var(--primary-light)';
-            });
-            
-            fileLabel.addEventListener('dragleave', function(e) {
-                e.preventDefault();
-                this.style.borderColor = '';
-                this.style.background = '';
-            });
-            
-            fileLabel.addEventListener('drop', function(e) {
-                e.preventDefault();
-                this.style.borderColor = '';
-                this.style.background = '';
+            if (optionToRemove) {
+                optionToRemove.remove();
+                showAlert(`✅ Класс ${classValue} удален`, 'success');
                 
-                const files = Array.from(e.dataTransfer.files);
-                announcementFiles.push(...files);
-                updateFileList();
-            });
-            
-            document.getElementById('showAddClassBtn').addEventListener('click', function() { 
-                document.getElementById('addClassSection').style.display = 'block'; 
-                document.getElementById('deleteClassSection').style.display = 'none'; 
-                document.getElementById('newClassName').focus(); 
-            });
-            
-            document.getElementById('showDeleteClassBtn').addEventListener('click', function() { 
-                document.getElementById('deleteClassSection').style.display = 'block'; 
-                document.getElementById('addClassSection').style.display = 'none'; 
-                updateDeleteClassList(); 
-            });
-            
-            document.getElementById('addClassBtn').addEventListener('click', function() {
-                const className = document.getElementById('newClassName').value.trim().toUpperCase();
-                if (!className) { showAlert('Введите название класса', 'error', 'Ошибка'); return; }
-                if (!/^\d+[А-ЯЁ]$/.test(className)) { showAlert('Формат: "11А" (цифра + заглавная буква)', 'error', 'Ошибка'); return; }
-                if (classesData.includes(className)) { showAlert('Такой класс уже существует', 'warning', 'Внимание'); return; }
-                classesData.push(className); 
-                classesData.sort();
-                updateClassSelect(); 
-                updateClassFilter();
-                document.getElementById('scheduleClass').value = className;
-                document.getElementById('addClassSection').style.display = 'none';
-                document.getElementById('newClassName').value = '';
-                showAlert(`Класс "${className}" успешно добавлен!`, 'success', 'Успех');
-            });
-            
-            document.getElementById('cancelAddClassBtn').addEventListener('click', function() { 
-                document.getElementById('addClassSection').style.display = 'none'; 
-                document.getElementById('newClassName').value = ''; 
-            });
-            
-            document.getElementById('cancelDeleteClassBtn').addEventListener('click', function() { 
-                document.getElementById('deleteClassSection').style.display = 'none'; 
-            });
-            
-            document.getElementById('deleteClassList').addEventListener('click', function(e) {
-                if (e.target.closest('.delete-class-btn')) {
-                    const btn = e.target.closest('.delete-class-btn');
-                    const className = btn.dataset.class;
-                    confirmDelete(`Удалить класс "${className}"? Это также удалит все уроки этого класса.`, () => {
-                        classesData = classesData.filter(c => c !== className);
-                        updateClassSelect(); updateClassFilter(); updateDeleteClassList();
-                        mockData.schedule = mockData.schedule.filter(lesson => lesson.class !== className);
-                        loadScheduleTable();
-                        if (classesData.length === 0) document.getElementById('deleteClassSection').style.display = 'none';
-                        showAlert(`Класс "${className}" успешно удален! Все уроки этого класса также были удалены.`, 'success', 'Удалено');
-                    });
-                }
-            });
-            
-            document.getElementById('confirmModalDelete').addEventListener('click', function() { 
-                if (state.deleteCallback) { state.deleteCallback(); state.deleteCallback = null; } 
-                closeModal('confirmModal'); 
-            });
-            
-            document.getElementById('scheduleForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = {
-                    id: state.editingItem ? state.editingItem.id : 'schedule-' + Date.now(),
-                    class: document.getElementById('scheduleClass').value,
-                    dayValue: document.getElementById('scheduleDay').value,
-                    day: document.getElementById('scheduleDay').selectedOptions[0].text,
-                    startTime: document.getElementById('scheduleStartTime').value,
-                    endTime: document.getElementById('scheduleEndTime').value,
-                    subject: document.getElementById('scheduleSubject').value,
-                    teacher: document.getElementById('scheduleTeacher').value,
-                    room: document.getElementById('scheduleRoom').value,
-                    notes: document.getElementById('scheduleNotes').value
-                };
-                if (state.editingItem) {
-                    const index = mockData.schedule.findIndex(item => item.id === state.editingItem.id);
-                    if (index !== -1) { mockData.schedule[index] = formData; showAlert('Урок обновлен!', 'success', 'Успех'); }
-                } else { mockData.schedule.push(formData); showAlert('Урок добавлен!', 'success', 'Успех'); }
-                loadScheduleTable(); closeModal('scheduleModal');
-            });
-            
-            document.getElementById('announcementForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = {
-                    id: state.editingItem ? state.editingItem.id : 'announcement-' + Date.now(),
-                    title: document.getElementById('announcementTitle').value,
-                    content: document.getElementById('announcementContent').value,
-                    category: document.getElementById('announcementCategory').value,
-                    type: document.getElementById('announcementType').value,
-                    date: new Date().toLocaleDateString('ru-RU'),
-                    pinned: document.getElementById('announcementPinned').checked,
-                    author: document.getElementById('announcementAuthor').value,
-                    priority: document.getElementById('announcementPriority').value,
-                    urgent: document.getElementById('announcementPriority').value === 'urgent',
-                    files: announcementFiles.map(file => ({ name: file.name, size: file.size, type: file.type }))
-                };
-                if (state.editingItem) {
-                    const index = mockData.announcements.findIndex(item => item.id === state.editingItem.id);
-                    if (index !== -1) { mockData.announcements[index] = formData; showAlert('Объявление обновлено!', 'success', 'Успех'); }
-                } else { mockData.announcements.unshift(formData); showAlert('Объявление добавлено!', 'success', 'Успех'); }
-                loadAnnouncementsTable(); closeModal('announcementModal');
-            });
-            
-            document.getElementById('userForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const password = document.getElementById('userPassword').value;
-                const confirmPassword = document.getElementById('userPasswordConfirm').value;
-                if (password !== confirmPassword) { showAlert('Пароли не совпадают!', 'error', 'Ошибка'); return; }
-                const name = document.getElementById('userFullName').value;
-                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
-                const formData = {
-                    id: state.editingItem ? state.editingItem.id : 'user-' + Date.now(),
-                    name: name, initials: initials,
-                    email: document.getElementById('userEmail').value,
-                    phone: document.getElementById('userPhone').value,
-                    role: document.getElementById('userRole').value,
-                    date: new Date().toLocaleDateString('ru-RU')
-                };
-                if (state.editingItem) {
-                    const index = mockData.users.findIndex(item => item.id === state.editingItem.id);
-                    if (index !== -1) { mockData.users[index] = formData; showAlert('Пользователь обновлен!', 'success', 'Успех'); }
-                } else { mockData.users.push(formData); showAlert('Пользователь добавлен!', 'success', 'Успех'); }
-                loadUsersTable(); closeModal('userModal');
-            });
-            
-            document.getElementById('announcementsSearch').addEventListener('input', filterAnnouncements);
-            document.getElementById('categoryFilter').addEventListener('change', filterAnnouncements);
-            document.getElementById('typeFilter').addEventListener('change', filterAnnouncements);
-            document.getElementById('scheduleSearch').addEventListener('input', filterSchedule);
-            document.getElementById('classFilter').addEventListener('change', filterSchedule);
-            document.getElementById('dayFilter').addEventListener('change', filterSchedule);
-            document.getElementById('usersSearch').addEventListener('input', filterUsers);
-            document.getElementById('roleFilter').addEventListener('change', filterUsers);
-            
-            document.getElementById('logoutBtn').addEventListener('click', function() {
-                confirmDelete('Вы уверены, что хотите выйти?', function() {
-                    showAlert('Вы успешно вышли из системы', 'success', 'Выход');
-                    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
-                });
-            });
-            
-            document.getElementById('announcementsTable').addEventListener('click', handleTableActions);
-            document.getElementById('scheduleTable').addEventListener('click', handleTableActions);
-            document.getElementById('usersTable').addEventListener('click', handleTableActions);
-        }
-
-        function handleTableActions(e) {
-            const btn = e.target.closest('button'); if (!btn) return;
-            const row = btn.closest('tr'); const id = row.dataset.id; const tableType = row.closest('tbody').id;
-            
-            if (btn.classList.contains('edit-btn')) {
-                if (tableType === 'announcementsTable') {
-                    const item = mockData.announcements.find(a => a.id === id);
-                    if (item) {
-                        state.editingItem = item;
-                        document.getElementById('announcementModalTitle').textContent = 'Редактировать объявление';
-                        document.getElementById('announcementTitle').value = item.title;
-                        document.getElementById('announcementContent').value = item.content;
-                        document.getElementById('announcementCategory').value = item.category;
-                        document.getElementById('announcementType').value = item.type;
-                        document.getElementById('announcementPriority').value = item.priority || 'normal';
-                        document.getElementById('announcementAuthor').value = item.author;
-                        document.getElementById('announcementPinned').checked = item.pinned || false;
-                        announcementFiles = item.files || [];
-                        updateFileList();
-                        openModal('announcementModal');
-                    }
-                } else if (tableType === 'scheduleTable') {
-                    const item = mockData.schedule.find(s => s.id === id);
-                    if (item) {
-                        state.editingItem = item;
-                        document.getElementById('scheduleModalTitle').textContent = 'Редактировать урок';
-                        document.getElementById('scheduleClass').value = item.class;
-                        document.getElementById('scheduleDay').value = item.dayValue;
-                        document.getElementById('scheduleStartTime').value = item.startTime;
-                        document.getElementById('scheduleEndTime').value = item.endTime;
-                        document.getElementById('scheduleSubject').value = item.subject;
-                        document.getElementById('scheduleTeacher').value = item.teacher;
-                        document.getElementById('scheduleRoom').value = item.room || '';
-                        document.getElementById('scheduleNotes').value = item.notes || '';
-                        openModal('scheduleModal');
-                    }
-                } else if (tableType === 'usersTable') {
-                    const item = mockData.users.find(u => u.id === id);
-                    if (item) {
-                        state.editingItem = item;
-                        document.getElementById('userModalTitle').textContent = 'Редактировать пользователя';
-                        document.getElementById('userFullName').value = item.name;
-                        document.getElementById('userEmail').value = item.email;
-                        document.getElementById('userPhone').value = item.phone || '';
-                        document.getElementById('userRole').value = item.role;
-                        document.getElementById('userPassword').required = false;
-                        document.getElementById('userPasswordConfirm').required = false;
-                        openModal('userModal');
-                    }
-                }
-            } else if (btn.classList.contains('delete-btn')) {
-                let message = 'Вы уверены, что хотите удалить этот элемент?'; let callback;
-                if (tableType === 'announcementsTable') {
-                    message = 'Удалить это объявление?'; callback = () => { mockData.announcements = mockData.announcements.filter(a => a.id !== id); loadAnnouncementsTable(); showAlert('Объявление удалено!', 'success', 'Удалено'); };
-                } else if (tableType === 'scheduleTable') {
-                    message = 'Удалить этот урок из расписания?'; callback = () => { mockData.schedule = mockData.schedule.filter(s => s.id !== id); loadScheduleTable(); showAlert('Урок удален!', 'success', 'Удалено'); };
-                } else if (tableType === 'usersTable') {
-                    message = 'Удалить этого пользователя? Все связанные данные будут удалены.'; callback = () => { mockData.users = mockData.users.filter(u => u.id !== id); loadUsersTable(); showAlert('Пользователь удален!', 'success', 'Удалено'); };
-                }
-                confirmDelete(message, callback);
+                // Обновляем список
+                button.closest('.class-item').remove();
             }
         }
-
-        function loadAnnouncementsTable() {
-            const tbody = document.getElementById('announcementsTable'); const emptyState = document.getElementById('emptyAnnouncements');
-            tbody.innerHTML = '';
-            if (mockData.announcements.length === 0) { tbody.style.display = 'none'; emptyState.style.display = 'block'; return; }
-            tbody.style.display = ''; emptyState.style.display = 'none';
-            mockData.announcements.forEach(item => {
-                const row = document.createElement('tr'); row.dataset.id = item.id;
-                row.innerHTML = `
-                    <td>
-                        <div style="font-weight: 500;">${item.title}</div>
-                        <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem;">
-                            ${item.content.substring(0,60)}${item.content.length > 60 ? '...' : ''}
-                            ${item.files && item.files.length > 0 ? `<br><i class="fas fa-paperclip" style="margin-right: 4px;"></i>${item.files.length} файл(ов)` : ''}
-                        </div>
-                    </td>
-                    <td><span class="badge badge-secondary">${getCategoryLabel(item.category)}</span></td>
-                    <td>${getTypeLabel(item.type)}</td>
-                    <td>${item.date} ${item.pinned ? '<i class="fas fa-thumbtack" style="color: var(--warning); margin-left: 0.5rem;" title="Закреплено"></i>' : ''}</td>
-                    <td><span class="badge ${item.urgent ? 'badge-danger' : 'badge-success'}">${item.urgent ? 'Срочное' : 'Активно'}</span></td>
-                    <td class="text-right"><div class="action-buttons"><button class="action-btn edit-btn" title="Редактировать"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" title="Удалить"><i class="fas fa-trash"></i></button></div></td>
-                `;
-                tbody.appendChild(row);
+    });
+    
+    // Кнопка добавления урока
+    const addScheduleBtn = document.getElementById('addScheduleBtn');
+    if (addScheduleBtn) {
+        addScheduleBtn.addEventListener('click', function() {
+            currentEditScheduleId = null;
+            document.getElementById('scheduleModalTitle').textContent = 'Новый урок';
+            document.getElementById('scheduleForm').reset();
+            document.getElementById('scheduleStartTime').value = '08:30';
+            document.getElementById('scheduleEndTime').value = '09:15';
+            openModal('scheduleModal');
+        });
+    }
+    
+    // Кнопка в пустом состоянии расписания
+    const addFirstScheduleBtn = document.getElementById('addFirstScheduleBtn');
+    if (addFirstScheduleBtn) {
+        addFirstScheduleBtn.addEventListener('click', function() {
+            currentEditScheduleId = null;
+            document.getElementById('scheduleModalTitle').textContent = 'Новый урок';
+            document.getElementById('scheduleForm').reset();
+            document.getElementById('scheduleStartTime').value = '08:30';
+            document.getElementById('scheduleEndTime').value = '09:15';
+            openModal('scheduleModal');
+        });
+    }
+    
+    // Фильтрация объявлений
+    const announcementsSearch = document.getElementById('announcementsSearch');
+    if (announcementsSearch) {
+        announcementsSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#announcementsTable tr[data-id]');
+            
+            rows.forEach(row => {
+                const title = row.querySelector('td:nth-child(1) div[style*="font-weight: 500"]').textContent.toLowerCase();
+                const content = row.querySelector('td:nth-child(1) div[style*="font-size: 0.75rem"]').textContent.toLowerCase();
+                const matches = !searchTerm || title.includes(searchTerm) || content.includes(searchTerm);
+                row.style.display = matches ? '' : 'none';
+            });
+        });
+    }
+    
+    // Фильтрация расписания
+    const scheduleSearch = document.getElementById('scheduleSearch');
+    if (scheduleSearch) {
+        scheduleSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#scheduleTable tr[data-id]');
+            
+            rows.forEach(row => {
+                const subject = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+                const teacher = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+                const matches = !searchTerm || subject.includes(searchTerm) || teacher.includes(searchTerm);
+                row.style.display = matches ? '' : 'none';
+            });
+        });
+    }
+    
+    // Вкладки
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabId + 'Tab').classList.add('active');
+            
+            // Загружаем расписание при переключении на вкладку
+            if (tabId === 'schedule') {
+                loadAdminSchedules();
+            }
+        });
+    });
+    
+    // Закрытие модалок
+    document.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modalId = this.getAttribute('data-modal');
+            if (modalId) {
+                closeModal(modalId);
+            }
+        });
+    });
+    
+    document.querySelectorAll('.modal-backdrop').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                const modalId = this.id;
+                closeModal(modalId);
+            }
+        });
+    });
+    
+    document.querySelectorAll('[data-modal]').forEach(btn => {
+        if (btn.id.includes('Cancel')) {
+            btn.addEventListener('click', function() {
+                const modalId = this.getAttribute('data-modal');
+                if (modalId) {
+                    closeModal(modalId);
+                }
             });
         }
-
-        function loadScheduleTable() {
-            const tbody = document.getElementById('scheduleTable'); const emptyState = document.getElementById('emptySchedule');
-            tbody.innerHTML = '';
-            if (mockData.schedule.length === 0) { tbody.style.display = 'none'; emptyState.style.display = 'block'; return; }
-            tbody.style.display = ''; emptyState.style.display = 'none';
-            mockData.schedule.forEach(item => {
-                const row = document.createElement('tr'); row.dataset.id = item.id;
-                row.innerHTML = `
-                    <td><span class="badge badge-primary">${item.class}</span></td>
-                    <td>${item.day}</td>
-                    <td>${item.startTime} - ${item.endTime}</td>
-                    <td><strong>${item.subject}</strong></td>
-                    <td>${item.teacher}</td>
-                    <td>${item.room || '—'}</td>
-                    <td class="text-right"><div class="action-buttons"><button class="action-btn edit-btn" title="Редактировать"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" title="Удалить"><i class="fas fa-trash"></i></button></div></td>
-                `;
-                tbody.appendChild(row);
-            });
+    });
+    
+    // Скрываем экран загрузки
+    setTimeout(() => {
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            loadingScreen.style.visibility = 'hidden';
         }
+    }, 500);
+});
 
-        function loadUsersTable() {
-            const tbody = document.getElementById('usersTable'); const emptyState = document.getElementById('emptyUsers');
-            tbody.innerHTML = '';
-            if (mockData.users.length === 0) { tbody.style.display = 'none'; emptyState.style.display = 'block'; return; }
-            tbody.style.display = ''; emptyState.style.display = 'none';
-            const roleColors = {'director':'danger','deputy_director':'warning'};
-            mockData.users.forEach(item => {
-                const row = document.createElement('tr'); row.dataset.id = item.id;
-                row.innerHTML = `
-                    <td><div style="display: flex; align-items: center; gap: 0.75rem;"><div class="avatar">${item.initials}</div><div><div style="font-weight: 500;">${item.name}</div></div></div></td>
-                    <td>${item.email}</td>
-                    <td><span class="badge badge-${roleColors[item.role] || 'secondary'}">${getRoleLabel(item.role)}</span></td>
-                    <td>${item.phone || '—'}</td>
-                    <td>${item.date}</td>
-                    <td class="text-right"><div class="action-buttons"><button class="action-btn edit-btn" title="Редактировать"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" title="Удалить"><i class="fas fa-trash"></i></button></div></td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function filterAnnouncements() {
-            const searchTerm = document.getElementById('announcementsSearch').value.toLowerCase();
-            const category = document.getElementById('categoryFilter').value;
-            const type = document.getElementById('typeFilter').value;
-            const filtered = mockData.announcements.filter(item => {
-                const matchesSearch = !searchTerm || item.title.toLowerCase().includes(searchTerm) || item.content.toLowerCase().includes(searchTerm) || item.author.toLowerCase().includes(searchTerm);
-                const matchesCategory = !category || item.category === category;
-                const matchesType = !type || item.type === type;
-                return matchesSearch && matchesCategory && matchesType;
-            });
-            renderFilteredAnnouncements(filtered);
-        }
-
-        function renderFilteredAnnouncements(items) {
-            const tbody = document.getElementById('announcementsTable'); const emptyState = document.getElementById('emptyAnnouncements');
-            tbody.innerHTML = '';
-            if (items.length === 0) { tbody.style.display = 'none'; emptyState.style.display = 'block'; return; }
-            tbody.style.display = ''; emptyState.style.display = 'none';
-            items.forEach(item => {
-                const row = document.createElement('tr'); row.dataset.id = item.id;
-                row.innerHTML = `
-                    <td><div style="font-weight: 500;">${item.title}</div><div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem;">${item.content.substring(0,60)}${item.content.length > 60 ? '...' : ''}</div></td>
-                    <td><span class="badge badge-secondary">${getCategoryLabel(item.category)}</span></td>
-                    <td>${getTypeLabel(item.type)}</td>
-                    <td>${item.date} ${item.pinned ? '<i class="fas fa-thumbtack" style="color: var(--warning); margin-left: 0.5rem;"></i>' : ''}</td>
-                    <td><span class="badge ${item.urgent ? 'badge-danger' : 'badge-success'}">${item.urgent ? 'Срочное' : 'Активно'}</span></td>
-                    <td class="text-right"><div class="action-buttons"><button class="action-btn edit-btn"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn"><i class="fas fa-trash"></i></button></div></td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function filterSchedule() {
-            const searchTerm = document.getElementById('scheduleSearch').value.toLowerCase();
-            const selectedClass = document.getElementById('classFilter').value;
-            const selectedDay = document.getElementById('dayFilter').value;
-            const filtered = mockData.schedule.filter(item => {
-                const matchesSearch = !searchTerm || item.subject.toLowerCase().includes(searchTerm) || item.teacher.toLowerCase().includes(searchTerm) || item.class.toLowerCase().includes(searchTerm);
-                const matchesClass = !selectedClass || item.class === selectedClass;
-                const matchesDay = !selectedDay || item.dayValue === selectedDay;
-                return matchesSearch && matchesClass && matchesDay;
-            });
-            renderFilteredSchedule(filtered);
-        }
-
-        function renderFilteredSchedule(items) {
-            const tbody = document.getElementById('scheduleTable'); const emptyState = document.getElementById('emptySchedule');
-            tbody.innerHTML = '';
-            if (items.length === 0) { tbody.style.display = 'none'; emptyState.style.display = 'block'; return; }
-            tbody.style.display = ''; emptyState.style.display = 'none';
-            items.forEach(item => {
-                const row = document.createElement('tr'); row.dataset.id = item.id;
-                row.innerHTML = `
-                    <td><span class="badge badge-primary">${item.class}</span></td>
-                    <td>${item.day}</td>
-                    <td>${item.startTime} - ${item.endTime}</td>
-                    <td><strong>${item.subject}</strong></td>
-                    <td>${item.teacher}</td>
-                    <td>${item.room || '—'}</td>
-                    <td class="text-right"><div class="action-buttons"><button class="action-btn edit-btn"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn"><i class="fas fa-trash"></i></button></div></td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function filterUsers() {
-            const searchTerm = document.getElementById('usersSearch').value.toLowerCase();
-            const selectedRole = document.getElementById('roleFilter').value;
-            const filtered = mockData.users.filter(item => {
-                const matchesSearch = !searchTerm || item.name.toLowerCase().includes(searchTerm) || item.email.toLowerCase().includes(searchTerm) || item.phone?.toLowerCase().includes(searchTerm);
-                const matchesRole = !selectedRole || item.role === selectedRole;
-                return matchesSearch && matchesRole;
-            });
-            renderFilteredUsers(filtered);
-        }
-
-        function renderFilteredUsers(items) {
-            const tbody = document.getElementById('usersTable'); const emptyState = document.getElementById('emptyUsers');
-            tbody.innerHTML = '';
-            if (items.length === 0) { tbody.style.display = 'none'; emptyState.style.display = 'block'; return; }
-            tbody.style.display = ''; emptyState.style.display = 'none';
-            const roleColors = {'director':'danger','deputy_director':'warning'};
-            items.forEach(item => {
-                const row = document.createElement('tr'); row.dataset.id = item.id;
-                row.innerHTML = `
-                    <td><div style="display: flex; align-items: center; gap: 0.75rem;"><div class="avatar">${item.initials}</div><div><div style="font-weight: 500;">${item.name}</div></div></div></td>
-                    <td>${item.email}</td>
-                    <td><span class="badge badge-${roleColors[item.role] || 'secondary'}">${getRoleLabel(item.role)}</span></td>
-                    <td>${item.phone || '—'}</td>
-                    <td>${item.date}</td>
-                    <td class="text-right"><div class="action-buttons"><button class="action-btn edit-btn"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn"><i class="fas fa-trash"></i></button></div></td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function initFilters() { filterAnnouncements(); filterSchedule(); filterUsers(); }
-        initFilters();
+// Функция для инициализации списка классов
+function initializeClassList() {
+    const scheduleClassSelect = document.getElementById('scheduleClass');
+    if (scheduleClassSelect) {
+        // Очищаем список
+        scheduleClassSelect.innerHTML = '<option value="">Выберите класс</option>';
         
-        setTimeout(() => { showAlert('Добро пожаловать в административную панель!', 'info', 'Приветствие', 7000); }, 1000);
+        // Добавляем классы из массива
+        availableClasses.forEach(className => {
+            const option = document.createElement('option');
+            option.value = className;
+            option.textContent = className;
+            scheduleClassSelect.appendChild(option);
+        });
+    }
+}
     </script>
 </body>
 </html>

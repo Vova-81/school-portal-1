@@ -1,0 +1,289 @@
+ДЛЯ BACKEND
+------📦 ПАКЕТЫ ДЛЯ EXPRESS.JS + POSTGRESQL-----
+🗄️ БАЗА ДАННЫХ (PostgreSQL)
+pg - PostgreSQL клиент для Node.js
+
+pg-pool - пул соединений (для оптимизации)
+
+sequelize - ORM для PostgreSQL (рекомендую для вашего случая)
+
+sequelize-cli - командная строка для миграций
+
+umzug - альтернатива для миграций (если не использовать sequelize-cli)
+
+Альтернатива (более легкая):
+
+knex.js - query builder + миграции
+
+objection.js - ORM поверх knex
+
+🔐 АУТЕНТИФИКАЦИЯ И СЕССИИ
+express-session - сессии на сервере
+
+connect-pg-simple или connect-session-sequelize - хранение сессий в PostgreSQL
+
+passport или passport-local - стратегии аутентификации
+
+jsonwebtoken - если нужны JWT (опционально)
+
+bcryptjs - хеширование паролей
+
+🛡️ БЕЗОПАСНОСТЬ
+helmet - защита заголовков HTTP
+
+cors - настройка CORS политики
+
+express-rate-limit - ограничение запросов (от DDoS)
+
+express-validator или joi - валидация входных данных
+
+express-mongo-sanitize - очистка от NoSQL инъекций
+
+express-sslify - если будет HTTPS (опционально)
+
+📁 ЗАГРУЗКА ФАЙЛОВ
+multer - обработка загрузки файлов
+
+sharp - обработка изображений (ресайз, оптимизация)
+
+uuid - генерация уникальных имен файлов
+
+📧 УВЕДОМЛЕНИЯ (если будет)
+nodemailer - отправка email
+
+node-cron - планировщик задач (если нужны напоминания)
+
+🧪 ТЕСТИРОВАНИЕ
+jest - тест-раннер
+
+supertest - HTTP тесты
+
+pg-mem или testcontainers-node - тестовая БД
+
+🛠️ РАЗРАБОТКА И УТИЛИТЫ
+nodemon - автоматическая перезагрузка при разработке
+
+dotenv - переменные окружения
+
+morgan или winston - логирование
+
+swagger-ui-express + swagger-jsdoc - документация API (опционально)
+
+compression - сжатие gzip
+
+express-fileupload - альтернатива multer (проще)
+
+📊 ПАКЕТЫ ДЛЯ АДМИНКИ (если будет расширяться)
+multer - уже для загрузки
+
+xlsx или csv-parser - импорт/экспорт данных
+
+puppeteer - если нужны PDF отчеты
+
+socket.io - если нужны реальные обновления в админке
+МИНИМАЛЬНЫЙ СТАРТОВЫЙ НАБОР:
+express + pg + sequelize (БД)
+
+express-session + connect-pg-simple + bcryptjs (аутентификация)
+
+helmet + cors + express-validator (безопасность)
+
+multer (загрузка файлов)
+
+nodemon + dotenv (разработка)
+
+
+
+----✅ ФИНАЛЬНЫЕ РЕШЕНИЯ:------
+1. Аутентификация:
+Логин/пароль (не email)
+
+Роли: директор, заместитель директора
+
+Механизм: директор создает учетки, раздает логины/пароли
+
+2. База данных:
+Одна БД PostgreSQL
+
+Миграции: Sequelize CLI
+
+Репликация: НЕ НУЖНА
+
+3. Безопасность:
+На мое усмотрение (сделаю базовый набор)
+
+4. Файлы:
+Откладываем на потом
+
+5. API:
+REST (без версионирования /v1/ на старте)
+
+Документация: позже
+
+6. Деплой/Инфраструктура:
+Разберем позже (сейчас фокус на разработке)
+
+7. Домены:
+Основной: school.ru
+
+Админка: admin-school.ru (отдельный домен/субдомен)
+
+8. Обязательно:
+Резервное копирование БД
+
+Остальное - по мере роста
+
+-------ПЛАН--------
+ЭТАП 0: ПОДГОТОВКА (1 час)
+Создать проект school-portal-backend
+
+Инициализировать package.json
+
+Создать структуру папок
+
+Написать README с описанием проекта
+
+ЭТАП 1: БАЗОВЫЙ СЕРВЕР (2-3 часа) (СДЕЛАНО)
+Установить Express.js
+
+Настроить базовый сервер
+
+Добавить CORS (для работы с фронтендом)
+
+Настроить логирование запросов
+
+Создать тестовый endpoint /api/health
+
+Результат: Сервер отвечает на запросы
+
+ЭТАП 2: ПОДКЛЮЧЕНИЕ БАЗЫ ДАННЫХ (3-4 часа)
+Установить PostgreSQL (локально или облако)
+
+Установить pg + sequelize
+
+Настроить подключение к БД
+
+Создать конфигурацию для dev/prod
+
+Написать скрипт инициализации БД
+
+Результат: Сервер подключается к PostgreSQL
+
+ЭТАП 3: МОДЕЛИ ДАННЫХ (4-5 часов)
+3.1. Пользователи (User)
+javascript
+// Поля: id, login, password_hash, role, created_at
+// Роли: director, deputy_director
+3.2. Объявления (Announcement)
+javascript
+// Поля: id, title, content, category, type, author_id, 
+//        pinned, urgent, created_at, updated_at
+// Категории: students, teachers, parents, all
+// Типы: announcement, news, event
+3.3. Классы (Class)
+javascript
+// Поля: id, name (10А), description
+3.4. Расписание (Schedule)
+javascript
+// Поля: id, class_id, day_of_week, start_time, end_time,
+//        subject, teacher, room, notes
+Результат: Миграции + модели в Sequelize
+
+ЭТАП 4: АУТЕНТИФИКАЦИЯ (3-4 часа)
+Установить bcryptjs для хеширования паролей
+
+Создать систему сессий (express-session)
+
+Endpoint /api/auth/login (логин/пароль)
+
+Endpoint /api/auth/logout
+
+Middleware проверки авторизации
+
+Middleware проверки ролей (директор/заместитель)
+
+Результат: Работающая авторизация
+
+ЭТАП 5: API ДЛЯ ГЛАВНОЙ СТРАНИЦЫ (2-3 часа)
+GET /api/stats - статистика
+
+GET /api/announcements/latest - последние 6 объявлений
+
+GET /api/announcements/urgent - срочные
+
+GET /api/announcements/pinned - закрепленные
+
+Результат: Главная страница работает с бэкендом
+
+ЭТАП 6: API ОБЪЯВЛЕНИЙ (4-5 часов)
+GET /api/announcements - список с фильтрами
+
+GET /api/announcements/:id - одно объявление
+
+GET /api/categories - список категорий
+
+GET /api/types - список типов
+
+Результат: Страница объявлений работает
+
+ЭТАП 7: API РАСПИСАНИЯ (3-4 часа)
+GET /api/classes - список классов
+
+GET /api/schedule/class/:classId - расписание класса
+
+GET /api/schedule/day/:day - на день недели
+
+Результат: Страница расписания работает
+
+ЭТАП 8: АДМИНКА - CRUD (6-8 часов)
+8.1. Управление объявлениями
+POST /api/admin/announcements - создать
+
+PUT /api/admin/announcements/:id - обновить
+
+DELETE /api/admin/announcements/:id - удалить
+
+PATCH /api/admin/announcements/:id/pin - закрепить
+
+8.2. Управление расписанием
+POST /api/admin/schedule - добавить урок
+
+PUT /api/admin/schedule/:id - изменить
+
+DELETE /api/admin/schedule/:id - удалить
+
+8.3. Управление пользователями
+GET /api/admin/users - список
+
+POST /api/admin/users - создать
+
+DELETE /api/admin/users/:id - удалить
+
+Результат: Админка полностью функциональна
+
+ЭТАП 9: БЕЗОПАСНОСТЬ И ВАЛИДАЦИЯ (2-3 часа)
+Установить helmet для безопасности
+
+Установить express-validator
+
+Валидация всех входных данных
+
+Rate limiting для /api/auth/login
+
+Проверка прав доступа для админских endpoint'ов
+
+ЭТАП 10: ТЕСТИРОВАНИЕ И ДЕПЛОЙ (3-4 часа)
+Написать тесты для основных endpoint'ов
+
+Настроить переменные окружения
+
+Написать docker-compose (опционально)
+
+Инструкция по деплою
+
+ЭТАП 11: РЕЗЕРВНОЕ КОПИРОВАНИЕ (1-2 часа)
+Написать скрипт backup БД
+
+Настроить автоматический backup
+
+Инструкция по восстановлению

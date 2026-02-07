@@ -6,7 +6,6 @@
     <title>Школьный портал - Главная</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        
          /* Базовые стили */
         * {
             margin: 0;
@@ -1296,7 +1295,7 @@
     </style>
 </head>
 <body>
-     <!-- Хедер -->
+    <!-- Хедер -->
     <header class="header">
         <div class="container">
             <div class="header-content">
@@ -1375,61 +1374,61 @@
     <!-- Основной контент -->
     <div class="content-container">
         <!-- Быстрые ссылки -->
-<div class="quick-links-grid">
-    <a href="announcements.html?filter=category:students" class="quick-link-card" 
-       style="--gradient-start: #10b981; --gradient-end: #059669;">
-        <div class="quick-link-inner">
-            <div class="quick-link-icon-wrapper">
-                <i class="fas fa-graduation-cap fa-lg"></i>
-            </div>
-            <div class="quick-link-info">
-                <span>Ученикам</span>
-                <i class="fas fa-chevron-right"></i>
-            </div>
+        <div class="quick-links-grid">
+            <a href="announcements.html?filter=category:students" class="quick-link-card" 
+               style="--gradient-start: #10b981; --gradient-end: #059669;">
+                <div class="quick-link-inner">
+                    <div class="quick-link-icon-wrapper">
+                        <i class="fas fa-graduation-cap fa-lg"></i>
+                    </div>
+                    <div class="quick-link-info">
+                        <span>Ученикам</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="announcements.html?filter=category:teachers" class="quick-link-card"
+               style="--gradient-start: #8b5cf6; --gradient-end: #7c3aed;">
+                <div class="quick-link-inner">
+                    <div class="quick-link-icon-wrapper">
+                        <i class="fas fa-briefcase fa-lg"></i>
+                    </div>
+                    <div class="quick-link-info">
+                        <span>Учителям</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="announcements.html?filter=category:parents" class="quick-link-card"
+               style="--gradient-start: #ec4899; --gradient-end: #db2777;">
+                <div class="quick-link-inner">
+                    <div class="quick-link-icon-wrapper">
+                        <i class="fas fa-heart fa-lg"></i>
+                    </div>
+                    <div class="quick-link-info">
+                        <span>Родителям</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="schedule.html" class="quick-link-card"
+               style="--gradient-start: #3b82f6; --gradient-end: #2563eb;">
+                <div class="quick-link-inner">
+                    <div class="quick-link-icon-wrapper">
+                        <i class="fas fa-clock fa-lg"></i>
+                    </div>
+                    <div class="quick-link-info">
+                        <span>Расписание</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </a>
         </div>
-    </a>
-    
-    <a href="announcements.html?filter=category:teachers" class="quick-link-card"
-       style="--gradient-start: #8b5cf6; --gradient-end: #7c3aed;">
-        <div class="quick-link-inner">
-            <div class="quick-link-icon-wrapper">
-                <i class="fas fa-briefcase fa-lg"></i>
-            </div>
-            <div class="quick-link-info">
-                <span>Учителям</span>
-                <i class="fas fa-chevron-right"></i>
-            </div>
-        </div>
-    </a>
-    
-    <a href="announcements.html?filter=category:parents" class="quick-link-card"
-       style="--gradient-start: #ec4899; --gradient-end: #db2777;">
-        <div class="quick-link-inner">
-            <div class="quick-link-icon-wrapper">
-                <i class="fas fa-heart fa-lg"></i>
-            </div>
-            <div class="quick-link-info">
-                <span>Родителям</span>
-                <i class="fas fa-chevron-right"></i>
-            </div>
-        </div>
-    </a>
-    
-    <a href="schedule.html" class="quick-link-card"
-       style="--gradient-start: #3b82f6; --gradient-end: #2563eb;">
-        <div class="quick-link-inner">
-            <div class="quick-link-icon-wrapper">
-                <i class="fas fa-clock fa-lg"></i>
-            </div>
-            <div class="quick-link-info">
-                <span>Расписание</span>
-                <i class="fas fa-chevron-right"></i>
-            </div>
-        </div>
-    </a>
-</div>
 
-        <!-- Статистика -->
+        <!-- Статистика (будет обновляться динамически) -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-inner">
@@ -1438,7 +1437,7 @@
                     </div>
                     <div class="stat-info">
                         <p class="stat-label">Объявления</p>
-                        <p class="stat-value">8</p>
+                        <p class="stat-value" id="totalAnnouncements">0</p>
                     </div>
                 </div>
             </div>
@@ -1450,7 +1449,7 @@
                     </div>
                     <div class="stat-info">
                         <p class="stat-label">Новости</p>
-                        <p class="stat-value">1</p>
+                        <p class="stat-value" id="totalNews">0</p>
                     </div>
                 </div>
             </div>
@@ -1462,7 +1461,7 @@
                     </div>
                     <div class="stat-info">
                         <p class="stat-label">Мероприятия</p>
-                        <p class="stat-value">4</p>
+                        <p class="stat-value" id="totalEvents">0</p>
                     </div>
                 </div>
             </div>
@@ -1474,462 +1473,526 @@
                     </div>
                     <div class="stat-info">
                         <p class="stat-label">Срочные</p>
-                        <p class="stat-value">1</p>
+                        <p class="stat-value" id="totalUrgent">0</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Срочные объявления -->
-        <div class="urgent-section">
+        <!-- Срочные объявления (загружаются с API) -->
+        <div id="urgentSection" class="urgent-section" style="display: none;">
             <h2 class="urgent-title">
                 <i class="fas fa-exclamation-triangle"></i>
                 Срочные объявления
             </h2>
-            <div class="announcements-grid">
-                <div class="announcement-card" style="border-left-color: #ef4444;" data-modal="urgent1">
-                    <div class="announcement-content">
-                        <div class="announcement-header">
-                            <div class="announcement-badges">
-                                <span class="badge badge-all">
-                                    <i class="fas fa-users badge-icon"></i>
-                                    Для всех
-                                </span>
-                                <span class="badge badge-type">
-                                    <i class="fas fa-bell badge-icon"></i>
-                                    Объявление
-                                </span>
-                            </div>
-                        </div>
-                        <h3 class="announcement-title">
-                            <i class="fas fa-exclamation-triangle" style="color: #ef4444; margin-right: 4px;"></i>
-                            ⚠️ Изменение в расписании на понедельник
-                        </h3>
-                        <p class="announcement-text">
-                            Внимание! В связи с проведением ремонтных работ в кабинете физики уроки физики для всех классов переносятся в кабинет 305. Просим учителей и учеников учитывать эту информацию при планировании учебного дня.
-                        </p>
-                        <div class="announcement-footer">
-                            <span class="announcement-date">
-                                <i class="far fa-calendar"></i>
-                                21 января 2026 года
-                            </span>
-                        </div>
-                    </div>
-                </div>
+            <div class="announcements-grid" id="urgentAnnouncements">
+                <!-- Срочные объявления загружаются сюда -->
             </div>
         </div>
 
-
-    <!-- Закрепленные объявления - ТЕКСТ КАРТОЧКИ (не модалка) -->
-    <div class="section-header">
-        <h2 class="section-title">
-            <span class="title-indicator" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></span>
-            Закреплённые
-        </h2>
-    </div>
-    
-    <div class="announcements-grid">
-        <div class="announcement-card" style="box-shadow: 0 0 0 3px #fbbf24, 0 10px 30px rgba(251, 191, 36, 0.2);" data-modal="pinned1">
-            <div class="announcement-content">
-                <div class="announcement-header">
-                    <div class="announcement-badges">
-                        <span class="badge badge-all">
-                            <i class="fas fa-users badge-icon"></i>
-                            Для всех
-                        </span>
-                        <span class="badge badge-type">
-                            <i class="fas fa-calendar badge-icon"></i>
-                            Мероприятие
-                        </span>
-                    </div>
-                </div>
-                <h3 class="announcement-title">🎓 Начало учебного года 2025</h3>
-                <p class="announcement-text">
-                    Уважаемые ученики, учителя и родители! Поздравляем с началом нового учебного года! Торжественная линейка состоится 1 сентября в 9:00 на школьном дворе...
-                </p>
-                <div class="announcement-footer">
-                    <span class="announcement-date">
-                        <i class="far fa-calendar"></i>
-                        21 января 2026 года
-                    </span>
-                    <span style="color: #2563eb; font-weight: 600;">
-                        <i class="far fa-calendar" style="margin-right: 4px;"></i>
-                        1 сентября
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Последние объявления -->
-    <div class="section-header">
-        <h2 class="section-title">
-            <span class="title-indicator" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);"></span>
-            Последние объявления
-        </h2>
-        <a href="announcements.html" class="btn-link">
-            Все объявления
-            <i class="fas fa-arrow-right"></i>
-        </a>
-    </div>
-    
-    <div class="announcements-grid">
-        <div class="announcement-card" data-modal="recent1">
-            <div class="announcement-content">
-                <div class="announcement-header">
-                    <div class="announcement-badges">
-                        <span class="badge" style="background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #be185d; border-color: #f9a8d4;">
-                            <i class="fas fa-heart badge-icon"></i>
-                            Родителям
-                        </span>
-                        <span class="badge badge-type">
-                            <i class="fas fa-calendar badge-icon"></i>
-                            Мероприятие
-                        </span>
-                    </div>
-                </div>
-                <h3 class="announcement-title">📚 Родительское собрание 10-х классов</h3>
-                <p class="announcement-text">
-                    Уважаемые родители учащихся 10-х классов! Приглашаем вас на родительское собрание, которое состоится 15 сентября в 18:00 в актовом зале...
-                </p>
-                <div class="announcement-footer">
-                    <span class="announcement-date">
-                        <i class="far fa-calendar"></i>
-                        21 января 2026 года
-                    </span>
-                    <span style="color: #2563eb; font-weight: 600;">
-                        <i class="far fa-calendar" style="margin-right: 4px;"></i>
-                        15 сентября
-                    </span>
-                </div>
-            </div>
+        <!-- Закрепленные объявления (загружаются с API) -->
+        <div id="pinnedSection" class="section-header" style="display: none;">
+            <h2 class="section-title">
+                <span class="title-indicator" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></span>
+                Закреплённые
+            </h2>
         </div>
         
-        <!-- ... остальные карточки recent2-recent6 ... -->
+        <div class="announcements-grid" id="pinnedAnnouncements">
+            <!-- Закрепленные объявления загружаются сюда -->
+        </div>
+
+        <!-- Последние объявления (загружаются с API) -->
+        <div class="section-header">
+            <h2 class="section-title">
+                <span class="title-indicator" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);"></span>
+                Последние объявления
+            </h2>
+            <a href="announcements.html" class="btn-link">
+                Все объявления
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        
+        <div class="announcements-grid" id="latestAnnouncements">
+            <!-- Последние объявления загружаются сюда -->
+        </div>
+
+        <!-- Сообщение об отсутствии данных -->
+        <div id="noDataMessage" style="display: none; text-align: center; padding: 40px;">
+            <i class="fas fa-newspaper fa-3x" style="color: #94a3b8;"></i>
+            <h3 style="margin-top: 20px; color: #64748b;">Объявлений пока нет</h3>
+            <p style="color: #94a3b8;">Как только появятся новые объявления, они отобразятся здесь</p>
+        </div>
+
     </div>
 
-    <!-- ========== МОДАЛЬНЫЕ ОКНА (добавьте в конец body перед script) ========== -->
+    <!-- Модальное окно для просмотра объявления -->
     <div class="modal-overlay" id="modalOverlay"></div>
     
-    <!-- Модальное окно для срочного объявления -->
-    <div class="modal" id="urgent1">
+    <div class="modal" id="announcementModal">
         <div class="modal-header">
-            <h3 class="modal-title">
-                <i class="fas fa-exclamation-triangle" style="color: #ef4444; margin-right: 10px;"></i>
-                ⚠️ Изменение в расписании на понедельник
-            </h3>
+            <h3 class="modal-title" id="modalTitle"></h3>
             <button class="modal-close">&times;</button>
         </div>
         <div class="modal-body">
-            <div class="modal-meta">
-                <span class="meta-item">
-                    <i class="fas fa-user"></i> Администрация школы
-                </span>
-                <span class="meta-item">
-                    <i class="far fa-calendar"></i> 21 января 2026 года
-                </span>
-                <span class="meta-item">
-                    <i class="fas fa-tag"></i> Для всех
-                </span>
+            <div class="modal-meta" id="modalMeta">
+                <!-- Мета-информация загружается сюда -->
             </div>
-            <div class="modal-text">
-                <p><strong>Внимание, ученики и учителя!</strong></p>
-                <p>В связи с проведением срочных ремонтных работ в кабинете физики №201, уроки физики для всех классов на понедельник (26 января 2026 года) переносятся.</p>
-                
-                <p><strong>Новое расписание:</strong></p>
-                <ul style="margin: 20px 0; padding-left: 25px;">
-                    <li>9А класс → Кабинет 305 (3 этаж)</li>
-                    <li>9Б класс → Кабинет 305 (3 этаж)</li>
-                    <li>10А класс → Кабинет 305 (3 этаж)</li>
-                    <li>10Б класс → Кабинет 305 (3 этаж)</li>
-                    <li>11А класс → Кабинет 305 (3 этаж)</li>
-                    <li>11Б класс → Кабинет 305 (3 этаж)</li>
-                </ul>
-                
-                <p><strong>Важная информация:</strong></p>
-                <p>• Работы будут проводиться с 8:00 до 16:00<br>
-                • Доступ в кабинет 201 строго запрещён<br>
-                • Остальные уроки проходят по расписанию<br>
-                • Просьба к учителям и ученикам заранее подойти к новому кабинету</p>
-                
-                <p>Просим отнестись с пониманием к временным неудобствам. О завершении работ будет сообщено дополнительно.</p>
+            <div class="modal-text" id="modalContent">
+                <!-- Содержимое объявления загружается сюда -->
             </div>
         </div>
     </div>
-
-    <!-- Модальное окно для закрепленного объявления -->
-    <div class="modal" id="pinned1">
-        <div class="modal-header">
-            <h3 class="modal-title">🎓 Начало учебного года 2025</h3>
-            <button class="modal-close">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="modal-meta">
-                <span class="meta-item">
-                    <i class="fas fa-user"></i> Директор школы
-                </span>
-                <span class="meta-item">
-                    <i class="far fa-calendar"></i> 21 января 2026 года
-                </span>
-                <span class="meta-item">
-                    <i class="fas fa-tag"></i> Для всех
-                </span>
-            </div>
-            <div class="modal-text">
-                <p><strong>Уважаемые ученики, учителя и родители!</strong></p>
-                <p>Поздравляем с началом нового учебного года 2025-2026! Желаем всем успехов, новых достижений и интересных открытий!</p>
-                
-                <p><strong>Торжественная линейка:</strong></p>
-                <p>• Дата: 1 сентября 2025 года<br>
-                • Время: 9:00<br>
-                • Место: Школьный двор<br>
-                • Форма одежды: парадная</p>
-                
-                <p><strong>Расписание на 1 сентября:</strong></p>
-                <ul style="margin: 20px 0; padding-left: 25px;">
-                    <li>09:00 — 09:30 — Торжественная линейка</li>
-                    <li>10:00 — 10:45 — Классные часы</li>
-                    <li>11:00 — 11:45 — Знакомство с расписанием</li>
-                    <li>12:00 — 12:45 — Вводные занятия</li>
-                    <li>13:00 — Окончание учебного дня</li>
-                </ul>
-                
-                <p><strong>Важная информация для родителей:</strong></p>
-                <p>• Списки классов будут размещены 30 августа<br>
-                • Встреча с классными руководителями — 1 сентября после линейки<br>
-                • Организационные собрания — 2-3 сентября</p>
-                
-                <p>С нетерпением ждём встречи с вами! Давайте вместе сделаем этот учебный год ярким и успешным!</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно для recent1 -->
-    <div class="modal" id="recent1">
-        <div class="modal-header">
-            <h3 class="modal-title">📚 Родительское собрание 10-х классов</h3>
-            <button class="modal-close">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="modal-meta">
-                <span class="meta-item">
-                    <i class="fas fa-user"></i> Завуч по учебной работе
-                </span>
-                <span class="meta-item">
-                    <i class="far fa-calendar"></i> 21 января 2026 года
-                </span>
-                <span class="meta-item">
-                    <i class="fas fa-tag"></i> Родителям
-                </span>
-            </div>
-            <div class="modal-text">
-                <p><strong>Уважаемые родители учащихся 10-х классов!</strong></p>
-                <p>Приглашаем вас на первое в этом учебном году родительское собрание, посвящённое организации учебного процесса в 10-х классах.</p>
-                
-                <p><strong>Информация о собрании:</strong></p>
-                <p>• Дата: 15 сентября 2025 года<br>
-                • Время: 18:00<br>
-                • Место: Актовый зал школы</p>
-                
-                <p><strong>Повестка дня:</strong></p>
-                <ol style="margin: 20px 0; padding-left: 25px;">
-                    <li>Встреча с классными руководителями 10-х классов</li>
-                    <li>Организация учебного процесса в старшей школе</li>
-                    <li>Особенности подготовки к ЕГЭ в 10-м классе</li>
-                    <li>Расписание дополнительных занятий и кружков</li>
-                    <li>Организационные вопросы</li>
-                </ol>
-                
-                <p><strong>Важно:</strong></p>
-                <p>• При себе иметь паспорт для прохода в школу<br>
-                • Заполненные согласия на обработку персональных данных<br>
-                • Блокнот и ручку для записей</p>
-                
-                <p><strong>Контакты для вопросов:</strong><br>
-                Завуч по учебной работе — Иванова Мария Петровна<br>
-                Телефон: +7 (495) 123-45-67 (доб. 123)<br>
-                Email: z@school-portal.ru</p>
-                
-                <p>Ждём вас на собрании! Ваше участие очень важно для успешной учёбы ваших детей.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Добавьте такие же модальные окна для recent2, recent3, recent4, recent5, recent6 -->
 
     <!-- JavaScript -->
     <script>
-        // ========== МОДАЛЬНАЯ СИСТЕМА ==========
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Загружаем модальные окна...');
+        // ========== КОНФИГУРАЦИЯ ==========
+        const API_BASE_URL = 'http://localhost:3000';
+        let announcementsCache = null;
+        
+        // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С API ==========
+        
+        // Загрузить все объявления
+        async function loadAnnouncements() {
+            try {
+                console.log('📡 Загружаем объявления с сервера...');
+                
+                const response = await fetch(`${API_BASE_URL}/api/announcements`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log(`✅ Загружено ${data.length} объявлений`);
+                
+                // Сохраняем в кэш
+                announcementsCache = data;
+                
+                // Обновляем статистику
+                updateStatistics(data);
+                
+                // Отображаем объявления
+                displayAnnouncements(data);
+                
+                return data;
+                
+            } catch (error) {
+                console.error('❌ Ошибка загрузки объявлений:', error);
+                
+                // Показываем сообщение об ошибке
+                document.getElementById('noDataMessage').style.display = 'block';
+                document.getElementById('noDataMessage').innerHTML = `
+                    <i class="fas fa-wifi-slash fa-3x" style="color: #ef4444;"></i>
+                    <h3 style="margin-top: 20px; color: #dc2626;">Ошибка загрузки</h3>
+                    <p style="color: #94a3b8;">Не удалось загрузить объявления с сервера</p>
+                `;
+                
+                return [];
+            }
+        }
+        
+        // Обновить статистику
+        function updateStatistics(announcements) {
+            // Общее количество объявлений
+            document.getElementById('totalAnnouncements').textContent = announcements.length;
             
+            // Новости (тип = news)
+            const newsCount = announcements.filter(a => a.type === 'news').length;
+            document.getElementById('totalNews').textContent = newsCount;
+            
+            // Мероприятия (тип = event)
+            const eventsCount = announcements.filter(a => a.type === 'event').length;
+            document.getElementById('totalEvents').textContent = eventsCount;
+            
+            // Срочные объявления
+            const urgentCount = announcements.filter(a => a.urgent).length;
+            document.getElementById('totalUrgent').textContent = urgentCount;
+        }
+        
+        // Отобразить объявления
+        function displayAnnouncements(announcements) {
+            if (announcements.length === 0) {
+                document.getElementById('noDataMessage').style.display = 'block';
+                return;
+            }
+            
+            // Сортируем по дате (сначала новые)
+            const sortedAnnouncements = [...announcements].sort((a, b) => 
+                new Date(b.created_at) - new Date(a.created_at)
+            );
+            
+            // 1. Срочные объявления
+            const urgentAnnouncements = sortedAnnouncements.filter(a => a.urgent);
+            displayUrgentAnnouncements(urgentAnnouncements);
+            
+            // 2. Закрепленные объявления (не срочные)
+            const pinnedAnnouncements = sortedAnnouncements.filter(a => a.pinned && !a.urgent);
+            displayPinnedAnnouncements(pinnedAnnouncements);
+            
+            // 3. Последние объявления (не срочные и не закрепленные)
+            const latestAnnouncements = sortedAnnouncements
+                .filter(a => !a.urgent && !a.pinned)
+                .slice(0, 6); // Берем 6 последних
+                
+            displayLatestAnnouncements(latestAnnouncements);
+        }
+        
+        // Отобразить срочные объявления
+        function displayUrgentAnnouncements(announcements) {
+            const container = document.getElementById('urgentAnnouncements');
+            
+            if (announcements.length === 0) {
+                document.getElementById('urgentSection').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('urgentSection').style.display = 'block';
+            container.innerHTML = '';
+            
+            announcements.forEach(announcement => {
+                const card = createAnnouncementCard(announcement, true);
+                container.appendChild(card);
+            });
+        }
+        
+        // Отобразить закрепленные объявления
+        function displayPinnedAnnouncements(announcements) {
+            const container = document.getElementById('pinnedAnnouncements');
+            
+            if (announcements.length === 0) {
+                document.getElementById('pinnedSection').style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+            
+            document.getElementById('pinnedSection').style.display = 'flex';
+            container.innerHTML = '';
+            
+            announcements.forEach(announcement => {
+                const card = createAnnouncementCard(announcement, false, true);
+                container.appendChild(card);
+            });
+        }
+        
+        // Отобразить последние объявления
+        function displayLatestAnnouncements(announcements) {
+            const container = document.getElementById('latestAnnouncements');
+            
+            if (announcements.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <i class="fas fa-newspaper fa-3x" style="color: #94a3b8;"></i>
+                        <h3 style="margin-top: 20px; color: #64748b;">Новых объявлений нет</h3>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            announcements.forEach(announcement => {
+                const card = createAnnouncementCard(announcement);
+                container.appendChild(card);
+            });
+        }
+        
+        // Создать карточку объявления
+        function createAnnouncementCard(announcement, isUrgent = false, isPinned = false) {
+            const card = document.createElement('div');
+            card.className = 'announcement-card';
+            card.dataset.id = announcement.id;
+            
+            // Стиль для срочных объявлений
+            if (isUrgent) {
+                card.style.borderLeftColor = '#ef4444';
+            }
+            
+            // Стиль для закрепленных объявлений
+            if (isPinned) {
+                card.style.boxShadow = '0 0 0 3px #fbbf24, 0 10px 30px rgba(251, 191, 36, 0.2)';
+            }
+            
+            // Определяем иконку категории
+            const categoryIcon = getCategoryIcon(announcement.category);
+            const categoryName = getCategoryName(announcement.category);
+            const categoryColor = getCategoryColor(announcement.category);
+            
+            // Определяем иконку типа
+            const typeIcon = getTypeIcon(announcement.type);
+            const typeName = getTypeName(announcement.type);
+            
+            // Форматируем дату
+            const date = formatDate(announcement.created_at);
+            
+            // Создаем HTML карточки
+            card.innerHTML = `
+                <div class="announcement-content">
+                    <div class="announcement-header">
+                        <div class="announcement-badges">
+                            <span class="badge" style="background: linear-gradient(135deg, ${categoryColor.start}, ${categoryColor.end}); color: white; border-color: ${categoryColor.border};">
+                                <i class="fas ${categoryIcon} badge-icon"></i>
+                                ${categoryName}
+                            </span>
+                            <span class="badge badge-type">
+                                <i class="fas ${typeIcon} badge-icon"></i>
+                                ${typeName}
+                            </span>
+                            ${isUrgent ? `<span class="badge" style="background: linear-gradient(135deg, #fca5a5, #ef4444); color: white; border-color: #dc2626;">
+                                <i class="fas fa-exclamation-triangle badge-icon"></i>
+                                Срочно
+                            </span>` : ''}
+                        </div>
+                    </div>
+                    <h3 class="announcement-title">
+                        ${isUrgent ? '<i class="fas fa-exclamation-triangle" style="color: #ef4444; margin-right: 4px;"></i>' : ''}
+                        ${announcement.title}
+                    </h3>
+                    <p class="announcement-text">
+                        ${announcement.content.substring(0, 150)}${announcement.content.length > 150 ? '...' : ''}
+                    </p>
+                    <div class="announcement-footer">
+                        <span class="announcement-date">
+                            <i class="far fa-calendar"></i>
+                            ${date}
+                        </span>
+                        ${announcement.author ? `<span style="color: #6b7280;">
+                            <i class="fas fa-user" style="margin-right: 4px;"></i>
+                            ${announcement.author}
+                        </span>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Добавляем обработчик клика
+            card.addEventListener('click', (e) => {
+                // Если кликнули на бадж - не открываем модалку
+                if (e.target.closest('.badge')) {
+                    return;
+                }
+                
+                openAnnouncementModal(announcement);
+            });
+            
+            return card;
+        }
+        
+        // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+        
+        // Получить иконку категории
+        function getCategoryIcon(category) {
+            const icons = {
+                'students': 'fa-graduation-cap',
+                'teachers': 'fa-briefcase',
+                'parents': 'fa-heart',
+                'all': 'fa-users'
+            };
+            return icons[category] || 'fa-bullhorn';
+        }
+        
+        // Получить название категории
+        function getCategoryName(category) {
+            const names = {
+                'students': 'Ученикам',
+                'teachers': 'Учителям',
+                'parents': 'Родителям',
+                'all': 'Для всех'
+            };
+            return names[category] || 'Общее';
+        }
+        
+        // Получить цвет категории
+        function getCategoryColor(category) {
+            const colors = {
+                'students': { start: '#10b981', end: '#059669', border: '#059669' },
+                'teachers': { start: '#8b5cf6', end: '#7c3aed', border: '#7c3aed' },
+                'parents': { start: '#ec4899', end: '#db2777', border: '#db2777' },
+                'all': { start: '#3b82f6', end: '#2563eb', border: '#2563eb' }
+            };
+            return colors[category] || { start: '#6b7280', end: '#4b5563', border: '#4b5563' };
+        }
+        
+        // Получить иконку типа
+        function getTypeIcon(type) {
+            const icons = {
+                'announcement': 'fa-bullhorn',
+                'news': 'fa-newspaper',
+                'event': 'fa-calendar'
+            };
+            return icons[type] || 'fa-bullhorn';
+        }
+        
+        // Получить название типа
+        function getTypeName(type) {
+            const names = {
+                'announcement': 'Объявление',
+                'news': 'Новость',
+                'event': 'Мероприятие'
+            };
+            return names[type] || 'Объявление';
+        }
+        
+        // Форматировать дату
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+        
+        // ========== МОДАЛЬНОЕ ОКНО ДЛЯ ОБЪЯВЛЕНИЙ ==========
+        
+        // Открыть модальное окно с объявлением
+        function openAnnouncementModal(announcement) {
+            // Заполняем заголовок
+            document.getElementById('modalTitle').innerHTML = announcement.title;
+            
+            // Заполняем мета-информацию
+            const meta = document.getElementById('modalMeta');
+            meta.innerHTML = `
+                <span class="meta-item">
+                    <i class="fas fa-user"></i> ${announcement.author || 'Администрация'}
+                </span>
+                <span class="meta-item">
+                    <i class="far fa-calendar"></i> ${formatDate(announcement.created_at)}
+                </span>
+                <span class="meta-item">
+                    <i class="fas fa-tag"></i> ${getCategoryName(announcement.category)}
+                </span>
+                ${announcement.urgent ? `<span class="meta-item" style="background: #fef2f2; color: #dc2626;">
+                    <i class="fas fa-exclamation-triangle"></i> Срочно
+                </span>` : ''}
+            `;
+            
+            // Заполняем содержимое
+            const content = document.getElementById('modalContent');
+            content.innerHTML = `
+                <div>${announcement.content.replace(/\n/g, '<br>')}</div>
+            `;
+            
+            // Показываем модальное окно
+            const modal = document.getElementById('announcementModal');
             const modalOverlay = document.getElementById('modalOverlay');
-            const announcementCards = document.querySelectorAll('.announcement-card');
             
-            // Проверяем элементы
-            console.log('✅ Найдено карточек:', announcementCards.length);
-            console.log('✅ Найдено модальных окон:', document.querySelectorAll('.modal').length);
-            console.log('✅ Оверлей:', modalOverlay ? '✓ найден' : '✗ не найден');
+            modalOverlay.style.display = 'block';
+            setTimeout(() => {
+                modalOverlay.style.opacity = '1';
+                modal.classList.add('active');
+                document.body.classList.add('no-scroll');
+            }, 10);
+        }
+        
+        // Закрыть модальное окно
+        function closeModal() {
+            const modal = document.getElementById('announcementModal');
+            const modalOverlay = document.getElementById('modalOverlay');
             
-            // ===== 1. ФУНКЦИЯ ОТКРЫТИЯ МОДАЛКИ =====
-            window.openModal = function(modalId) {
-                console.log('📂 Открываем модалку:', modalId);
+            modal.classList.remove('active');
+            modalOverlay.style.opacity = '0';
+            
+            setTimeout(() => {
+                modalOverlay.style.display = 'none';
+                document.body.classList.remove('no-scroll');
+            }, 400);
+        }
+        
+        // ========== ПОИСК ==========
+        
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            
+            if (!searchInput) return;
+            
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                const allCards = document.querySelectorAll('.announcement-card');
                 
-                const modal = document.getElementById(modalId);
-                if (!modal) {
-                    console.error('❌ Модальное окно не найдено:', modalId);
+                if (searchTerm === '') {
+                    allCards.forEach(card => {
+                        card.style.display = 'block';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'none';
+                        }, 10);
+                    });
                     return;
                 }
                 
-                if (!modalOverlay) {
-                    console.error('❌ Оверлей не найден');
-                    return;
-                }
-                
-                // Показываем оверлей
-                modalOverlay.style.display = 'block';
-                
-                // Анимация появления
-                setTimeout(() => {
-                    modalOverlay.style.opacity = '1';
-                    modal.classList.add('active');
-                    document.body.classList.add('no-scroll');
-                }, 10);
-                
-                console.log('✅ Модалка открыта');
-            };
-            
-            // ===== 2. ФУНКЦИЯ ЗАКРЫТИЯ МОДАЛКИ =====
-            window.closeModal = function() {
-                console.log('📕 Закрываем все модалки');
-                
-                // Закрываем все модалки
-                document.querySelectorAll('.modal').forEach(modal => {
-                    modal.classList.remove('active');
-                });
-                
-                // Скрываем оверлей с анимацией
-                if (modalOverlay) {
-                    modalOverlay.style.opacity = '0';
+                allCards.forEach(card => {
+                    const title = card.querySelector('.announcement-title').textContent.toLowerCase();
+                    const text = card.querySelector('.announcement-text').textContent.toLowerCase();
                     
-                    setTimeout(() => {
-                        modalOverlay.style.display = 'none';
-                        document.body.classList.remove('no-scroll');
-                        console.log('✅ Все модалки закрыты');
-                    }, 400);
-                }
-            };
-            
-            // ===== 3. ОБРАБОТЧИК КЛИКА НА КАРТОЧКИ =====
-            announcementCards.forEach(card => {
-                card.addEventListener('click', function(e) {
-                    // Если кликнули на бадж - не открываем модалку
-                    if (e.target.closest('.badge')) {
-                        console.log('Клик на бадж - игнорируем');
-                        return;
-                    }
-                    
-                    // Получаем ID модалки из data-modal
-                    const modalId = this.getAttribute('data-modal');
-                    
-                    if (modalId) {
-                        console.log('🟢 Клик на карточку:', modalId);
-                        openModal(modalId);
+                    if (title.includes(searchTerm) || text.includes(searchTerm)) {
+                        card.style.display = 'block';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, 10);
+                    } else {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            card.style.display = 'none';
+                        }, 300);
                     }
                 });
             });
+        }
+        
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Инициализация главной страницы...');
             
-            // ===== 4. ОБРАБОТЧИКИ ЗАКРЫТИЯ =====
+            // 1. Настройка мобильного меню
+            const menuToggle = document.querySelector('.menu-toggle');
+            const nav = document.querySelector('.nav');
             
-            // Клик на крестик
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('modal-close') || 
-                    e.target.closest('.modal-close')) {
-                    console.log('✖️ Клик на крестик');
-                    closeModal();
-                }
-            });
+            if (menuToggle && nav) {
+                menuToggle.addEventListener('click', () => {
+                    nav.classList.toggle('active');
+                });
+            }
             
-            // Клик на оверлей
-            modalOverlay.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    console.log('🌌 Клик на оверлей');
-                    closeModal();
-                }
-            });
+            // 2. Настройка обработчиков для модальных окон
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalClose = document.querySelector('.modal-close');
+            
+            if (modalOverlay) {
+                modalOverlay.addEventListener('click', (e) => {
+                    if (e.target === modalOverlay) {
+                        closeModal();
+                    }
+                });
+            }
+            
+            if (modalClose) {
+                modalClose.addEventListener('click', closeModal);
+            }
             
             // Закрытие по ESC
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
-                    console.log('⌨️ Нажата ESC');
                     closeModal();
                 }
             });
             
-            // ===== 5. ПОИСК (ваш существующий код) =====
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('input', function(e) {
-                    const searchTerm = e.target.value.toLowerCase().trim();
-                    
-                    if (searchTerm === '') {
-                        announcementCards.forEach(card => {
-                            card.style.display = 'block';
-                            setTimeout(() => {
-                                card.style.opacity = '1';
-                                card.style.transform = 'none';
-                            }, 10);
-                        });
-                        return;
-                    }
-                    
-                    announcementCards.forEach(card => {
-                        const title = card.querySelector('.announcement-title').textContent.toLowerCase();
-                        const text = card.querySelector('.announcement-text').textContent.toLowerCase();
-                        
-                        if (title.includes(searchTerm) || text.includes(searchTerm)) {
-                            card.style.display = 'block';
-                            setTimeout(() => {
-                                card.style.opacity = '1';
-                                card.style.transform = 'translateY(0)';
-                            }, 10);
-                        } else {
-                            card.style.opacity = '0';
-                            card.style.transform = 'translateY(20px)';
-                            setTimeout(() => {
-                                card.style.display = 'none';
-                            }, 300);
-                        }
-                    });
-                });
-            }
+            // 3. Настройка поиска
+            setupSearch();
             
-            // ===== 6. ДОПОЛНИТЕЛЬНЫЕ АНИМАЦИИ =====
+            // 4. Загружаем объявления
+            loadAnnouncements();
             
-            // Параллакс эффект
-            const blobs = document.querySelectorAll('.blob');
-            if (blobs.length > 0) {
-                window.addEventListener('mousemove', (e) => {
-                    const x = e.clientX / window.innerWidth;
-                    const y = e.clientY / window.innerHeight;
-                    
-                    blobs.forEach((blob, index) => {
-                        const speed = 0.5 + index * 0.1;
-                        const xMove = (x - 0.5) * 50 * speed;
-                        const yMove = (y - 0.5) * 50 * speed;
-                        
-                        blob.style.transform = `translate(${xMove}px, ${yMove}px)`;
-                    });
-                });
-            }
+            // 5. Анимация загрузки страницы
+            window.addEventListener('load', () => {
+                document.body.style.opacity = '1';
+                document.body.style.transform = 'translateY(0)';
+            });
             
-            console.log('🎉 Модальная система готова к работе!');
-        });
-        
-        // Анимация загрузки страницы
-        window.addEventListener('load', () => {
-            document.body.style.opacity = '1';
-            document.body.style.transform = 'translateY(0)';
+            console.log('✅ Главная страница инициализирована');
         });
     </script>
 </body>

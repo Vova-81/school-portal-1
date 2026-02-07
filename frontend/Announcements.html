@@ -664,390 +664,411 @@
     </div>
 
     <script>
-        // ДАННЫЕ
-        const announcementsData = [
-            {
-                id: 1,
-                title: "Родительское собрание",
-                content: "Уважаемые родители! Приглашаем вас на родительское собрание, которое состоится 25 января в 18:00 в актовом зале школы. Будут обсуждаться вопросы успеваемости, подготовка к выпускным экзаменам и планы на следующий учебный год.",
-                category: "parents",
-                type: "announcement",
-                author: "Иванова М.А.",
-                position: "Директор школы",
-                authorInitials: "МИ",
-                date: "20 января 2024",
-                pinned: true,
-                urgent: false
-            },
-            {
-                id: 2,
-                title: "Отмена занятий",
-                content: "В связи с ухудшением погодных условий, занятия 25 января отменяются. Информация о возобновлении занятий будет размещена дополнительно.",
-                category: "students",
-                type: "announcement",
-                author: "Петров С.И.",
-                position: "Заместитель директора",
-                authorInitials: "ПС",
-                date: "24 января 2024",
-                pinned: false,
-                urgent: true
-            },
-            {
-                id: 3,
-                title: "Олимпиада по математике",
-                content: "Приглашаем учащихся 9-11 классов принять участие в школьном этапе олимпиады по математике. Олимпиада пройдёт 30 января в кабинете 203.",
-                category: "students",
-                type: "event",
-                author: "Сидорова Е.В.",
-                position: "Учитель математики",
-                authorInitials: "ЕС",
-                date: "22 января 2024",
-                pinned: false,
-                urgent: false
-            },
-            {
-                id: 4,
-                title: "Методический совет",
-                content: "Совещание для учителей начальных классов состоится 26 января в 15:00 в учительской. Тема: 'Обновление учебных планов на 2024-2025 учебный год'.",
-                category: "teachers",
-                type: "announcement",
-                author: "Козлова Т.П.",
-                position: "Методист",
-                authorInitials: "ТК",
-                date: "23 января 2024",
-                pinned: true,
-                urgent: false
-            },
-            {
-                id: 5,
-                title: "Конкурс чтецов",
-                content: "Школьный этап конкурса 'Живая классика' состоится 15 февраля в актовом зале. Регистрация участников до 10 февраля.",
-                category: "students",
-                type: "event",
-                author: "Николаева Л.М.",
-                position: "Учитель литературы",
-                authorInitials: "ЛН",
-                date: "21 января 2024",
-                pinned: false,
-                urgent: false
-            },
-            {
-                id: 6,
-                title: "Новое расписание",
-                content: "С 1 февраля вводится новое расписание уроков. Расписание доступно в соответствующем разделе портала.",
-                category: "teachers",
-                type: "news",
-                author: "Васильев А.С.",
-                position: "Завуч",
-                authorInitials: "АВ",
-                date: "19 января 2024",
-                pinned: false,
-                urgent: false
-            }
-        ];
+// ========== КОНФИГУРАЦИЯ API ==========
+const API_BASE_URL = 'http://localhost:3000';
+let currentAnnouncementId = null;
 
-        // СОСТОЯНИЕ
-        let state = {
-            category: 'all',
-            type: 'all',
-            urgent: false,
-            pinned: false,
-            search: ''
-        };
+// Состояние фильтров
+let state = {
+    category: 'all',
+    type: 'all',
+    urgent: false,
+    pinned: false,
+    search: ''
+};
 
-        // ЭЛЕМЕНТЫ
-        const elements = {
-            searchInput: document.getElementById('searchInput'),
-            filterPills: document.querySelectorAll('.filter-pill'),
-            pinnedList: document.getElementById('pinnedList'),
-            announcementsList: document.getElementById('announcementsList'),
-            emptyState: document.getElementById('emptyState'),
-            modalOverlay: document.getElementById('modalOverlay'),
-            modalClose: document.getElementById('modalClose'),
-            modalTitle: document.getElementById('modalTitle'),
-            modalAvatar: document.getElementById('modalAvatar'),
-            modalAuthor: document.getElementById('modalAuthor'),
-            modalPosition: document.getElementById('modalPosition'),
-            modalDate: document.getElementById('modalDate'),
-            modalTags: document.getElementById('modalTags'),
-            modalContent: document.getElementById('modalContent')
-        };
+// Элементы DOM
+const elements = {
+    searchInput: document.getElementById('searchInput'),
+    filterPills: document.querySelectorAll('.filter-pill'),
+    pinnedList: document.getElementById('pinnedList'),
+    announcementsList: document.getElementById('announcementsList'),
+    emptyState: document.getElementById('emptyState'),
+    
+    // Модалка просмотра
+    modalOverlay: document.getElementById('modalOverlay'),
+    modalClose: document.getElementById('modalClose'),
+    modalTitle: document.getElementById('modalTitle'),
+    modalAvatar: document.getElementById('modalAvatar'),
+    modalAuthor: document.getElementById('modalAuthor'),
+    modalPosition: document.getElementById('modalPosition'),
+    modalDate: document.getElementById('modalDate'),
+    modalTags: document.getElementById('modalTags'),
+    modalContent: document.getElementById('modalContent')
+};
 
-        // ИНИЦИАЛИЗАЦИЯ
-        document.addEventListener('DOMContentLoaded', function() {
-            renderAnnouncements();
-            
-            // Поиск
-            elements.searchInput.addEventListener('input', function(e) {
-                state.search = e.target.value.toLowerCase().trim();
-                renderAnnouncements();
-            });
-            
-            // Фильтры
-            elements.filterPills.forEach(pill => {
-                pill.addEventListener('click', function() {
-                    const filter = this.dataset.filter;
-                    
-                    if (filter === 'all') {
-                        elements.filterPills.forEach(p => p.classList.remove('active'));
-                        this.classList.add('active');
-                        resetFilters();
-                    } else {
-                        document.querySelector('[data-filter="all"]').classList.remove('active');
-                        this.classList.toggle('active');
-                        
-                        if (filter.startsWith('category:')) {
-                            state.category = this.classList.contains('active') ? filter.split(':')[1] : 'all';
-                        } else if (filter.startsWith('type:')) {
-                            state.type = this.classList.contains('active') ? filter.split(':')[1] : 'all';
-                        } else if (filter === 'urgent') {
-                            state.urgent = this.classList.contains('active');
-                        } else if (filter === 'pinned') {
-                            state.pinned = this.classList.contains('active');
-                        }
-                    }
-                    
-                    renderAnnouncements();
-                });
-            });
-            
-            // Модальное окно
-            elements.modalClose.addEventListener('click', closeModal);
-            elements.modalOverlay.addEventListener('click', function(e) {
-                if (e.target === this) closeModal();
-            });
-            
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') closeModal();
-            });
+// ========== ФУНКЦИИ API ==========
+
+// Загрузить все объявления
+async function loadAnnouncements() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/announcements`);
+        if (!response.ok) throw new Error('Ошибка сервера');
+        
+        const announcements = await response.json();
+        renderAnnouncements(announcements);
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
+        showError('Не удалось загрузить объявления');
+    }
+}
+
+// Удалить объявление
+async function deleteAnnouncement(id) {
+    if (!confirm('Удалить это объявление?')) return;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/announcements/${id}`, {
+            method: 'DELETE'
         });
-
-        // ФУНКЦИИ
-        function resetFilters() {
-            state = {
-                category: 'all',
-                type: 'all',
-                urgent: false,
-                pinned: false,
-                search: ''
-            };
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showSuccess('Объявление удалено');
+            await loadAnnouncements();
+            closeModal();
+        } else {
+            showError(result.error || 'Ошибка удаления');
         }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showError('Не удалось удалить объявление');
+    }
+}
 
-        function filterAnnouncements() {
-            return announcementsData.filter(announcement => {
-                if (state.search) {
-                    const searchQuery = state.search.toLowerCase();
-                    const matches = announcement.title.toLowerCase().includes(searchQuery) ||
-                                   announcement.content.toLowerCase().includes(searchQuery);
-                    if (!matches) return false;
-                }
-                
-                if (state.category !== 'all' && announcement.category !== state.category) {
-                    return false;
-                }
-                
-                if (state.type !== 'all' && announcement.type !== state.type) {
-                    return false;
-                }
-                
-                if (state.urgent && !announcement.urgent) {
-                    return false;
-                }
-                
-                if (state.pinned && !announcement.pinned) {
-                    return false;
-                }
-                
-                return true;
-            });
-        }
+// ========== РЕНДЕРИНГ ==========
 
-        function renderAnnouncements() {
-            const filtered = filterAnnouncements();
-            const pinned = filtered.filter(a => a.pinned);
-            const regular = filtered.filter(a => !a.pinned);
-            
-            elements.pinnedList.innerHTML = '';
-            elements.announcementsList.innerHTML = '';
-            
-            if (filtered.length === 0) {
-                elements.emptyState.style.display = 'block';
-                return;
+function renderAnnouncements(announcements) {
+    // Фильтрация
+    let filtered = announcements.filter(ann => {
+        if (state.search) {
+            const searchTerm = state.search.toLowerCase();
+            if (!ann.title.toLowerCase().includes(searchTerm) && 
+                !ann.content.toLowerCase().includes(searchTerm)) {
+                return false;
             }
-            
-            elements.emptyState.style.display = 'none';
-            
-            pinned.forEach(announcement => {
-                elements.pinnedList.innerHTML += createCardHTML(announcement);
-            });
-            
-            regular.forEach(announcement => {
-                elements.announcementsList.innerHTML += createCardHTML(announcement);
-            });
-            
-            addCardListeners();
         }
+        
+        if (state.category !== 'all' && ann.category !== state.category) {
+            return false;
+        }
+        
+        if (state.type !== 'all' && ann.type !== state.type) {
+            return false;
+        }
+        
+        if (state.urgent && !ann.urgent) return false;
+        if (state.pinned && !ann.pinned) return false;
+        
+        return true;
+    });
+    
+    // Разделение на закреплённые и обычные
+    const pinned = filtered.filter(a => a.pinned);
+    const regular = filtered.filter(a => !a.pinned);
+    
+    // Очистка контейнеров
+    elements.pinnedList.innerHTML = '';
+    elements.announcementsList.innerHTML = '';
+    
+    // Рендер закреплённых
+    if (pinned.length > 0) {
+        pinned.forEach(announcement => {
+            elements.pinnedList.innerHTML += createCardHTML(announcement);
+        });
+    }
+    
+    // Рендер обычных
+    if (regular.length > 0) {
+        regular.forEach(announcement => {
+            elements.announcementsList.innerHTML += createCardHTML(announcement);
+        });
+    }
+    
+    // Показ/скрытие пустого состояния
+    if (filtered.length === 0) {
+        elements.emptyState.style.display = 'block';
+    } else {
+        elements.emptyState.style.display = 'none';
+    }
+    
+    // Добавляем обработчики на карточки
+    addCardListeners();
+}
 
-        function createCardHTML(announcement) {
-            const cardClass = `announcement-card ${announcement.pinned ? 'pinned' : ''} ${announcement.urgent ? 'urgent' : ''}`;
-            const categoryClass = `card-tag category-${announcement.category}`;
-            const typeClass = `card-tag type-${announcement.type}`;
-            
-            const shortContent = announcement.content.length > 120 
-                ? announcement.content.substring(0, 120) + '...' 
-                : announcement.content;
-            
-            return `
-                <div class="${cardClass}" data-id="${announcement.id}">
-                    <div class="card-header">
-                        <h3 class="card-title">${announcement.title}</h3>
-                        <div class="card-tags">
-                            ${announcement.pinned ? '<span class="card-tag status-pinned"><i class="fas fa-thumbtack"></i></span>' : ''}
-                            ${announcement.urgent ? '<span class="card-tag status-urgent"><i class="fas fa-bolt"></i></span>' : ''}
-                            <span class="${categoryClass}">${getCategoryLabel(announcement.category)}</span>
-                            <span class="${typeClass}">${getTypeLabel(announcement.type)}</span>
-                        </div>
-                    </div>
-                    <p class="card-content">${shortContent}</p>
-                    <div class="card-footer">
-                        <div class="author-info">
-                            <div class="author-avatar">${announcement.authorInitials}</div>
-                            <div class="author-details">
-                                <h4>${announcement.author}</h4>
-                                <p>${announcement.position}</p>
-                            </div>
-                        </div>
-                        <div class="card-date">
-                            <i class="far fa-calendar"></i>
-                            ${announcement.date}
-                        </div>
+function createCardHTML(announcement) {
+    const cardClass = `announcement-card ${announcement.pinned ? 'pinned' : ''} ${announcement.urgent ? 'urgent' : ''}`;
+    const categoryClass = `card-tag category-${announcement.category}`;
+    const typeClass = `card-tag type-${announcement.type}`;
+    
+    // Форматирование даты
+    const date = new Date(announcement.created_at);
+    const formattedDate = date.toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
+    
+    // Обрезаем текст для карточки
+    const shortContent = announcement.content.length > 120 
+        ? announcement.content.substring(0, 120) + '...' 
+        : announcement.content;
+    
+    // Получаем инициалы автора
+    const initials = announcement.author 
+        ? announcement.author.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+        : 'АВ';
+    
+    return `
+        <div class="${cardClass}" data-id="${announcement.id}">
+            <div class="card-header">
+                <h3 class="card-title">${announcement.title}</h3>
+                <div class="card-tags">
+                    ${announcement.pinned ? '<span class="card-tag status-pinned"><i class="fas fa-thumbtack"></i></span>' : ''}
+                    ${announcement.urgent ? '<span class="card-tag status-urgent"><i class="fas fa-bolt"></i></span>' : ''}
+                    <span class="${categoryClass}">${getCategoryLabel(announcement.category)}</span>
+                    <span class="${typeClass}">${getTypeLabel(announcement.type)}</span>
+                </div>
+            </div>
+            <p class="card-content">${shortContent}</p>
+            <div class="card-footer">
+                <div class="author-info">
+                    <div class="author-avatar">${initials}</div>
+                    <div class="author-details">
+                        <h4>${announcement.author || 'Администрация'}</h4>
+                        <p>${announcement.position || ''}</p>
                     </div>
                 </div>
-            `;
-        }
+                <div class="card-date">
+                    <i class="far fa-calendar"></i>
+                    ${formattedDate}
+                </div>
+            </div>
+        </div>
+    `;
+}
 
-        function getCategoryLabel(category) {
-            const labels = {
-                'students': 'Ученикам',
-                'teachers': 'Учителям',
-                'parents': 'Родителям'
-            };
-            return labels[category] || category;
-        }
+function getCategoryLabel(category) {
+    const labels = {
+        'students': 'Ученикам',
+        'teachers': 'Учителям',
+        'parents': 'Родителям',
+        'all': 'Для всех'
+    };
+    return labels[category] || category;
+}
 
-        function getTypeLabel(type) {
-            const labels = {
-                'announcement': 'Объявление',
-                'news': 'Новость',
-                'event': 'Мероприятие'
-            };
-            return labels[type] || type;
-        }
+function getTypeLabel(type) {
+    const labels = {
+        'announcement': 'Объявление',
+        'news': 'Новость',
+        'event': 'Мероприятие'
+    };
+    return labels[type] || type;
+}
 
-        function addCardListeners() {
-            document.querySelectorAll('.announcement-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    const id = parseInt(this.dataset.id);
-                    const announcement = announcementsData.find(a => a.id === id);
-                    if (announcement) {
-                        openModal(announcement);
-                    }
-                });
-            });
-        }
+function addCardListeners() {
+    document.querySelectorAll('.announcement-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const id = parseInt(this.dataset.id);
+            openAnnouncementModal(id);
+        });
+    });
+}
 
-        function openModal(announcement) {
-            elements.modalTitle.textContent = announcement.title;
-            elements.modalAvatar.textContent = announcement.authorInitials;
-            elements.modalAuthor.textContent = announcement.author;
-            elements.modalPosition.textContent = announcement.position;
-            elements.modalDate.textContent = announcement.date;
-            elements.modalContent.innerHTML = `<p>${announcement.content}</p>`;
-            
-            let tagsHTML = '';
-            tagsHTML += `<span class="card-tag category-${announcement.category}">${getCategoryLabel(announcement.category)}</span>`;
-            tagsHTML += `<span class="card-tag type-${announcement.type}">${getTypeLabel(announcement.type)}</span>`;
-            if (announcement.pinned) {
-                tagsHTML += '<span class="card-tag status-pinned"><i class="fas fa-thumbtack"></i></span>';
-            }
-            if (announcement.urgent) {
-                tagsHTML += '<span class="card-tag status-urgent"><i class="fas fa-bolt"></i></span>';
-            }
-            elements.modalTags.innerHTML = tagsHTML;
-            
-            elements.modalOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
+// ========== МОДАЛЬНОЕ ОКНО ==========
 
-        function closeModal() {
-            elements.modalOverlay.classList.remove('active');
-            document.body.style.overflow = 'auto';
+async function openAnnouncementModal(id) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/announcements`);
+        const announcements = await response.json();
+        const announcement = announcements.find(a => a.id === id);
+        
+        if (!announcement) {
+            showError('Объявление не найдено');
+            return;
         }
-        // Добавь этот код в файл announcements.html в тег <script>
+        
+        // Заполняем модалку
+        elements.modalTitle.textContent = announcement.title;
+        
+        // Инициалы автора
+        const initials = announcement.author 
+            ? announcement.author.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+            : 'АВ';
+        elements.modalAvatar.textContent = initials;
+        
+        elements.modalAuthor.textContent = announcement.author || 'Администрация';
+        elements.modalPosition.textContent = announcement.position || '';
+        
+        // Форматирование даты
+        const date = new Date(announcement.created_at);
+        const formattedDate = date.toLocaleDateString('ru-RU', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        elements.modalDate.textContent = formattedDate;
+        
+        // Содержимое
+        elements.modalContent.innerHTML = `<p>${announcement.content}</p>`;
+        
+        // Теги
+        let tagsHTML = '';
+        tagsHTML += `<span class="card-tag category-${announcement.category}">${getCategoryLabel(announcement.category)}</span>`;
+        tagsHTML += `<span class="card-tag type-${announcement.type}">${getTypeLabel(announcement.type)}</span>`;
+        if (announcement.pinned) {
+            tagsHTML += '<span class="card-tag status-pinned"><i class="fas fa-thumbtack"></i></span>';
+        }
+        if (announcement.urgent) {
+            tagsHTML += '<span class="card-tag status-urgent"><i class="fas fa-bolt"></i></span>';
+        }
+        elements.modalTags.innerHTML = tagsHTML;
+        
+        // Сохраняем ID для возможных действий
+        currentAnnouncementId = id;
+        
+        // Показываем модалку
+        elements.modalOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+    } catch (error) {
+        console.error('Ошибка загрузки объявления:', error);
+        showError('Не удалось загрузить объявление');
+    }
+}
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Получаем параметр фильтра из URL
+function closeModal() {
+    elements.modalOverlay.classList.remove('active');
+    document.body.style.overflow = 'auto';
+    currentAnnouncementId = null;
+}
+
+// ========== ОБРАБОТКА URL ПАРАМЕТРОВ ==========
+
+function applyUrlFilters() {
     const urlParams = new URLSearchParams(window.location.search);
     const filterParam = urlParams.get('filter');
     
-    if (filterParam) {
-        console.log('Фильтр из URL:', filterParam);
-        
-        // Автоматически активируем соответствующую кнопку фильтра
-        const filterButtons = document.querySelectorAll('.filter-pill');
-        
-        filterButtons.forEach(button => {
-            if (button.getAttribute('data-filter') === filterParam) {
-                // Сначала сбросим все фильтры
-                if (filterParam !== 'all') {
-                    document.querySelector('[data-filter="all"]').classList.remove('active');
-                }
-                
-                // Активируем нужную кнопку
-                button.classList.add('active');
-                
-                // Применяем фильтр
-                if (filterParam.startsWith('category:')) {
-                    const category = filterParam.split(':')[1];
-                    state.category = category;
-                } else if (filterParam.startsWith('type:')) {
-                    const type = filterParam.split(':')[1];
-                    state.type = type;
-                } else if (filterParam === 'urgent') {
-                    state.urgent = true;
-                } else if (filterParam === 'pinned') {
-                    state.pinned = true;
-                }
-                
-                // Применяем фильтр к объявлениям
-                setTimeout(() => {
-                    renderAnnouncements();
-                    
-                    // Прокручиваем к фильтрам
-                    const filtersSection = document.querySelector('.filters-section');
-                    if (filtersSection) {
-                        filtersSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                }, 100);
-            }
-        });
-    }
+    if (!filterParam) return;
     
-    // Также обрабатываем старый формат параметров (если у тебя был ?category=...)
-    const categoryParam = urlParams.get('category');
-    if (categoryParam && !filterParam) {
-        const categoryMap = {
-            'students': 'category:students',
-            'teachers': 'category:teachers', 
-            'parents': 'category:parents'
-        };
+    console.log('🔗 Применяем фильтр из URL:', filterParam);
+    
+    // Разбираем параметр: "category:students"
+    const [filterType, filterValue] = filterParam.split(':');
+    
+    if (filterType === 'category') {
+        // Находим кнопку фильтра
+        const filterBtn = document.querySelector(`[data-filter="category:${filterValue}"]`);
         
-        if (categoryMap[categoryParam]) {
-            // Перенаправляем на новый формат
-            window.location.href = `announcements.html?filter=${categoryMap[categoryParam]}`;
+        if (filterBtn) {
+            // Сбрасываем все фильтры
+            resetFilters();
+            
+            // Активируем нужный фильтр
+            state.category = filterValue;
+            filterBtn.classList.add('active');
+            
+            console.log('✅ Фильтр применен:', state);
         }
     }
+    
+    // После применения фильтров загружаем объявления
+    loadAnnouncements();
+}
+
+// ========== УТИЛИТЫ ==========
+
+function showSuccess(message) {
+    alert('✅ ' + message);
+}
+
+function showError(message) {
+    alert('❌ ' + message);
+}
+
+function resetFilters() {
+    state = {
+        category: 'all',
+        type: 'all',
+        urgent: false,
+        pinned: false,
+        search: ''
+    };
+    
+    elements.searchInput.value = '';
+    elements.filterPills.forEach(pill => {
+        pill.classList.remove('active');
+        if (pill.dataset.filter === 'all') {
+            pill.classList.add('active');
+        }
+    });
+}
+
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Загружаем объявления
+    loadAnnouncements();
+    
+    // Применяем фильтры из URL (ЕСЛИ ЕСТЬ)
+    applyUrlFilters();
+    
+    // Поиск
+    elements.searchInput.addEventListener('input', function(e) {
+        state.search = e.target.value.toLowerCase().trim();
+        loadAnnouncements();
+    });
+    
+    // Фильтры
+    elements.filterPills.forEach(pill => {
+        pill.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            
+            if (filter === 'all') {
+                elements.filterPills.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                resetFilters();
+            } else {
+                // Снимаем активность с "Все"
+                document.querySelector('[data-filter="all"]').classList.remove('active');
+                
+                // Переключаем текущую кнопку
+                this.classList.toggle('active');
+                
+                // Обновляем состояние фильтров
+                if (filter.startsWith('category:')) {
+                    state.category = this.classList.contains('active') ? filter.split(':')[1] : 'all';
+                } else if (filter.startsWith('type:')) {
+                    state.type = this.classList.contains('active') ? filter.split(':')[1] : 'all';
+                } else if (filter === 'urgent') {
+                    state.urgent = this.classList.contains('active');
+                } else if (filter === 'pinned') {
+                    state.pinned = this.classList.contains('active');
+                }
+            }
+            
+            // Применяем фильтры
+            loadAnnouncements();
+        });
+    });
+    
+    // Модальное окно
+    elements.modalClose.addEventListener('click', closeModal);
+    elements.modalOverlay.addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+    
+    // Авто-обновление каждые 30 секунд
+    setInterval(loadAnnouncements, 30000);
 });
-    </script>
+</script>
 </body>
 </html>
