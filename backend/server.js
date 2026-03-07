@@ -192,7 +192,7 @@ app.get('/api/health', async (req, res) => {
 });
 
 // 2. ПРОВЕРКА НУЖЕН ЛИ ПЕРВЫЙ АДМИН
-app.get('/api/setup/check', checkDatabase, async (req, res) => {
+app.get('/api/setup/check', async (req, res) => {
     try {
         // Проверяем есть ли пользователи
         const result = await db.query('SELECT COUNT(*) as count FROM users');
@@ -278,7 +278,7 @@ app.post('/api/setup/first-admin', checkDatabase, async (req, res) => {
 });
 
 // 4. ВХОД В СИСТЕМУ
-app.post('/api/auth/login', checkDatabase, async (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
     try {
         const { username, password } = req.body;
         
