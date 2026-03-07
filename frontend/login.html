@@ -148,8 +148,8 @@
         </div>
     </div>
 
-    <script>
-        const API_BASE_URL = '';
+<script>
+    const API_BASE_URL = '';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Проверяем, нужно ли создавать первого администратора
@@ -203,9 +203,9 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = true;
         
         try {
-            console.log('📨 Отправляю POST запрос на', `${API_BASE_URL}https://backend-school-portal.onrender.com/api/auth/login`);
+            console.log('📨 Отправляю POST запрос на /api/auth/login');
             
-            const response = await fetch(`${API_BASE_URL}https://backend-school-portal.onrender.com/api/auth/login`, {
+            const response = await fetch(`/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Подробная диагностика
             if (error.message.includes('Failed to fetch')) {
-                showError('Сервер не отвечает. Проверьте что:<br>1. Сервер запущен (node server.js)<br>2. URL правильный: ' + API_BASE_URL);
+                showError('Сервер не отвечает. Проверьте что сервер запущен.');
             } else if (error.message.includes('NetworkError')) {
                 showError('Проблема с сетью. Проверьте соединение.');
             } else {
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Проверка, нужно ли создавать первого администратора
 async function checkIfSetupNeeded() {
     try {
-        const response = await fetch(`${API_BASE_URL}https://backend-school-portal.onrender.com/api/setup/check`);
+        const response = await fetch(`/api/setup/check`);
         const data = await response.json();
         
         if (data.needsSetup) {
@@ -431,7 +431,7 @@ async function createFirstAdmin() {
     createBtn.disabled = true;
     
     try {
-        const response = await fetch(`${API_BASE_URL}https://backend-school-portal.onrender.com/api/setup/first-admin`, {
+        const response = await fetch(`/api/setup/first-admin`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -519,7 +519,7 @@ function fillDemo(role) {
 // Проверка сервера
 async function checkServer() {
     try {
-        const response = await fetch(`${API_BASE_URL}https://backend-school-portal.onrender.com/api/health`);
+        const response = await fetch(`/api/health`);
         if (response.ok) {
             console.log('✅ Сервер доступен');
         } else {
@@ -527,13 +527,12 @@ async function checkServer() {
         }
     } catch (error) {
         console.error('❌ Сервер не отвечает:', error.message);
-        showError('⚠️ Сервер не запущен! Запустите:<br><code>node server.js</code>', true);
+        showError('⚠️ Сервер не запущен! Запустите: node server.js', true);
     }
 }
 
 // Вспомогательные функции для уведомлений
 function showError(message, isHtml = false) {
-    // Удаляем старые уведомления
     const oldAlert = document.querySelector('.login-alert');
     if (oldAlert) oldAlert.remove();
     
@@ -550,8 +549,6 @@ function showError(message, isHtml = false) {
         </div>`;
     
     document.body.appendChild(alert);
-    
-    // Автоудаление через 5 секунд
     setTimeout(() => alert.remove(), 5000);
 }
 
@@ -569,7 +566,6 @@ function showSuccess(message) {
     `;
     
     document.body.appendChild(alert);
-    
     setTimeout(() => alert.remove(), 3000);
 }
 
@@ -587,13 +583,11 @@ function showInfo(message) {
     `;
     
     document.body.appendChild(alert);
-    
     setTimeout(() => alert.remove(), 2000);
 }
 
 // Глобальные функции для кнопок демо
-window.fillDemo = fillDemo;
-    </script>
-    
+window.fillDemo = fillDemo;    
+</script>
 </body>
 </html>
