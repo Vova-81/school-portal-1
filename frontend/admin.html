@@ -753,10 +753,12 @@ async function loadAnnouncements() {
             return;
         }
         
-        // Проверяем структуру ответа
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
         const data = await response.json();
         
-        // API может возвращать { success: true, announcements: [...] } или просто массив
         if (Array.isArray(data)) {
             allAnnouncements = data;
         } else if (data.announcements && Array.isArray(data.announcements)) {
@@ -789,6 +791,10 @@ async function loadSchedules() {
             localStorage.removeItem('user');
             window.location.href = 'login.html';
             return;
+        }
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
         
         const data = await response.json();
@@ -825,6 +831,10 @@ async function loadUsers() {
             localStorage.removeItem('user');
             window.location.href = 'login.html';
             return;
+        }
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
         
         const data = await response.json();
