@@ -753,12 +753,25 @@ async function loadAnnouncements() {
             return;
         }
         
+        // Проверяем структуру ответа
         const data = await response.json();
-        allAnnouncements = data.announcements || [];
+        
+        // API может возвращать { success: true, announcements: [...] } или просто массив
+        if (Array.isArray(data)) {
+            allAnnouncements = data;
+        } else if (data.announcements && Array.isArray(data.announcements)) {
+            allAnnouncements = data.announcements;
+        } else if (data.success && data.announcements) {
+            allAnnouncements = data.announcements;
+        } else {
+            allAnnouncements = [];
+        }
+        
         renderAnnouncementsTable(allAnnouncements);
     } catch (error) {
         console.error('Ошибка загрузки объявлений:', error);
         showNotification('Не удалось загрузить объявления', 'error');
+        renderAnnouncementsTable([]);
     }
 }
 
@@ -779,11 +792,22 @@ async function loadSchedules() {
         }
         
         const data = await response.json();
-        allSchedules = data.schedules || [];
+        
+        if (Array.isArray(data)) {
+            allSchedules = data;
+        } else if (data.schedules && Array.isArray(data.schedules)) {
+            allSchedules = data.schedules;
+        } else if (data.success && data.schedules) {
+            allSchedules = data.schedules;
+        } else {
+            allSchedules = [];
+        }
+        
         renderSchedulesTable(allSchedules);
     } catch (error) {
         console.error('Ошибка загрузки расписания:', error);
         showNotification('Не удалось загрузить расписание', 'error');
+        renderSchedulesTable([]);
     }
 }
 
@@ -804,11 +828,22 @@ async function loadUsers() {
         }
         
         const data = await response.json();
-        allUsers = data.users || [];
+        
+        if (Array.isArray(data)) {
+            allUsers = data;
+        } else if (data.users && Array.isArray(data.users)) {
+            allUsers = data.users;
+        } else if (data.success && data.users) {
+            allUsers = data.users;
+        } else {
+            allUsers = [];
+        }
+        
         renderUsersTable(allUsers);
     } catch (error) {
         console.error('Ошибка загрузки пользователей:', error);
         showNotification('Не удалось загрузить пользователей', 'error');
+        renderUsersTable([]);
     }
 }
 
@@ -1067,7 +1102,7 @@ function renderAnnouncementsTable(announcements) {
     
     tbody.innerHTML = announcements.map(ann => {
         const statusBadge = ann.urgent ? '<span class="badge badge-danger">Срочное</span>' : '<span class="badge badge-success">Активно</span>';
-        const date = new Date(ann.created_at).toLocaleDateString('ru-RU');
+        const date = ann.created_at ? new Date(ann.created_at).toLocaleDateString('ru-RU') : '-';
         
         return `
             <tr data-id="${ann.id}">
@@ -1336,6 +1371,10 @@ async function resetUserPassword() {
             body: JSON.stringify({ newPassword })
         });
         
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
         const data = await response.json();
         
         if (data.success) {
@@ -1386,6 +1425,10 @@ async function confirmDelete() {
                 'Authorization': `Bearer ${token}`
             }
         });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
         
         const data = await response.json();
         
@@ -1444,6 +1487,10 @@ function setupFormHandlers() {
                 },
                 body: JSON.stringify(formData)
             });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
             
             const data = await response.json();
             
@@ -1504,6 +1551,10 @@ function setupFormHandlers() {
                 body: JSON.stringify(formData)
             });
             
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
             const data = await response.json();
             
             if (data.success) {
@@ -1561,6 +1612,10 @@ function setupFormHandlers() {
                     body: JSON.stringify({ username, password, full_name: fullName, role })
                 });
                 
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.success) {
@@ -1580,6 +1635,10 @@ function setupFormHandlers() {
                     },
                     body: JSON.stringify({ full_name: fullName, role })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
                 
                 const data = await response.json();
                 
