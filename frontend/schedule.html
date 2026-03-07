@@ -99,6 +99,7 @@ async function showSchedule(grade) {
     document.getElementById('scheduleState').style.display = 'none';
     
     try {
+        // Проверяем кэш для этого класса
         if (scheduleCache[grade]) {
             setTimeout(() => {
                 renderSchedule(grade, scheduleCache[grade]);
@@ -108,6 +109,7 @@ async function showSchedule(grade) {
         
         console.log(`📡 Загружаем расписание для ${grade} классов...`);
         
+        // ВАЖНО: Загружаем ТОЛЬКО уроки с нужным class_number
         const response = await fetch(`${API_BASE_URL}/api/schedules?class_number=${grade}`, {
             headers: { 'Accept': 'application/json' }
         });
@@ -118,40 +120,44 @@ async function showSchedule(grade) {
 
         const data = await response.json();
         
-        // ИСПРАВЛЕНИЕ: проверяем структуру ответа
-        let schedules = [];
+        // Получаем массив уроков из ответа
+        let lessons = [];
         if (Array.isArray(data)) {
-            schedules = data;
+            lessons = data;
         } else if (data.schedules && Array.isArray(data.schedules)) {
-            schedules = data.schedules;
+            lessons = data.schedules;
         } else if (data.success && data.schedules) {
-            schedules = data.schedules;
+            lessons = data.schedules;
         }
         
-        console.log(`✅ Загружено ${schedules.length} уроков для ${grade} класса`);
+        console.log(`✅ Загружено ${lessons.length} уроков для ${grade} класса`);
 
-        if (schedules && schedules.length > 0) {
+        if (lessons && lessons.length > 0) {
+            // Группируем уроки по классам и дням
             const scheduleData = {};
             
-            schedules.forEach(lesson => {
-                const classKey = `${lesson.class_number}${lesson.class_letter || ''}`;
-                const day = lesson.day_of_week;
-                
-                if (!scheduleData[classKey]) {
-                    scheduleData[classKey] = {};
+            lessons.forEach(lesson => {
+                // Убеждаемся что это уроки только нужного класса
+                if (lesson.class_number == grade) {
+                    const classKey = `${lesson.class_number}${lesson.class_letter || ''}`;
+                    const day = lesson.day_of_week;
+                    
+                    if (!scheduleData[classKey]) {
+                        scheduleData[classKey] = {};
+                    }
+                    
+                    if (!scheduleData[classKey][day]) {
+                        scheduleData[classKey][day] = [];
+                    }
+                    
+                    scheduleData[classKey][day].push({
+                        start_time: lesson.start_time,
+                        end_time: lesson.end_time,
+                        subject: lesson.subject,
+                        teacher: lesson.teacher,
+                        room: lesson.room || '—'
+                    });
                 }
-                
-                if (!scheduleData[classKey][day]) {
-                    scheduleData[classKey][day] = [];
-                }
-                
-                scheduleData[classKey][day].push({
-                    start_time: lesson.start_time,
-                    end_time: lesson.end_time,
-                    subject: lesson.subject,
-                    teacher: lesson.teacher,
-                    room: lesson.room || '—'
-                });
             });
             
             console.log('📊 Сгруппированные данные:', scheduleData);
@@ -293,7 +299,6 @@ function showNotification(message, type = 'warning') {
     setTimeout(() => notification.remove(), 3000);
 }
 
-// Добавляем анимацию
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideUp {
