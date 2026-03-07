@@ -82,8 +82,8 @@
     </main>
 </body>
 <script>
-// ========== КОНФИГУРАЦИЯ ==========
-const API_BASE_URL = ''; // для локальной разработки
+    // ========== КОНФИГУРАЦИЯ ==========
+const API_BASE_URL = '';
 let scheduleCache = {};
 let currentGrade = null;
 
@@ -92,16 +92,13 @@ async function showSchedule(grade) {
     console.log(`🖱️ КЛИК по кнопке ${grade} класса`);
     currentGrade = grade;
     
-    // СРАЗУ МЕНЯЕМ ЗАГОЛОВОК!
     document.getElementById('scheduleTitle').textContent = `Расписание ${grade} классов`;
     
-    // Показываем загрузку
     document.getElementById('emptyState').style.display = 'none';
     document.getElementById('loadingState').style.display = 'block';
     document.getElementById('scheduleState').style.display = 'none';
     
     try {
-        // Проверяем кэш
         if (scheduleCache[grade]) {
             setTimeout(() => {
                 renderSchedule(grade, scheduleCache[grade]);
@@ -109,10 +106,8 @@ async function showSchedule(grade) {
             return;
         }
         
-        // Загружаем с сервера
         console.log(`📡 Загружаем расписание для ${grade} классов...`);
         
-        // Загружаем с фильтром по классу
         const response = await fetch(`${API_BASE_URL}/api/schedules?class_number=${grade}`, {
             headers: { 'Accept': 'application/json' }
         });
@@ -122,14 +117,23 @@ async function showSchedule(grade) {
         }
 
         const data = await response.json();
-        console.log('📊 Данные из БД:', data);
-        console.log(`✅ Загружено ${data.length} уроков для ${grade} класса`);
+        
+        // ИСПРАВЛЕНИЕ: проверяем структуру ответа
+        let schedules = [];
+        if (Array.isArray(data)) {
+            schedules = data;
+        } else if (data.schedules && Array.isArray(data.schedules)) {
+            schedules = data.schedules;
+        } else if (data.success && data.schedules) {
+            schedules = data.schedules;
+        }
+        
+        console.log(`✅ Загружено ${schedules.length} уроков для ${grade} класса`);
 
-        if (data && data.length > 0) {
-            // Группируем данные с сервера
+        if (schedules && schedules.length > 0) {
             const scheduleData = {};
             
-            data.forEach(lesson => {
+            schedules.forEach(lesson => {
                 const classKey = `${lesson.class_number}${lesson.class_letter || ''}`;
                 const day = lesson.day_of_week;
                 
@@ -155,7 +159,6 @@ async function showSchedule(grade) {
             scheduleCache[grade] = scheduleData;
             renderSchedule(grade, scheduleData);
         } else {
-            // Если данных нет - показываем заглушку
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('scheduleContent').innerHTML = `
                 <div class="schedule-empty-state">
@@ -174,9 +177,8 @@ async function showSchedule(grade) {
         document.getElementById('scheduleContent').innerHTML = `
             <div class="schedule-empty-state">
                 <i class="fas fa-calendar-times"></i>
-                <h3>Ой! Расписания нет</h3>
-                <p>Для ${grade} классов пока ничего не добавили</p>
-                <div class="empty-emoji">📭 😢 📚</div>
+                <h3>Ошибка загрузки</h3>
+                <p>Не удалось загрузить расписание</p>
             </div>
         `;
         document.getElementById('scheduleState').style.display = 'block';
@@ -189,7 +191,6 @@ function renderSchedule(grade, scheduleData) {
     document.getElementById('scheduleState').style.display = 'block';
     document.getElementById('scheduleTitle').textContent = `Расписание ${grade} классов`;
     
-    // Преобразуем данные в формат для карточек
     const daysMap = {
         'monday': 'ПОНЕДЕЛЬНИК',
         'tuesday': 'ВТОРНИК',
@@ -203,9 +204,7 @@ function renderSchedule(grade, scheduleData) {
     
     let html = '<div class="schedule-container">';
     
-    // Для каждого дня недели
     dayOrder.forEach(day => {
-        // Собираем классы, у которых есть уроки в этот день
         const classesWithLessons = [];
         
         Object.keys(scheduleData).forEach(cls => {
@@ -214,7 +213,6 @@ function renderSchedule(grade, scheduleData) {
             }
         });
         
-        // Сортируем классы правильно (5А, 5Б, 6А, 6Б...)
         classesWithLessons.sort((a, b) => {
             const numA = parseInt(a.match(/\d+/)?.[0] || 0);
             const numB = parseInt(b.match(/\d+/)?.[0] || 0);
@@ -227,17 +225,13 @@ function renderSchedule(grade, scheduleData) {
             return letterA.localeCompare(letterB, 'ru');
         });
         
-        // Если есть уроки в этот день
         if (classesWithLessons.length > 0) {
             html += `<div class="schedule-day">`;
             html += `<div class="day-header">${daysMap[day]}</div>`;
             html += `<div class="classes-row">`;
             
-            // Для каждого класса
             classesWithLessons.forEach(cls => {
                 const lessons = scheduleData[cls][day] || [];
-                
-                // Сортируем уроки по времени
                 lessons.sort((a, b) => a.start_time.localeCompare(b.start_time));
                 
                 html += `<div class="class-card">`;
@@ -292,17 +286,27 @@ function showNotification(message, type = 'warning') {
         background: ${colors[type]}; color: white; padding: 12px 24px;
         border-radius: 30px; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         font-family: 'Kurale', sans-serif;
+        animation: slideUp 0.3s ease;
     `;
     notification.textContent = message;
     document.body.appendChild(notification);
     setTimeout(() => notification.remove(), 3000);
 }
 
+// Добавляем анимацию
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideUp {
+        from { opacity: 0; transform: translate(-50%, 20px); }
+        to { opacity: 1; transform: translate(-50%, 0); }
+    }
+`;
+document.head.appendChild(style);
+
 // ========== ИНИЦИАЛИЗАЦИЯ ==========
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Страница расписания инициализация');
     
-    // Скрываем загрузку при старте
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('scheduleState').style.display = 'none';
     document.getElementById('emptyState').style.display = 'block';
