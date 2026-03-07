@@ -717,11 +717,13 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Запуск сервера
-app.listen(PORT, () => {
-    console.log(`
-🚀 Сервер запущен: http://localhost:${PORT}
-📁 Статические файлы из: ${FRONTEND_PATH}
-🐘 PostgreSQL подключен
-    `);
+// Запуск сервера - ВАЖНО: добавляем '0.0.0.0' для Render
+app.listen(PORT, '0.0.0.0', () => {
+    console.log('=========================================');
+    console.log(`🚀 Сервер запущен на порту: ${PORT}`);
+    console.log(`📁 Frontend путь: ${FRONTEND_PATH}`);
+    console.log(`🔐 JWT Secret: ${JWT_SECRET ? 'Установлен' : 'По умолчанию'}`);
+    console.log(`🌐 Режим: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🗄️ Database: ${isDatabaseConnected ? 'Подключен' : 'Не подключен'}`);
+    console.log('=========================================');
 });
