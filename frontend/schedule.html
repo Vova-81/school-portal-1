@@ -132,11 +132,16 @@ async function showSchedule(grade) {
         
         console.log(`✅ Загружено ${lessons.length} уроков для ${grade} класса`);
 
-        if (lessons && lessons.length > 0) {
+        // ФИЛЬТРУЕМ ТОЛЬКО НУЖНЫЙ КЛАСС!
+        const filteredLessons = lessons.filter(lesson => lesson.class_number == grade);
+        
+        console.log(`🔍 После фильтрации осталось ${filteredLessons.length} уроков для класса ${grade}`);
+
+        if (filteredLessons && filteredLessons.length > 0) {
             // Группируем уроки по классам и дням
             const scheduleData = {};
             
-            lessons.forEach(lesson => {
+            filteredLessons.forEach(lesson => {
                 const classKey = `${lesson.class_number}${lesson.class_letter || ''}`;
                 const day = lesson.day_of_week;
                 
@@ -173,7 +178,7 @@ async function showSchedule(grade) {
                 showEmptyState(grade);
             }
         } else {
-            console.log('❌ Уроков нет в ответе API');
+            console.log('❌ Уроков нет для этого класса');
             showEmptyState(grade);
         }
         
