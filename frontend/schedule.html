@@ -109,7 +109,7 @@ async function showSchedule(grade) {
         
         console.log(`📡 Загружаем расписание для ${grade} классов...`);
         
-        // ВАЖНО: Загружаем ТОЛЬКО уроки с нужным class_number
+        // Загружаем ТОЛЬКО уроки с нужным class_number
         const response = await fetch(`${API_BASE_URL}/api/schedules?class_number=${grade}`, {
             headers: { 'Accept': 'application/json' }
         });
@@ -160,11 +160,27 @@ async function showSchedule(grade) {
                 }
             });
             
-            console.log('📊 Сгруппированные данные:', scheduleData);
+            // Проверяем, есть ли вообще какие-то данные после группировки
+            const hasData = Object.keys(scheduleData).length > 0;
             
-            scheduleCache[grade] = scheduleData;
-            renderSchedule(grade, scheduleData);
+            if (hasData) {
+                console.log('📊 Сгруппированные данные:', scheduleData);
+                scheduleCache[grade] = scheduleData;
+                renderSchedule(grade, scheduleData);
+            } else {
+                // Если после фильтрации данных нет - показываем пустое состояние
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('scheduleContent').innerHTML = `
+                    <div class="schedule-empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <h3>Расписание не найдено</h3>
+                        <p>Для ${grade} классов пока нет расписания</p>
+                    </div>
+                `;
+                document.getElementById('scheduleState').style.display = 'block';
+            }
         } else {
+            // Если уроков нет - показываем пустое состояние
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('scheduleContent').innerHTML = `
                 <div class="schedule-empty-state">
@@ -206,6 +222,12 @@ function renderSchedule(grade, scheduleData) {
         'saturday': 'СУББОТА'
     };
     
+    // Создаем обратный маппинг (русский -> английский)
+    const reverseDayMapping = {};
+    Object.entries(daysMap).forEach(([eng, rus]) => {
+        reverseDayMapping[rus.toLowerCase()] = eng;
+    });
+    
     const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     
     let html = '<div class="schedule-container">';
@@ -214,7 +236,15 @@ function renderSchedule(grade, scheduleData) {
         const classesWithLessons = [];
         
         Object.keys(scheduleData).forEach(cls => {
-            if (scheduleData[cls][day] && scheduleData[cls][day].length > 0) {
+            // Проверяем наличие уроков в этот день (ищем по русским названиям)
+            let hasLessons = false;
+            Object.keys(scheduleData[cls]).forEach(dayInData => {
+                if (reverseDayMapping[dayInData.toLowerCase()] === day) {
+                    hasLessons = true;
+                }
+            });
+            
+            if (hasLessons) {
                 classesWithLessons.push(cls);
             }
         });
@@ -237,7 +267,14 @@ function renderSchedule(grade, scheduleData) {
             html += `<div class="classes-row">`;
             
             classesWithLessons.forEach(cls => {
-                const lessons = scheduleData[cls][day] || [];
+                // Собираем уроки для этого класса в текущий день
+                const lessons = [];
+                Object.keys(scheduleData[cls]).forEach(dayInData => {
+                    if (reverseDayMapping[dayInData.toLowerCase()] === day) {
+                        lessons.push(...scheduleData[cls][dayInData]);
+                    }
+                });
+                
                 lessons.sort((a, b) => a.start_time.localeCompare(b.start_time));
                 
                 html += `<div class="class-card">`;
