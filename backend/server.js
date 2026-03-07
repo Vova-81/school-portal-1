@@ -699,6 +699,134 @@ app.get('/api/auth/profile', checkDatabase, requireAuth, async (req, res) => {
         });
     }
 });
+// 14. ОБНОВИТЬ ПОЛЬЗОВАТЕЛЯ
+app.put('/api/admin/users/:id', checkDatabase, requireAuth, async (req, res) => {
+    try {
+        if (!['director', 'deputy'].includes(req.userRole)) {
+            return res.status(403).json({ success: false, error: 'Недостаточно прав' });
+        }
+        
+        const { id } = req.params;
+        const { full_name, role } = req.body;
+        
+        const result = await db.query(
+            'UPDATE users SET full_name = $1, role = $2 WHERE id = $3 RETURNING id, username, full_name, role, created_at, last_login',
+            [full_name, role, id]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Пользователь не найден' });
+        }
+        
+        res.json({ success: true, user: result.rows[0] });
+    } catch (error) {
+        console.error('Update user error:', error);
+        res.status(500).json({ success: false, error: 'Ошибка обновления пользователя' });
+    }
+});
+
+// 15. УДАЛИТЬ ПОЛЬЗОВАТЕЛЯ
+app.delete('/api/admin/users/:id', checkDatabase, requireAuth, async (req, res) => {
+    try {
+        if (!['director', 'deputy'].includes(req.userRole)) {
+            return res.status(403).json({ success: false, error: 'Недостаточно прав' });
+        }
+        
+        const { id } = req.params;
+        
+        const result = await db.query('DELETE FROM users WHERE id = $1 RETURNING id', [id]);
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Пользователь не найден' });
+        }
+        
+        res.json({ success: true, message: 'Пользователь удален' });
+    } catch (error) {
+        console.error('Delete user error:', error);
+        res.status(500).json({ success: false, error: 'Ошибка удаления пользователя' });
+    }
+});
+
+// 16. СБРОС ПАРОЛЯ ПОЛЬЗОВАТЕЛЯ
+app.post('/api/admin/users/:id/reset-password', checkDatabase, requireAuth, async (req, res) => {
+    try {
+        if (!['director', 'deputy'].includes(req.userRole)) {
+            return res.status(403).json({ success: false, error: 'Недостаточно прав' });
+        }
+        
+        const { id } = req.params;
+        const { newPassword } = req.body;
+        
+        if (!newPassword || newPassword.length < 6) {
+            return res.status(400).json({ success: false, error: 'Пароль должен быть не менее 6 символов' });
+        }
+        
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        
+        const result = await db.query(
+            'UPDATE users SET password = $1 WHERE id = $2 RETURNING id',
+            [hashedPassword, id]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Пользователь не найден' });
+        }
+        
+        res.json({ success: true, message: 'Пароль успешно изменен' });
+    } catch (error) {
+        console.error('Reset password error:', error);
+        res.status(500).json({ success: false, error: 'Ошибка сброса пароля' });
+    }
+});
+
+// 17. ОБНОВИТЬ ОБЪЯВЛЕНИЕ
+app.put('/api/announcements/:id', checkDatabase, requireAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, content, category, type, pinned, urgent } = req.body;
+        
+        const result = await db.query(
+            `UPDATE announcements 
+             SET title = $1, content = $2, category = $3, type = $4, pinned = $5, urgent = $6
+             WHERE id = $7 RETURNING *`,
+            [title, content, category, type, pinned, urgent, id]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Объявление не найдено' });
+        }
+        
+        res.json({ success: true, announcement: result.rows[0] });
+    } catch (error) {
+        console.error('Update announcement error:', error);
+        res.status(500).json({ success: false, error: 'Ошибка обновления объявления' });
+    }
+});
+
+// 18. ОБНОВИТЬ УРОК
+app.put('/api/schedules/:id', checkDatabase, requireAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { class_number, class_letter, day_of_week, start_time, end_time, subject, teacher, room } = req.body;
+        
+        const result = await db.query(
+            `UPDATE schedules 
+             SET class_number = $1, class_letter = $2, day_of_week = $3, 
+                 start_time = $4, end_time = $5, subject = $6, teacher = $7, room = $8
+             WHERE id = $9 RETURNING *`,
+            [class_number, class_letter, day_of_week, start_time, end_time, subject, teacher, room, id]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Урок не найден' });
+        }
+        
+        res.json({ success: true, schedule: result.rows[0] });
+    } catch (error) {
+        console.error('Update schedule error:', error);
+        res.status(500).json({ success: false, error: 'Ошибка обновления урока' });
+    }
+});
 
 // ========== СТАТИЧЕСКИЕ ФАЙЛЫ ==========
 app.use(express.static(FRONTEND_PATH));
