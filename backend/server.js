@@ -13,7 +13,20 @@ const JWT_SECRET = process.env.JWT_SECRET || 'school-portal-secret-2024';
 const FRONTEND_PATH = path.join(__dirname, '..', 'frontend');
 
 // ========== БАЗОВЫЕ НАСТРОЙКИ ==========
-app.use(cors());
+// Настройка CORS
+app.use(cors({
+    origin: [
+        'https://school-portal-real.onrender.com',
+        'http://localhost:3000',
+        'http://localhost:5500'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Добавь обработку OPTIONS запросов
+app.options('*', cors());
 app.use(express.json());
 
 // ========== ПОДКЛЮЧЕНИЕ БАЗЫ ДАННЫХ ==========
