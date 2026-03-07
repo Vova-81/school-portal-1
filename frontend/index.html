@@ -364,101 +364,42 @@
 
     // ========== ЗАГРУЗКА ОБЪЯВЛЕНИЙ ==========
     async function loadAnnouncements() {
-        // Удаляем статические карточки-заглушки
-    document.getElementById('urgentAnnouncements').innerHTML = '';
-    document.getElementById('pinnedAnnouncements').innerHTML = '';
-    document.getElementById('latestAnnouncements').innerHTML = '';
-        try {
-            console.log('📡 Загружаем объявления...');
-            
-            const response = await fetch(`${API_BASE_URL}/api/announcements`);
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
-            const data = await response.json();
-            console.log(`✅ Загружено ${data.length} объявлений`);
-            
-            announcementsCache = data;
-            updateStatistics(data);
-            displayAnnouncements(data);
-            
-            const noDataMsg = document.getElementById('noDataMessage');
-            if (noDataMsg) noDataMsg.style.display = 'none';
-            
-            return data;
-            
-        } catch (error) {
-            console.error('❌ Ошибка загрузки:', error);
-            
-            const noDataMsg = document.getElementById('noDataMessage');
-            if (noDataMsg) {
-                noDataMsg.style.display = 'block';
-                noDataMsg.innerHTML = `
-                    <i class="fas fa-exclamation-triangle" style="color: #ef4444; font-size: 3rem;"></i>
-                    <h3 style="margin-top: 20px; color: #dc2626;">Ошибка загрузки</h3>
-                    <p style="color: #94a3b8;">Не удалось загрузить объявления</p>
-                `;
-            }
-            
-            showDemoAnnouncements();
-            return [];
-        }
-    }
-
-    // Демо-данные
-    function showDemoAnnouncements() {
-        const demoData = [
-            {
-                id: 1,
-                title: "Родительское собрание",
-                content: "Приглашаем родителей на общешкольное собрание 15 марта в 18:00",
-                category: "parents",
-                type: "event",
-                urgent: true,
-                pinned: false,
-                author: "Директор",
-                created_at: new Date().toISOString()
-            },
-            {
-                id: 2,
-                title: "Изменение в расписании",
-                content: "Экзамен по математике переносится на 20 марта",
-                category: "students",
-                type: "announcement",
-                urgent: false,
-                pinned: true,
-                author: "Зам. директора",
-                created_at: new Date().toISOString()
-            },
-            {
-                id: 3,
-                title: "Весенний концерт",
-                content: "Концерт состоится 25 марта в актовом зале",
-                category: "all",
-                type: "event",
-                urgent: false,
-                pinned: false,
-                author: "Оргкомитет",
-                created_at: new Date().toISOString()
-            }
-        ];
+    try {
+        console.log('📡 Загружаем объявления...');
         
-        updateStatistics(demoData);
-        displayAnnouncements(demoData);
+        const response = await fetch(`/api/announcements`);
+        const data = await response.json();
+        
+        // Твой API возвращает { success: true, announcements: [...] }
+        const announcements = data.announcements || [];
+        
+        console.log(`✅ Загружено ${announcements.length} объявлений`);
+        
+        if (announcements.length > 0) {
+            updateStatistics(announcements);
+            displayAnnouncements(announcements);
+        } else {
+            document.getElementById('noDataMessage').style.display = 'block';
+        }
+        
+    } catch (error) {
+        console.error('❌ Ошибка загрузки:', error);
+        document.getElementById('noDataMessage').style.display = 'block';
     }
+}
 
     // ========== СТАТИСТИКА ==========
     function updateStatistics(announcements) {
-        const totalEl = document.getElementById('totalAnnouncements');
-        const newsEl = document.getElementById('totalNews');
-        const eventsEl = document.getElementById('totalEvents');
-        const urgentEl = document.getElementById('totalUrgent');
-        
-        if (totalEl) totalEl.textContent = announcements.length;
-        if (newsEl) newsEl.textContent = announcements.filter(a => a.type === 'news').length;
-        if (eventsEl) eventsEl.textContent = announcements.filter(a => a.type === 'event').length;
-        if (urgentEl) urgentEl.textContent = announcements.filter(a => a.urgent).length;
-    }
+    const totalEl = document.getElementById('totalAnnouncements');
+    const newsEl = document.getElementById('totalNews');
+    const eventsEl = document.getElementById('totalEvents');
+    const urgentEl = document.getElementById('totalUrgent');
+    
+    if (totalEl) totalEl.textContent = announcements.length;
+    if (newsEl) newsEl.textContent = announcements.filter(a => a.type === 'news').length;
+    if (eventsEl) eventsEl.textContent = announcements.filter(a => a.type === 'event').length;
+    if (urgentEl) urgentEl.textContent = announcements.filter(a => a.urgent).length;
+}
 
     // ========== ОТОБРАЖЕНИЕ КАРТОЧЕК ==========
     function displayAnnouncements(announcements) {
@@ -480,7 +421,6 @@
     const latest = sorted.filter(a => !a.urgent && !a.pinned).slice(0, 6);
     displayLatestAnnouncements(latest);
     
-    // ✅ ВОТ ЭТА ВАЖНАЯ СТРОКА!
     console.log('✅ Карточки отображены');
 }
 
