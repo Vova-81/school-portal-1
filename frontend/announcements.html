@@ -196,23 +196,22 @@ async function loadAnnouncements() {
     showLoading(true);
     
     try {
-        const response = await fetch(`${API_BASE_URL}/api/announcements`);
-        
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        
+        const response = await fetch(`/api/announcements`);
         const data = await response.json();
-        console.log(`✅ Загружено ${data.length} объявлений`);
         
-        announcementsCache = data;
+        // API возвращает { success: true, announcements: [...] }
+        const announcements = data.announcements || [];
+        
+        console.log(`✅ Загружено ${announcements.length} объявлений`);
+        
+        announcementsCache = announcements;
         
         showLoading(false);
-        renderAnnouncements(data);
+        renderAnnouncements(announcements);
         
     } catch (error) {
         console.error('❌ Ошибка загрузки:', error);
         showLoading(false);
-        
-        showNotification('Не удалось загрузить объявления', 'error');
         renderAnnouncements([]);
     }
 }
@@ -229,6 +228,11 @@ function showLoading(show) {
 
 // ========== ФИЛЬТРАЦИЯ ==========
 function filterAnnouncements(announcements) {
+    // Если announcements не массив, возвращаем пустой массив
+    if (!Array.isArray(announcements)) {
+        return [];
+    }
+    
     return announcements.filter(ann => {
         // Поиск
         if (state.search) {
@@ -261,7 +265,9 @@ function renderAnnouncements(announcements) {
     
     if (!container) return;
     
-    const filtered = filterAnnouncements(announcements);
+    // Убедимся что announcements - массив
+    const announcementsArray = Array.isArray(announcements) ? announcements : [];
+    const filtered = filterAnnouncements(announcementsArray);
     
     if (filtered.length === 0) {
         container.innerHTML = '';
@@ -280,8 +286,6 @@ function renderAnnouncements(announcements) {
     });
     
     container.innerHTML = html;
-    
-    // Добавляем обработчики для карточек
     addCardListeners();
 }
 
