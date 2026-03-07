@@ -101,15 +101,14 @@ async function showSchedule(grade) {
     try {
         // Проверяем кэш для этого класса
         if (scheduleCache[grade]) {
-            setTimeout(() => {
-                renderSchedule(grade, scheduleCache[grade]);
-            }, 300);
+            console.log(`📦 Используем кэш для ${grade} класса`);
+            renderSchedule(grade, scheduleCache[grade]);
             return;
         }
         
         console.log(`📡 Загружаем расписание для ${grade} классов...`);
         
-        // Загружаем ТОЛЬКО уроки с нужным class_number
+        // Загружаем уроки с нужным class_number
         const response = await fetch(`${API_BASE_URL}/api/schedules?class_number=${grade}`, {
             headers: { 'Accept': 'application/json' }
         });
@@ -119,6 +118,7 @@ async function showSchedule(grade) {
         }
 
         const data = await response.json();
+        console.log('📦 Ответ от API:', data);
         
         // Получаем массив уроков из ответа
         let lessons = [];
@@ -137,78 +137,81 @@ async function showSchedule(grade) {
             const scheduleData = {};
             
             lessons.forEach(lesson => {
-                // Убеждаемся что это уроки только нужного класса
-                if (lesson.class_number == grade) {
-                    const classKey = `${lesson.class_number}${lesson.class_letter || ''}`;
-                    const day = lesson.day_of_week;
-                    
-                    if (!scheduleData[classKey]) {
-                        scheduleData[classKey] = {};
-                    }
-                    
-                    if (!scheduleData[classKey][day]) {
-                        scheduleData[classKey][day] = [];
-                    }
-                    
-                    scheduleData[classKey][day].push({
-                        start_time: lesson.start_time,
-                        end_time: lesson.end_time,
-                        subject: lesson.subject,
-                        teacher: lesson.teacher,
-                        room: lesson.room || '—'
-                    });
+                const classKey = `${lesson.class_number}${lesson.class_letter || ''}`;
+                const day = lesson.day_of_week;
+                
+                console.log(`📝 Обрабатываем урок: класс=${classKey}, день=${day}, предмет=${lesson.subject}`);
+                
+                if (!scheduleData[classKey]) {
+                    scheduleData[classKey] = {};
                 }
+                
+                if (!scheduleData[classKey][day]) {
+                    scheduleData[classKey][day] = [];
+                }
+                
+                scheduleData[classKey][day].push({
+                    start_time: lesson.start_time,
+                    end_time: lesson.end_time,
+                    subject: lesson.subject,
+                    teacher: lesson.teacher,
+                    room: lesson.room || '—'
+                });
             });
+            
+            console.log('📊 Сгруппированные данные:', scheduleData);
             
             // Проверяем, есть ли вообще какие-то данные после группировки
             const hasData = Object.keys(scheduleData).length > 0;
             
             if (hasData) {
-                console.log('📊 Сгруппированные данные:', scheduleData);
+                console.log('✅ Данные есть, вызываем renderSchedule');
                 scheduleCache[grade] = scheduleData;
                 renderSchedule(grade, scheduleData);
             } else {
-                // Если после фильтрации данных нет - показываем пустое состояние
-                document.getElementById('loadingState').style.display = 'none';
-                document.getElementById('scheduleContent').innerHTML = `
-                    <div class="schedule-empty-state">
-                        <i class="fas fa-calendar-times"></i>
-                        <h3>Расписание не найдено</h3>
-                        <p>Для ${grade} классов пока нет расписания</p>
-                    </div>
-                `;
-                document.getElementById('scheduleState').style.display = 'block';
+                console.log('❌ После группировки данных нет');
+                showEmptyState(grade);
             }
         } else {
-            // Если уроков нет - показываем пустое состояние
-            document.getElementById('loadingState').style.display = 'none';
-            document.getElementById('scheduleContent').innerHTML = `
-                <div class="schedule-empty-state">
-                    <i class="fas fa-calendar-times"></i>
-                    <h3>Расписание не найдено</h3>
-                    <p>Для ${grade} классов пока нет расписания</p>
-                </div>
-            `;
-            document.getElementById('scheduleState').style.display = 'block';
+            console.log('❌ Уроков нет в ответе API');
+            showEmptyState(grade);
         }
         
     } catch (error) {
         console.error('❌ Ошибка загрузки расписания:', error);
-        
-        document.getElementById('loadingState').style.display = 'none';
-        document.getElementById('scheduleContent').innerHTML = `
-            <div class="schedule-empty-state">
-                <i class="fas fa-calendar-times"></i>
-                <h3>Ошибка загрузки</h3>
-                <p>Не удалось загрузить расписание</p>
-            </div>
-        `;
-        document.getElementById('scheduleState').style.display = 'block';
+        showErrorState();
     }
+}
+
+// ========== ПУСТОЕ СОСТОЯНИЕ ==========
+function showEmptyState(grade) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('scheduleContent').innerHTML = `
+        <div class="schedule-empty-state">
+            <i class="fas fa-calendar-times"></i>
+            <h3>Расписание не найдено</h3>
+            <p>Для ${grade} классов пока нет расписания</p>
+        </div>
+    `;
+    document.getElementById('scheduleState').style.display = 'block';
+}
+
+// ========== СОСТОЯНИЕ ОШИБКИ ==========
+function showErrorState() {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('scheduleContent').innerHTML = `
+        <div class="schedule-empty-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Ошибка загрузки</h3>
+            <p>Не удалось загрузить расписание</p>
+        </div>
+    `;
+    document.getElementById('scheduleState').style.display = 'block';
 }
 
 // ========== РЕНДЕРИНГ ==========
 function renderSchedule(grade, scheduleData) {
+    console.log('🎨 Рендерим расписание для класса', grade, 'с данными:', scheduleData);
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('scheduleState').style.display = 'block';
     document.getElementById('scheduleTitle').textContent = `Расписание ${grade} классов`;
@@ -222,29 +225,16 @@ function renderSchedule(grade, scheduleData) {
         'saturday': 'СУББОТА'
     };
     
-    // Создаем обратный маппинг (русский -> английский)
-    const reverseDayMapping = {};
-    Object.entries(daysMap).forEach(([eng, rus]) => {
-        reverseDayMapping[rus.toLowerCase()] = eng;
-    });
-    
     const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     
     let html = '<div class="schedule-container">';
+    let hasAnyLessons = false;
     
     dayOrder.forEach(day => {
         const classesWithLessons = [];
         
         Object.keys(scheduleData).forEach(cls => {
-            // Проверяем наличие уроков в этот день (ищем по русским названиям)
-            let hasLessons = false;
-            Object.keys(scheduleData[cls]).forEach(dayInData => {
-                if (reverseDayMapping[dayInData.toLowerCase()] === day) {
-                    hasLessons = true;
-                }
-            });
-            
-            if (hasLessons) {
+            if (scheduleData[cls][day] && scheduleData[cls][day].length > 0) {
                 classesWithLessons.push(cls);
             }
         });
@@ -262,19 +252,13 @@ function renderSchedule(grade, scheduleData) {
         });
         
         if (classesWithLessons.length > 0) {
+            hasAnyLessons = true;
             html += `<div class="schedule-day">`;
             html += `<div class="day-header">${daysMap[day]}</div>`;
             html += `<div class="classes-row">`;
             
             classesWithLessons.forEach(cls => {
-                // Собираем уроки для этого класса в текущий день
-                const lessons = [];
-                Object.keys(scheduleData[cls]).forEach(dayInData => {
-                    if (reverseDayMapping[dayInData.toLowerCase()] === day) {
-                        lessons.push(...scheduleData[cls][dayInData]);
-                    }
-                });
-                
+                const lessons = scheduleData[cls][day] || [];
                 lessons.sort((a, b) => a.start_time.localeCompare(b.start_time));
                 
                 html += `<div class="class-card">`;
@@ -305,7 +289,13 @@ function renderSchedule(grade, scheduleData) {
     });
     
     html += '</div>';
-    document.getElementById('scheduleContent').innerHTML = html;
+    
+    if (!hasAnyLessons) {
+        console.log('⚠️ Нет уроков для отображения после рендеринга');
+        showEmptyState(grade);
+    } else {
+        document.getElementById('scheduleContent').innerHTML = html;
+    }
 }
 
 // ========== ВСПОМОГАТЕЛЬНОЕ ==========
