@@ -623,11 +623,6 @@ let allUsers = [];
 // Список классов
 let availableClasses = ['5А', '5Б', '6А', '6Б', '7А', '7Б', '8А', '8Б', '9А', '9Б', '10А', '10Б', '11А', '11Б'];
 
-// ========== ОЧИСТКА КОНФЛИКТУЮЩИХ ДАННЫХ ==========
-console.log('🧹 Очистка конфликтующих данных...');
-localStorage.removeItem('authToken');
-localStorage.removeItem('user');
-
 // ========== ПОЛУЧЕНИЕ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ ==========
 function getCurrentUser() {
     const userStr = sessionStorage.getItem(CONFIG.SESSION.userKey);
@@ -644,7 +639,7 @@ function getCurrentUser() {
 
 // ========== ПРОВЕРКА АВТОРИЗАЦИИ ==========
 function checkAuth() {
-    // Принудительно чистим localStorage чтобы не мешал
+    // Полностью очищаем localStorage чтобы не мешал
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
     
@@ -656,6 +651,7 @@ function checkAuth() {
     if (!token || !user || !user.role) {
         console.log('🚫 Не авторизован, перенаправление на login.html');
         sessionStorage.clear();
+        alert('Сессия истекла. Пожалуйста, войдите снова.');
         window.location.href = CONFIG.REDIRECT.login;
         return false;
     }
@@ -664,6 +660,7 @@ function checkAuth() {
     if (user.role !== 'director' && user.role !== 'deputy') {
         console.log('🚫 Нет прав доступа к админке');
         sessionStorage.clear();
+        alert('У вас нет прав доступа к этой странице.');
         window.location.href = CONFIG.REDIRECT.index;
         return false;
     }
