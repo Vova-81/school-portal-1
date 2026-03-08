@@ -627,7 +627,6 @@ let availableClasses = ['5А', '5Б', '6А', '6Б', '7А', '7Б', '8А', '8Б', 
 console.log('🧹 Очистка конфликтующих данных...');
 localStorage.removeItem('authToken');
 localStorage.removeItem('user');
-sessionStorage.removeItem('localStorageConflict');
 
 // ========== ПОЛУЧЕНИЕ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ ==========
 function getCurrentUser() {
@@ -645,6 +644,10 @@ function getCurrentUser() {
 
 // ========== ПРОВЕРКА АВТОРИЗАЦИИ ==========
 function checkAuth() {
+    // Принудительно чистим localStorage чтобы не мешал
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    
     const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
     const user = getCurrentUser();
     
