@@ -600,363 +600,277 @@
     <div id="alertsContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000;"></div>
 
 <script>
-    // ========== КОНФИГУРАЦИЯ ==========
-const API_BASE_URL = '';
-let currentUser = null;
-let currentEditId = null;
-let currentEditScheduleId = null;
-let currentUserId = null;
-let allAnnouncements = [];
-let allSchedules = [];
-let allUsers = [];
-
-// Список классов (только 5-11)
-let availableClasses = ['5А', '5Б', '6А', '6Б', '7А', '7Б', '8А', '8Б', '9А', '9Б', '10А', '10Б', '11А', '11Б'];
-
-// ========== СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ ==========
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes fadeOut {
-        from { opacity: 1; }
-        to { opacity: 0; }
-    }
-`;
-document.head.appendChild(style);
-
-// ========== ПРИНУДИТЕЛЬНОЕ СКРЫТИЕ ТАБОВ ==========
-document.querySelectorAll('.tab-content').forEach(tab => {
-    tab.style.display = 'none';
-});
-const initialActiveTab = document.querySelector('.tab-content.active');
-if (initialActiveTab) {
-    initialActiveTab.style.display = 'block';
-}
-
-// ========== УВЕДОМЛЕНИЯ ==========
-function showNotification(message, type = 'success') {
-    const container = document.getElementById('alertsContainer');
-    if (!container) return;
+    // ========== КОНФИГУРАЦИЯ ДЛЯ ХОСТА ==========
+    const API_BASE_URL = 'https://backend-school-portal.onrender.com';
     
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        background: ${type === 'success' ? '#4caf50' : '#f44336'};
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
-        z-index: 10000;
+    console.log('🔧 API URL (хост):', API_BASE_URL);
+
+    let currentUser = null;
+    let currentEditId = null;
+    let currentEditScheduleId = null;
+    let currentUserId = null;
+    let allAnnouncements = [];
+    let allSchedules = [];
+    let allUsers = [];
+
+    // Список классов (только 5-11)
+    let availableClasses = ['5А', '5Б', '6А', '6Б', '7А', '7Б', '8А', '8Б', '9А', '9Б', '10А', '10Б', '11А', '11Б'];
+
+    // ========== ТЕСТОВЫЕ ДАННЫЕ ==========
+    const demoAnnouncements = [
+        {
+            id: 1,
+            title: "Родительское собрание",
+            content: "Приглашаем родителей на собрание 15 марта",
+            category: "parents",
+            type: "event",
+            urgent: true,
+            pinned: false,
+            author: "Директор",
+            created_at: "2024-03-01T10:00:00Z"
+        },
+        {
+            id: 2,
+            title: "Изменение в расписании",
+            content: "Экзамен по математике переносится",
+            category: "students",
+            type: "announcement",
+            urgent: false,
+            pinned: true,
+            author: "Зам. директора",
+            created_at: "2024-03-02T14:30:00Z"
+        }
+    ];
+
+    const demoSchedules = [
+        {
+            id: 1,
+            class_number: 5,
+            class_letter: "А",
+            day_of_week: "monday",
+            start_time: "08:30:00",
+            end_time: "09:15:00",
+            subject: "Математика",
+            teacher: "Иванова А.А.",
+            room: "305"
+        }
+    ];
+
+    const demoUsers = [
+        {
+            id: 1,
+            full_name: "Иванов Иван Иванович",
+            username: "ivanov",
+            password: "director123",
+            role: "director",
+            created_at: "2024-01-10T09:00:00Z",
+            last_login: "2024-03-02T08:30:00Z"
+        },
+        {
+            id: 2,
+            full_name: "Петрова Анна Сергеевна",
+            username: "petrova",
+            password: "deputy456",
+            role: "deputy",
+            created_at: "2024-01-15T10:00:00Z",
+            last_login: "2024-03-01T16:20:00Z"
+        }
+    ];
+
+    // ========== СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ ==========
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
     `;
-    notification.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-        <span>${message}</span>
-    `;
-    container.appendChild(notification);
-    
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
-        }
-    }, 3000);
-}
+    document.head.appendChild(style);
 
-// ========== ФУНКЦИИ ДЛЯ МОДАЛОК ==========
-function openModal(modalId) {
-    document.getElementById(modalId).classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeModal(modalId) {
-    document.getElementById(modalId).classList.remove('active');
-    document.body.style.overflow = '';
-    
-    if (modalId === 'scheduleModal') {
-        const addSection = document.getElementById('addClassSection');
-        const deleteSection = document.getElementById('deleteClassSection');
-        if (addSection) addSection.style.display = 'none';
-        if (deleteSection) deleteSection.style.display = 'none';
-    }
-}
-
-document.querySelectorAll('.modal-backdrop').forEach(modal => {
-    modal.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeModal(this.id);
-        }
+    // ========== ПРИНУДИТЕЛЬНОЕ СКРЫТИЕ ТАБОВ ==========
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
     });
-});
-
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        document.querySelectorAll('.modal-backdrop.active').forEach(modal => {
-            closeModal(modal.id);
-        });
+    const initialActiveTab = document.querySelector('.tab-content.active');
+    if (initialActiveTab) {
+        initialActiveTab.style.display = 'block';
     }
-});
 
-// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
-function getCategoryLabel(category) {
-    const labels = { 'all': 'Для всех', 'students': 'Ученикам', 'teachers': 'Учителям', 'parents': 'Родителям' };
-    return labels[category] || category;
-}
-
-function getTypeLabel(type) {
-    const labels = { 'announcement': 'Объявление', 'news': 'Новость', 'event': 'Мероприятие' };
-    return labels[type] || type;
-}
-
-function getDayLabel(day) {
-    const days = { 'monday': 'Понедельник', 'tuesday': 'Вторник', 'wednesday': 'Среда', 'thursday': 'Четверг', 'friday': 'Пятница', 'saturday': 'Суббота' };
-    return days[day] || day;
-}
-
-function getRoleLabel(role) {
-    const labels = { 'director': '<span class="badge badge-warning">Директор</span>', 'deputy': '<span class="badge badge-primary">Заместитель</span>' };
-    return labels[role] || role;
-}
-
-// ========== АУТЕНТИФИКАЦИЯ ==========
-function checkAuth() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const token = localStorage.getItem('authToken');
-    
-    if (!token || !user || !user.role) {
-        window.location.href = 'login.html';
-        return false;
+    // ========== УВЕДОМЛЕНИЯ ==========
+    function showNotification(message, type = 'success') {
+        const container = document.getElementById('alertsContainer');
+        if (!container) return;
+        
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            background: ${type === 'success' ? '#4caf50' : '#f44336'};
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+            z-index: 10000;
+        `;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        container.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 3000);
     }
-    currentUser = user;
-    return true;
-}
 
-// ========== ЗАГРУЗКА ДАННЫХ ==========
-async function loadAnnouncements() {
-    try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch(`/api/announcements`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
+    // ========== ФУНКЦИИ ДЛЯ МОДАЛОК ==========
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+        document.body.style.overflow = '';
+        
+        if (modalId === 'scheduleModal') {
+            const addSection = document.getElementById('addClassSection');
+            const deleteSection = document.getElementById('deleteClassSection');
+            if (addSection) addSection.style.display = 'none';
+            if (deleteSection) deleteSection.style.display = 'none';
+        }
+    }
+
+    document.querySelectorAll('.modal-backdrop').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal(this.id);
             }
         });
-        
-        if (response.status === 401) {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
-            window.location.href = 'login.html';
-            return;
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-backdrop.active').forEach(modal => {
+                closeModal(modal.id);
+            });
         }
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (Array.isArray(data)) {
-            allAnnouncements = data;
-        } else if (data.announcements && Array.isArray(data.announcements)) {
-            allAnnouncements = data.announcements;
-        } else if (data.success && data.announcements) {
-            allAnnouncements = data.announcements;
-        } else {
-            allAnnouncements = [];
-        }
-        
-        renderAnnouncementsTable(allAnnouncements);
-    } catch (error) {
-        console.error('Ошибка загрузки объявлений:', error);
-        showNotification('Не удалось загрузить объявления', 'error');
-        renderAnnouncementsTable([]);
+    });
+
+    // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+    function getCategoryLabel(category) {
+        const labels = { 'all': 'Для всех', 'students': 'Ученикам', 'teachers': 'Учителям', 'parents': 'Родителям' };
+        return labels[category] || category;
     }
-}
 
-async function loadSchedules() {
-    try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch(`/api/schedules`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        
-        if (response.status === 401) {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (Array.isArray(data)) {
-            allSchedules = data;
-        } else if (data.schedules && Array.isArray(data.schedules)) {
-            allSchedules = data.schedules;
-        } else if (data.success && data.schedules) {
-            allSchedules = data.schedules;
-        } else {
-            allSchedules = [];
-        }
-        
-        renderSchedulesTable(allSchedules);
-    } catch (error) {
-        console.error('Ошибка загрузки расписания:', error);
-        showNotification('Не удалось загрузить расписание', 'error');
-        renderSchedulesTable([]);
+    function getTypeLabel(type) {
+        const labels = { 'announcement': 'Объявление', 'news': 'Новость', 'event': 'Мероприятие' };
+        return labels[type] || type;
     }
-}
 
-async function loadUsers() {
-    try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch(`/api/admin/users`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        
-        if (response.status === 401) {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (Array.isArray(data)) {
-            allUsers = data;
-        } else if (data.users && Array.isArray(data.users)) {
-            allUsers = data.users;
-        } else if (data.success && data.users) {
-            allUsers = data.users;
-        } else {
-            allUsers = [];
-        }
-        
-        renderUsersTable(allUsers);
-    } catch (error) {
-        console.error('Ошибка загрузки пользователей:', error);
-        showNotification('Не удалось загрузить пользователей', 'error');
-        renderUsersTable([]);
+    function getDayLabel(day) {
+        const days = { 'monday': 'Понедельник', 'tuesday': 'Вторник', 'wednesday': 'Среда', 'thursday': 'Четверг', 'friday': 'Пятница', 'saturday': 'Суббота' };
+        return days[day] || day;
     }
-}
 
-// ========== УПРАВЛЕНИЕ КЛАССАМИ ==========
-function sortClasses(classes) {
-    return [...classes].sort((a, b) => {
-        const numA = parseInt(a.match(/\d+/)?.[0] || 0);
-        const numB = parseInt(b.match(/\d+/)?.[0] || 0);
-        const letterA = a.match(/[А-Яа-яA-Za-z]+/)?.[0] || '';
-        const letterB = b.match(/[А-Яа-яA-Za-z]+/)?.[0] || '';
-        
-        if (numA !== numB) return numA - numB;
-        return letterA.localeCompare(letterB);
-    });
-}
+    function getRoleLabel(role) {
+        const labels = { 
+            'director': '<span class="badge badge-warning">Директор</span>', 
+            'deputy': '<span class="badge badge-primary">Заместитель</span>' 
+        };
+        return labels[role] || role;
+    }
 
-function populateClassSelects() {
-    const scheduleClass = document.getElementById('scheduleClass');
-    const editScheduleClass = document.getElementById('editScheduleClass');
-    
-    const sortedClasses = sortClasses(availableClasses);
-    const options = sortedClasses.map(c => `<option value="${c}">${c}</option>`).join('');
-    
-    if (scheduleClass) scheduleClass.innerHTML = '<option value="">Выберите класс</option>' + options;
-    if (editScheduleClass) editScheduleClass.innerHTML = '<option value="">Выберите класс</option>' + options;
-}
+    // ========== АУТЕНТИФИКАЦИЯ ==========
+    function checkAuth() {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (!user || !user.role) {
+            window.location.href = 'login.html';
+            return false;
+        }
+        currentUser = user;
+        return true;
+    }
 
-function setupClassButtons() {
-    document.getElementById('showAddClassBtn')?.addEventListener('click', function() {
-        document.getElementById('addClassSection').style.display = 'block';
-        document.getElementById('deleteClassSection').style.display = 'none';
-    });
-    
-    document.getElementById('cancelAddClassBtn')?.addEventListener('click', function() {
-        document.getElementById('addClassSection').style.display = 'none';
-        document.getElementById('newClassName').value = '';
-    });
-    
-    document.getElementById('addClassBtn')?.addEventListener('click', function() {
-        const newClassName = document.getElementById('newClassName')?.value.trim();
-        
-        if (!newClassName || newClassName.length < 2) {
-            showNotification('Введите название класса (например: 5А)', 'error');
-            return;
-        }
-        
-        const hasNumber = /\d/.test(newClassName);
-        const hasLetter = /[А-Яа-яA-Za-z]/.test(newClassName);
-        
-        if (!hasNumber || !hasLetter) {
-            showNotification('Формат: цифра + буква (например: 5А)', 'error');
-            return;
-        }
-        
-        if (!availableClasses.includes(newClassName)) {
-            availableClasses.push(newClassName);
-            availableClasses = sortClasses(availableClasses);
-            populateClassSelects();
-            showNotification(`Класс ${newClassName} добавлен`, 'success');
-        } else {
-            showNotification('Такой класс уже существует', 'error');
-        }
-        
-        document.getElementById('addClassSection').style.display = 'none';
-        document.getElementById('newClassName').value = '';
-    });
-    
-    document.getElementById('showDeleteClassBtn')?.addEventListener('click', function() {
-        const deleteClassList = document.getElementById('deleteClassList');
-        
-        if (deleteClassList) {
-            const sortedClasses = sortClasses(availableClasses);
-            deleteClassList.innerHTML = sortedClasses.map(className => `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: white; border-radius: 10px; margin-bottom: 5px;">
-                    <span style="font-weight: 500;">${className}</span>
-                    <button class="delete-class-item" data-class="${className}" style="background: #dc2626; color: white; border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer;">
-                        <i class="fas fa-trash"></i> Удалить
-                    </button>
-                </div>
-            `).join('');
-        }
-        
-        document.getElementById('deleteClassSection').style.display = 'block';
-        document.getElementById('addClassSection').style.display = 'none';
-    });
-    
-    document.getElementById('cancelDeleteClassBtn')?.addEventListener('click', function() {
-        document.getElementById('deleteClassSection').style.display = 'none';
-    });
-    
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.delete-class-item')) {
-            const button = e.target.closest('.delete-class-item');
-            const className = button.getAttribute('data-class');
+    // ========== УПРАВЛЕНИЕ КЛАССАМИ ==========
+    function sortClasses(classes) {
+        return [...classes].sort((a, b) => {
+            const numA = parseInt(a.match(/\d+/)?.[0] || 0);
+            const numB = parseInt(b.match(/\d+/)?.[0] || 0);
+            const letterA = a.match(/[А-Яа-яA-Za-z]+/)?.[0] || '';
+            const letterB = b.match(/[А-Яа-яA-Za-z]+/)?.[0] || '';
             
-            availableClasses = availableClasses.filter(c => c !== className);
-            availableClasses = sortClasses(availableClasses);
-            populateClassSelects();
+            if (numA !== numB) return numA - numB;
+            return letterA.localeCompare(letterB);
+        });
+    }
+
+    function populateClassSelects() {
+        const scheduleClass = document.getElementById('scheduleClass');
+        const editScheduleClass = document.getElementById('editScheduleClass');
+        
+        const sortedClasses = sortClasses(availableClasses);
+        const options = sortedClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+        
+        if (scheduleClass) scheduleClass.innerHTML = '<option value="">Выберите класс</option>' + options;
+        if (editScheduleClass) editScheduleClass.innerHTML = '<option value="">Выберите класс</option>' + options;
+    }
+
+    function setupClassButtons() {
+        document.getElementById('showAddClassBtn')?.addEventListener('click', function() {
+            document.getElementById('addClassSection').style.display = 'block';
+            document.getElementById('deleteClassSection').style.display = 'none';
+        });
+        
+        document.getElementById('cancelAddClassBtn')?.addEventListener('click', function() {
+            document.getElementById('addClassSection').style.display = 'none';
+            document.getElementById('newClassName').value = '';
+        });
+        
+        document.getElementById('addClassBtn')?.addEventListener('click', function() {
+            const newClassName = document.getElementById('newClassName')?.value.trim();
             
-            const deleteList = document.getElementById('deleteClassList');
-            if (deleteList) {
+            if (!newClassName || newClassName.length < 2) {
+                showNotification('Введите название класса (например: 5А)', 'error');
+                return;
+            }
+            
+            const hasNumber = /\d/.test(newClassName);
+            const hasLetter = /[А-Яа-яA-Za-z]/.test(newClassName);
+            
+            if (!hasNumber || !hasLetter) {
+                showNotification('Формат: цифра + буква (например: 5А)', 'error');
+                return;
+            }
+            
+            if (!availableClasses.includes(newClassName)) {
+                availableClasses.push(newClassName);
+                availableClasses = sortClasses(availableClasses);
+                populateClassSelects();
+                showNotification(`Класс ${newClassName} добавлен`, 'success');
+            } else {
+                showNotification('Такой класс уже существует', 'error');
+            }
+            
+            document.getElementById('addClassSection').style.display = 'none';
+            document.getElementById('newClassName').value = '';
+        });
+        
+        document.getElementById('showDeleteClassBtn')?.addEventListener('click', function() {
+            const deleteClassList = document.getElementById('deleteClassList');
+            
+            if (deleteClassList) {
                 const sortedClasses = sortClasses(availableClasses);
-                deleteList.innerHTML = sortedClasses.map(className => `
+                deleteClassList.innerHTML = sortedClasses.map(className => `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: white; border-radius: 10px; margin-bottom: 5px;">
                         <span style="font-weight: 500;">${className}</span>
                         <button class="delete-class-item" data-class="${className}" style="background: #dc2626; color: white; border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer;">
@@ -966,641 +880,558 @@ function setupClassButtons() {
                 `).join('');
             }
             
-            showNotification(`Класс ${className} удален`, 'success');
+            document.getElementById('deleteClassSection').style.display = 'block';
+            document.getElementById('addClassSection').style.display = 'none';
+        });
+        
+        document.getElementById('cancelDeleteClassBtn')?.addEventListener('click', function() {
             document.getElementById('deleteClassSection').style.display = 'none';
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.delete-class-item')) {
+                const button = e.target.closest('.delete-class-item');
+                const className = button.getAttribute('data-class');
+                
+                availableClasses = availableClasses.filter(c => c !== className);
+                availableClasses = sortClasses(availableClasses);
+                populateClassSelects();
+                
+                const deleteList = document.getElementById('deleteClassList');
+                if (deleteList) {
+                    const sortedClasses = sortClasses(availableClasses);
+                    deleteList.innerHTML = sortedClasses.map(className => `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: white; border-radius: 10px; margin-bottom: 5px;">
+                            <span style="font-weight: 500;">${className}</span>
+                            <button class="delete-class-item" data-class="${className}" style="background: #dc2626; color: white; border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer;">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                        </div>
+                    `).join('');
+                }
+                
+                showNotification(`Класс ${className} удален`, 'success');
+                document.getElementById('deleteClassSection').style.display = 'none';
+            }
+        });
+    }
+
+    // ========== ДИНАМИЧЕСКИЕ ФИЛЬТРЫ ==========
+    function updateFiltersForTab(tabId) {
+        const filtersContainer = document.getElementById('dynamicFilters');
+        if (!filtersContainer) return;
+        
+        let filtersHTML = '';
+        
+        if (tabId === 'announcements') {
+            filtersHTML = `
+                <div class="select-wrapper">
+                    <select class="select" id="categoryFilter">
+                        <option value="">Все категории</option>
+                        <option value="all">Для всех</option>
+                        <option value="students">Ученикам</option>
+                        <option value="teachers">Учителям</option>
+                        <option value="parents">Родителям</option>
+                    </select>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="select-wrapper">
+                    <select class="select" id="typeFilter">
+                        <option value="">Все типы</option>
+                        <option value="announcement">Объявление</option>
+                        <option value="news">Новость</option>
+                        <option value="event">Мероприятие</option>
+                    </select>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <button class="btn btn-primary" id="addAnnouncementBtn" onclick="openModal('announcementModal')">
+                    <i class="fas fa-plus"></i> Добавить
+                </button>
+            `;
+        } else if (tabId === 'schedule') {
+            const sortedClasses = sortClasses(availableClasses);
+            const classOptions = sortedClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+            
+            filtersHTML = `
+                <div class="select-wrapper">
+                    <select class="select" id="classFilter">
+                        <option value="">Все классы</option>
+                        ${classOptions}
+                    </select>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="select-wrapper">
+                    <select class="select" id="dayFilter">
+                        <option value="">Все дни</option>
+                        <option value="monday">Понедельник</option>
+                        <option value="tuesday">Вторник</option>
+                        <option value="wednesday">Среда</option>
+                        <option value="thursday">Четверг</option>
+                        <option value="friday">Пятница</option>
+                        <option value="saturday">Суббота</option>
+                    </select>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <button class="btn btn-primary" id="addScheduleBtn" onclick="openModal('scheduleModal')">
+                    <i class="fas fa-plus"></i> Добавить урок
+                </button>
+            `;
+        } else if (tabId === 'users') {
+            filtersHTML = `
+                <div class="select-wrapper">
+                    <select class="select" id="roleFilter">
+                        <option value="">Все роли</option>
+                        <option value="director">Директор</option>
+                        <option value="deputy">Заместитель</option>
+                    </select>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <button class="btn btn-primary" id="addUserBtn" onclick="openModal('userModal')">
+                    <i class="fas fa-plus"></i> Добавить пользователя
+                </button>
+            `;
         }
-    });
-}
-
-// ========== ДИНАМИЧЕСКИЕ ФИЛЬТРЫ ==========
-function updateFiltersForTab(tabId) {
-    const filtersContainer = document.getElementById('dynamicFilters');
-    if (!filtersContainer) return;
-    
-    let filtersHTML = '';
-    
-    if (tabId === 'announcements') {
-        filtersHTML = `
-            <div class="select-wrapper">
-                <select class="select" id="categoryFilter">
-                    <option value="">Все категории</option>
-                    <option value="all">Для всех</option>
-                    <option value="students">Ученикам</option>
-                    <option value="teachers">Учителям</option>
-                    <option value="parents">Родителям</option>
-                </select>
-                <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="select-wrapper">
-                <select class="select" id="typeFilter">
-                    <option value="">Все типы</option>
-                    <option value="announcement">Объявление</option>
-                    <option value="news">Новость</option>
-                    <option value="event">Мероприятие</option>
-                </select>
-                <i class="fas fa-chevron-down"></i>
-            </div>
-            <button class="btn btn-primary" id="addAnnouncementBtn">
-                <i class="fas fa-plus"></i> Добавить
-            </button>
-        `;
-    } else if (tabId === 'schedule') {
-        const sortedClasses = sortClasses(availableClasses);
-        const classOptions = sortedClasses.map(c => `<option value="${c}">${c}</option>`).join('');
         
-        filtersHTML = `
-            <div class="select-wrapper">
-                <select class="select" id="classFilter">
-                    <option value="">Все классы</option>
-                    ${classOptions}
-                </select>
-                <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="select-wrapper">
-                <select class="select" id="dayFilter">
-                    <option value="">Все дни</option>
-                    <option value="monday">Понедельник</option>
-                    <option value="tuesday">Вторник</option>
-                    <option value="wednesday">Среда</option>
-                    <option value="thursday">Четверг</option>
-                    <option value="friday">Пятница</option>
-                    <option value="saturday">Суббота</option>
-                </select>
-                <i class="fas fa-chevron-down"></i>
-            </div>
-            <button class="btn btn-primary" id="addScheduleBtn">
-                <i class="fas fa-plus"></i> Добавить урок
-            </button>
-        `;
-    } else if (tabId === 'users') {
-        filtersHTML = `
-            <div class="select-wrapper">
-                <select class="select" id="roleFilter">
-                    <option value="">Все роли</option>
-                    <option value="director">Директор</option>
-                    <option value="deputy">Заместитель</option>
-                </select>
-                <i class="fas fa-chevron-down"></i>
-            </div>
-            <button class="btn btn-primary" id="addUserBtn">
-                <i class="fas fa-plus"></i> Добавить пользователя
-            </button>
-        `;
-    }
-    
-    filtersContainer.innerHTML = filtersHTML;
-    
-    if (tabId === 'announcements') {
-        document.getElementById('addAnnouncementBtn')?.addEventListener('click', openAddAnnouncementModal);
-        document.getElementById('categoryFilter')?.addEventListener('change', filterAnnouncements);
-        document.getElementById('typeFilter')?.addEventListener('change', filterAnnouncements);
-    } else if (tabId === 'schedule') {
-        document.getElementById('addScheduleBtn')?.addEventListener('click', openAddScheduleModal);
-        document.getElementById('classFilter')?.addEventListener('change', filterSchedules);
-        document.getElementById('dayFilter')?.addEventListener('change', filterSchedules);
-    } else if (tabId === 'users') {
-        document.getElementById('addUserBtn')?.addEventListener('click', openAddUserModal);
-        document.getElementById('roleFilter')?.addEventListener('change', filterUsers);
-    }
-}
-
-// ========== ОТКРЫТИЕ МОДАЛОК ДОБАВЛЕНИЯ ==========
-function openAddAnnouncementModal() {
-    currentEditId = null;
-    document.getElementById('announcementModalTitle').textContent = 'Новое объявление';
-    document.getElementById('announcementForm').reset();
-    openModal('announcementModal');
-}
-
-function openAddScheduleModal() {
-    currentEditScheduleId = null;
-    document.getElementById('scheduleModalTitle').textContent = 'Новый урок';
-    document.getElementById('scheduleForm').reset();
-    document.getElementById('scheduleStartTime').value = '08:30';
-    document.getElementById('scheduleEndTime').value = '09:15';
-    openModal('scheduleModal');
-}
-
-function openAddUserModal() {
-    currentUserId = null;
-    document.getElementById('userModalTitle').textContent = 'Новый пользователь';
-    document.getElementById('userForm').reset();
-    
-    const passwordGroup = document.getElementById('userPassword')?.closest('.input-group');
-    const confirmGroup = document.getElementById('userPasswordConfirm')?.closest('.input-group');
-    if (passwordGroup) passwordGroup.style.display = 'block';
-    if (confirmGroup) confirmGroup.style.display = 'block';
-    
-    document.getElementById('userPassword').required = true;
-    document.getElementById('userPasswordConfirm').required = true;
-    
-    openModal('userModal');
-}
-
-// ========== РЕНДЕРИНГ ТАБЛИЦ ==========
-function renderAnnouncementsTable(announcements) {
-    const tbody = document.getElementById('announcementsTable');
-    const emptyState = document.getElementById('emptyAnnouncements');
-    
-    if (!tbody) return;
-    
-    if (!announcements || announcements.length === 0) {
-        tbody.innerHTML = '';
-        if (emptyState) emptyState.style.display = 'block';
-        return;
-    }
-    
-    tbody.innerHTML = announcements.map(ann => {
-        const statusBadge = ann.urgent ? '<span class="badge badge-danger">Срочное</span>' : '<span class="badge badge-success">Активно</span>';
-        const date = ann.created_at ? new Date(ann.created_at).toLocaleDateString('ru-RU') : '-';
+        filtersContainer.innerHTML = filtersHTML;
         
-        return `
-            <tr data-id="${ann.id}">
-                <td>
-                    <div style="font-weight: 500;">${ann.title || 'Без названия'}</div>
-                    <div style="font-size: 0.75rem; color: #6b7280;">${ann.content ? (ann.content.substring(0,60) + (ann.content.length > 60 ? '...' : '')) : ''}</div>
-                </td>
-                <td><span class="badge badge-secondary">${getCategoryLabel(ann.category)}</span></td>
-                <td>${getTypeLabel(ann.type)}</td>
-                <td>${date}</td>
-                <td>${statusBadge} ${ann.pinned ? '<i class="fas fa-thumbtack" style="color: #d97706; margin-left: 5px;"></i>' : ''}</td>
-                <td class="text-right">
-                    <div class="action-buttons">
+        if (tabId === 'announcements') {
+            document.getElementById('categoryFilter')?.addEventListener('change', filterAnnouncements);
+            document.getElementById('typeFilter')?.addEventListener('change', filterAnnouncements);
+        } else if (tabId === 'schedule') {
+            document.getElementById('classFilter')?.addEventListener('change', filterSchedules);
+            document.getElementById('dayFilter')?.addEventListener('change', filterSchedules);
+        } else if (tabId === 'users') {
+            document.getElementById('roleFilter')?.addEventListener('change', filterUsers);
+        }
+    }
+
+    // ========== ЗАПОЛНЕНИЕ ТАБЛИЦ ==========
+    function fillAnnouncementsTable() {
+        const tbody = document.getElementById('announcementsTable');
+        const emptyState = document.getElementById('emptyAnnouncements');
+        
+        if (!tbody) return;
+        
+        if (demoAnnouncements.length === 0) {
+            tbody.innerHTML = '';
+            if (emptyState) emptyState.style.display = 'block';
+            return;
+        }
+        
+        tbody.innerHTML = demoAnnouncements.map(ann => {
+            const statusBadge = ann.urgent ? '<span class="badge badge-danger">Срочное</span>' : '<span class="badge badge-success">Активно</span>';
+            const date = new Date(ann.created_at).toLocaleDateString('ru-RU');
+            
+            return `
+                <tr data-id="${ann.id}">
+                    <td><div style="font-weight: 500;">${ann.title}</div><div style="font-size: 0.75rem; color: #6b7280;">${ann.content.substring(0,60)}${ann.content.length > 60 ? '...' : ''}</div></td>
+                    <td><span class="badge badge-secondary">${getCategoryLabel(ann.category)}</span></td>
+                    <td>${getTypeLabel(ann.type)}</td>
+                    <td>${date}</td>
+                    <td>${statusBadge} ${ann.pinned ? '<i class="fas fa-thumbtack" style="color: #d97706; margin-left: 5px;"></i>' : ''}</td>
+                    <td class="text-right"><div class="action-buttons">
                         <button class="action-btn" onclick="editAnnouncement(${ann.id})"><i class="fas fa-edit"></i></button>
                         <button class="action-btn" onclick="showDeleteConfirm('announcement', ${ann.id}, '${ann.title}')"><i class="fas fa-trash"></i></button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }).join('');
-    
-    if (emptyState) emptyState.style.display = 'none';
-}
-
-function renderSchedulesTable(schedules) {
-    const tbody = document.getElementById('scheduleTable');
-    const emptyState = document.getElementById('emptySchedule');
-    
-    if (!tbody) return;
-    
-    if (!schedules || schedules.length === 0) {
-        tbody.innerHTML = '';
-        if (emptyState) emptyState.style.display = 'block';
-        return;
+                    </div></td>
+                </tr>
+            `;
+        }).join('');
+        
+        if (emptyState) emptyState.style.display = 'none';
     }
-    
-    tbody.innerHTML = schedules.map(schedule => `
-        <tr data-id="${schedule.id}">
-            <td>${schedule.class_number}${schedule.class_letter || ''}</td>
-            <td>${getDayLabel(schedule.day_of_week)}</td>
-            <td>${schedule.start_time ? schedule.start_time.slice(0,5) : ''} - ${schedule.end_time ? schedule.end_time.slice(0,5) : ''}</td>
-            <td>${schedule.subject || ''}</td>
-            <td>${schedule.teacher || ''}</td>
-            <td>${schedule.room || '-'}</td>
-            <td class="text-right">
-                <div class="action-buttons">
+
+    function fillSchedulesTable() {
+        const tbody = document.getElementById('scheduleTable');
+        const emptyState = document.getElementById('emptySchedule');
+        
+        if (!tbody) return;
+        
+        if (demoSchedules.length === 0) {
+            tbody.innerHTML = '';
+            if (emptyState) emptyState.style.display = 'block';
+            return;
+        }
+        
+        tbody.innerHTML = demoSchedules.map(schedule => `
+            <tr data-id="${schedule.id}">
+                <td>${schedule.class_number}${schedule.class_letter}</td>
+                <td>${getDayLabel(schedule.day_of_week)}</td>
+                <td>${schedule.start_time.slice(0,5)} - ${schedule.end_time.slice(0,5)}</td>
+                <td>${schedule.subject}</td>
+                <td>${schedule.teacher}</td>
+                <td>${schedule.room || '-'}</td>
+                <td class="text-right"><div class="action-buttons">
                     <button class="action-btn" onclick="editSchedule(${schedule.id})"><i class="fas fa-edit"></i></button>
                     <button class="action-btn" onclick="showDeleteConfirm('schedule', ${schedule.id}, '${schedule.subject}')"><i class="fas fa-trash"></i></button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
-    
-    if (emptyState) emptyState.style.display = 'none';
-}
-
-function renderUsersTable(users) {
-    const tbody = document.getElementById('usersTable');
-    const emptyState = document.getElementById('emptyUsers');
-    
-    if (!tbody) return;
-    
-    if (!users || users.length === 0) {
-        tbody.innerHTML = '';
-        if (emptyState) emptyState.style.display = 'block';
-        return;
-    }
-    
-    tbody.innerHTML = users.map(user => {
-        const created = user.created_at ? new Date(user.created_at).toLocaleDateString('ru-RU') : '-';
-        const lastLogin = user.last_login ? new Date(user.last_login).toLocaleDateString('ru-RU') : 'Никогда';
-        
-        return `
-            <tr data-id="${user.id}">
-                <td>
-                    <div style="font-weight: 500;">${user.full_name || 'Без имени'}</div>
-                    <div style="font-size: 0.75rem;">ID: ${user.id}</div>
-                </td>
-                <td><strong>${user.username || ''}</strong></td>
-                <td>${getRoleLabel(user.role)}</td>
-                <td>${created}</td>
-                <td>${lastLogin}</td>
-                <td class="text-right">
-                    <div class="action-buttons">
-                        <button class="action-btn" onclick="openResetPasswordModal(${user.id})" title="Сбросить пароль"><i class="fas fa-key"></i></button>
-                        <button class="action-btn" onclick="editUser(${user.id})" title="Редактировать"><i class="fas fa-edit"></i></button>
-                        <button class="action-btn" onclick="showDeleteConfirm('user', ${user.id}, '${user.full_name}')" title="Удалить"><i class="fas fa-trash"></i></button>
-                    </div>
-                </td>
+                </div></td>
             </tr>
-        `;
-    }).join('');
-    
-    if (emptyState) emptyState.style.display = 'none';
-}
-
-// ========== ФИЛЬТРАЦИЯ ==========
-function filterAnnouncements() {
-    const searchInput = document.getElementById('searchInput');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const typeFilter = document.getElementById('typeFilter');
-    
-    if (!searchInput || !categoryFilter || !typeFilter) return;
-    
-    const searchTerm = searchInput.value.toLowerCase();
-    const category = categoryFilter.value;
-    const type = typeFilter.value;
-    
-    const filtered = allAnnouncements.filter(ann => {
-        const matchesSearch = !searchTerm || 
-            (ann.title && ann.title.toLowerCase().includes(searchTerm)) || 
-            (ann.content && ann.content.toLowerCase().includes(searchTerm));
-        const matchesCategory = !category || ann.category === category;
-        const matchesType = !type || ann.type === type;
+        `).join('');
         
-        return matchesSearch && matchesCategory && matchesType;
-    });
-    
-    renderAnnouncementsTable(filtered);
-}
+        if (emptyState) emptyState.style.display = 'none';
+    }
 
-function filterSchedules() {
-    const searchInput = document.getElementById('searchInput');
-    const classFilter = document.getElementById('classFilter');
-    const dayFilter = document.getElementById('dayFilter');
-    
-    if (!searchInput) return;
-    
-    const searchTerm = searchInput.value.toLowerCase();
-    const classValue = classFilter?.value || '';
-    const dayValue = dayFilter?.value || '';
-    
-    const filtered = allSchedules.filter(schedule => {
-        const classStr = `${schedule.class_number}${schedule.class_letter || ''}`;
-        const matchesSearch = !searchTerm || 
-            (schedule.subject && schedule.subject.toLowerCase().includes(searchTerm)) || 
-            (schedule.teacher && schedule.teacher.toLowerCase().includes(searchTerm));
-        const matchesClass = !classValue || classStr === classValue;
-        const matchesDay = !dayValue || schedule.day_of_week === dayValue;
+    function fillUsersTable() {
+        const tbody = document.getElementById('usersTable');
+        const emptyState = document.getElementById('emptyUsers');
         
-        return matchesSearch && matchesClass && matchesDay;
-    });
-    
-    renderSchedulesTable(filtered);
-}
-
-function filterUsers() {
-    const searchInput = document.getElementById('searchInput');
-    const roleFilter = document.getElementById('roleFilter');
-    
-    if (!searchInput || !roleFilter) return;
-    
-    const searchTerm = searchInput.value.toLowerCase();
-    const roleValue = roleFilter.value;
-    
-    const filtered = allUsers.filter(user => {
-        const matchesSearch = !searchTerm || 
-            (user.full_name && user.full_name.toLowerCase().includes(searchTerm)) || 
-            (user.username && user.username.toLowerCase().includes(searchTerm));
-        const matchesRole = !roleValue || user.role === roleValue;
+        if (!tbody) return;
         
-        return matchesSearch && matchesRole;
-    });
-    
-    renderUsersTable(filtered);
-}
-
-// ========== ФУНКЦИИ РЕДАКТИРОВАНИЯ ==========
-function editAnnouncement(id) {
-    const announcement = allAnnouncements.find(a => a.id === id);
-    if (!announcement) return;
-    
-    currentEditId = id;
-    document.getElementById('announcementModalTitle').textContent = 'Редактировать объявление';
-    document.getElementById('announcementTitle').value = announcement.title || '';
-    document.getElementById('announcementContent').value = announcement.content || '';
-    document.getElementById('announcementCategory').value = announcement.category || 'all';
-    document.getElementById('announcementType').value = announcement.type || 'announcement';
-    document.getElementById('announcementAuthor').value = announcement.author || '';
-    document.getElementById('announcementPinned').checked = announcement.pinned || false;
-    document.getElementById('announcementUrgent').checked = announcement.urgent || false;
-    
-    openModal('announcementModal');
-}
-
-function editSchedule(id) {
-    const schedule = allSchedules.find(s => s.id === id);
-    if (!schedule) return;
-    
-    currentEditScheduleId = id;
-    populateClassSelects();
-    document.getElementById('scheduleModalTitle').textContent = 'Редактировать урок';
-    document.getElementById('scheduleClass').value = `${schedule.class_number}${schedule.class_letter || ''}`;
-    document.getElementById('scheduleDay').value = schedule.day_of_week || '';
-    document.getElementById('scheduleStartTime').value = schedule.start_time ? schedule.start_time.slice(0,5) : '';
-    document.getElementById('scheduleEndTime').value = schedule.end_time ? schedule.end_time.slice(0,5) : '';
-    document.getElementById('scheduleSubject').value = schedule.subject || '';
-    document.getElementById('scheduleTeacher').value = schedule.teacher || '';
-    document.getElementById('scheduleRoom').value = schedule.room || '';
-    
-    openModal('scheduleModal');
-}
-
-function editUser(id) {
-    const user = allUsers.find(u => u.id === id);
-    if (!user) return;
-    
-    currentUserId = id;
-    document.getElementById('userModalTitle').textContent = 'Редактировать пользователя';
-    document.getElementById('userFullName').value = user.full_name || '';
-    document.getElementById('userUsername').value = user.username || '';
-    document.getElementById('userRole').value = user.role || '';
-    
-    const passwordGroup = document.getElementById('userPassword')?.closest('.input-group');
-    const confirmGroup = document.getElementById('userPasswordConfirm')?.closest('.input-group');
-    
-    if (passwordGroup) {
-        passwordGroup.style.display = 'none';
-        document.getElementById('userPassword').required = false;
+        if (demoUsers.length === 0) {
+            tbody.innerHTML = '';
+            if (emptyState) emptyState.style.display = 'block';
+            return;
+        }
+        
+        tbody.innerHTML = demoUsers.map(user => {
+            const created = new Date(user.created_at).toLocaleDateString('ru-RU');
+            const lastLogin = user.last_login ? new Date(user.last_login).toLocaleDateString('ru-RU') : 'Никогда';
+            
+            return `
+                <tr data-id="${user.id}">
+                    <td>
+                        <div style="font-weight: 500;">${user.full_name}</div>
+                        <div style="font-size: 0.75rem; color: #6b7280;">ID: ${user.id}</div>
+                    </td>
+                    <td><strong>${user.username}</strong></td>
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            ${getRoleLabel(user.role)}
+                            <div style="font-size: 0.8rem; margin-top: 3px;">
+                                ${getPasswordDisplay(user)}
+                            </div>
+                        </div>
+                    </td>
+                    <td>${created}</td>
+                    <td>${lastLogin}</td>
+                    <td class="text-right">
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="openResetPasswordModal(${user.id})" title="Сбросить пароль">
+                                <i class="fas fa-key"></i>
+                            </button>
+                            <button class="action-btn" onclick="editUser(${user.id})" title="Редактировать">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" onclick="showDeleteConfirm('user', ${user.id}, '${user.full_name}')" title="Удалить">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+        if (emptyState) emptyState.style.display = 'none';
     }
-    if (confirmGroup) {
-        confirmGroup.style.display = 'none';
-        document.getElementById('userPasswordConfirm').required = false;
-    }
-    
-    openModal('userModal');
-}
 
-// ========== СБРОС ПАРОЛЯ ==========
-function openResetPasswordModal(userId) {
-    currentUserId = userId;
-    const input = document.getElementById('resetPasswordInput');
-    const confirm = document.getElementById('resetPasswordConfirm');
-    
-    if (input && confirm) {
-        input.value = '';
-        confirm.value = '';
-        openModal('resetPasswordModal');
-    } else {
-        showNotification('Ошибка: модалка сброса пароля не найдена', 'error');
+    // ========== ФИЛЬТРАЦИЯ ==========
+    function filterAnnouncements() {
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const typeFilter = document.getElementById('typeFilter');
+        
+        if (!searchInput || !categoryFilter || !typeFilter) return;
+        
+        const searchTerm = searchInput.value.toLowerCase();
+        const category = categoryFilter.value;
+        const type = typeFilter.value;
+        const rows = document.querySelectorAll('#announcementsTable tr');
+        
+        rows.forEach(row => {
+            const title = row.querySelector('td:nth-child(1) div:first-child')?.textContent.toLowerCase() || '';
+            const content = row.querySelector('td:nth-child(1) div:last-child')?.textContent.toLowerCase() || '';
+            const rowCategory = row.querySelector('td:nth-child(2) span')?.textContent.toLowerCase() || '';
+            const rowType = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
+            
+            const matchesSearch = !searchTerm || title.includes(searchTerm) || content.includes(searchTerm);
+            const matchesCategory = !category || rowCategory.includes(getCategoryLabel(category).toLowerCase());
+            const matchesType = !type || rowType.includes(getTypeLabel(type).toLowerCase());
+            
+            row.style.display = matchesSearch && matchesCategory && matchesType ? '' : 'none';
+        });
     }
-}
 
-async function resetUserPassword() {
-    const newPassword = document.getElementById('resetPasswordInput').value;
-    const confirmPassword = document.getElementById('resetPasswordConfirm').value;
-    
-    if (!newPassword || newPassword.length < 6) {
-        showNotification('Пароль должен быть не менее 6 символов', 'error');
-        return;
+    function filterSchedules() {
+        const searchInput = document.getElementById('searchInput');
+        const classFilter = document.getElementById('classFilter');
+        const dayFilter = document.getElementById('dayFilter');
+        
+        if (!searchInput) return;
+        
+        const searchTerm = searchInput.value.toLowerCase();
+        const classValue = classFilter?.value || '';
+        const dayValue = dayFilter?.value || '';
+        const rows = document.querySelectorAll('#scheduleTable tr');
+        
+        rows.forEach(row => {
+            const classNum = row.querySelector('td:nth-child(1)')?.textContent || '';
+            const day = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+            const subject = row.querySelector('td:nth-child(4)')?.textContent.toLowerCase() || '';
+            const teacher = row.querySelector('td:nth-child(5)')?.textContent.toLowerCase() || '';
+            
+            const matchesSearch = !searchTerm || subject.includes(searchTerm) || teacher.includes(searchTerm);
+            const matchesClass = !classValue || classNum === classValue;
+            const matchesDay = !dayValue || day.includes(getDayLabel(dayValue).toLowerCase());
+            
+            row.style.display = matchesSearch && matchesClass && matchesDay ? '' : 'none';
+        });
     }
-    
-    if (newPassword !== confirmPassword) {
-        showNotification('Пароли не совпадают', 'error');
-        return;
+
+    function filterUsers() {
+        const searchInput = document.getElementById('searchInput');
+        const roleFilter = document.getElementById('roleFilter');
+        
+        if (!searchInput || !roleFilter) return;
+        
+        const searchTerm = searchInput.value.toLowerCase();
+        const roleValue = roleFilter.value;
+        const rows = document.querySelectorAll('#usersTable tr');
+        
+        rows.forEach(row => {
+            const name = row.querySelector('td:nth-child(1) div:first-child')?.textContent.toLowerCase() || '';
+            const login = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+            const roleSpan = row.querySelector('td:nth-child(3) span');
+            const role = roleSpan ? roleSpan.textContent.toLowerCase() : '';
+            
+            const matchesSearch = !searchTerm || name.includes(searchTerm) || login.includes(searchTerm);
+            
+            let matchesRole = true;
+            if (roleValue === 'director') matchesRole = role.includes('директор');
+            else if (roleValue === 'deputy') matchesRole = role.includes('заместитель');
+            
+            row.style.display = matchesSearch && matchesRole ? '' : 'none';
+        });
     }
-    
-    try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch(`/api/admin/users/${currentUserId}/reset-password`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ newPassword })
+
+    // ========== ФУНКЦИИ РЕДАКТИРОВАНИЯ ==========
+    function editAnnouncement(id) {
+        const announcement = demoAnnouncements.find(a => a.id === id);
+        if (!announcement) return;
+        
+        currentEditId = id;
+        document.getElementById('announcementModalTitle').textContent = 'Редактировать объявление';
+        document.getElementById('announcementTitle').value = announcement.title;
+        document.getElementById('announcementContent').value = announcement.content;
+        document.getElementById('announcementCategory').value = announcement.category;
+        document.getElementById('announcementType').value = announcement.type;
+        document.getElementById('announcementAuthor').value = announcement.author;
+        document.getElementById('announcementPinned').checked = announcement.pinned;
+        document.getElementById('announcementUrgent').checked = announcement.urgent;
+        
+        openModal('announcementModal');
+    }
+
+    function editSchedule(id) {
+        const schedule = demoSchedules.find(s => s.id === id);
+        if (!schedule) return;
+        
+        currentEditScheduleId = id;
+        populateClassSelects();
+        document.getElementById('scheduleModalTitle').textContent = 'Редактировать урок';
+        document.getElementById('scheduleClass').value = `${schedule.class_number}${schedule.class_letter}`;
+        document.getElementById('scheduleDay').value = schedule.day_of_week;
+        document.getElementById('scheduleStartTime').value = schedule.start_time.slice(0,5);
+        document.getElementById('scheduleEndTime').value = schedule.end_time.slice(0,5);
+        document.getElementById('scheduleSubject').value = schedule.subject;
+        document.getElementById('scheduleTeacher').value = schedule.teacher;
+        document.getElementById('scheduleRoom').value = schedule.room;
+        
+        openModal('scheduleModal');
+    }
+
+    function editUser(id) {
+        const user = demoUsers.find(u => u.id === id);
+        if (!user) return;
+        
+        currentUserId = id;
+        document.getElementById('userModalTitle').textContent = 'Редактировать пользователя';
+        document.getElementById('userFullName').value = user.full_name;
+        document.getElementById('userUsername').value = user.username;
+        document.getElementById('userRole').value = user.role;
+        
+        const passwordField = document.getElementById('userPassword');
+        if (passwordField) {
+            passwordField.value = user.password || '';
+        }
+        
+        const passwordGroup = document.getElementById('userPassword')?.closest('.input-group');
+        const confirmGroup = document.getElementById('userPasswordConfirm')?.closest('.input-group');
+        
+        if (passwordGroup) {
+            passwordGroup.style.display = 'block';
+            document.getElementById('userPassword').required = false;
+        }
+        if (confirmGroup) {
+            confirmGroup.style.display = 'block';
+            document.getElementById('userPasswordConfirm').required = false;
+        }
+        
+        openModal('userModal');
+    }
+
+    // ========== СБРОС ПАРОЛЯ ==========
+    function openResetPasswordModal(userId) {
+        currentUserId = userId;
+        const input = document.getElementById('resetPasswordInput');
+        const confirm = document.getElementById('resetPasswordConfirm');
+        
+        if (input && confirm) {
+            input.value = '';
+            confirm.value = '';
+            openModal('resetPasswordModal');
+        } else {
+            showNotification('Ошибка: модалка сброса пароля не найдена', 'error');
+        }
+    }
+
+    // ========== ПОДТВЕРЖДЕНИЕ УДАЛЕНИЯ ==========
+    let deleteItemType = null;
+    let deleteItemId = null;
+
+    function showDeleteConfirm(type, id, name) {
+        deleteItemType = type;
+        deleteItemId = id;
+        
+        let message = '';
+        if (type === 'announcement') message = `Удалить объявление "${name}"?`;
+        else if (type === 'schedule') message = `Удалить урок "${name}"?`;
+        else if (type === 'user') message = `Удалить пользователя "${name}"?`;
+        
+        document.getElementById('deleteConfirmMessage').textContent = message;
+        openModal('deleteConfirmModal');
+    }
+
+    function confirmDelete() {
+        if (deleteItemType === 'announcement') {
+            const index = demoAnnouncements.findIndex(item => item.id === deleteItemId);
+            if (index !== -1) demoAnnouncements.splice(index, 1);
+            fillAnnouncementsTable();
+            filterAnnouncements();
+            showNotification('Объявление удалено', 'success');
+        } else if (deleteItemType === 'schedule') {
+            const index = demoSchedules.findIndex(item => item.id === deleteItemId);
+            if (index !== -1) demoSchedules.splice(index, 1);
+            fillSchedulesTable();
+            filterSchedules();
+            showNotification('Урок удален', 'success');
+        } else if (deleteItemType === 'user') {
+            const index = demoUsers.findIndex(item => item.id === deleteItemId);
+            if (index !== -1) demoUsers.splice(index, 1);
+            fillUsersTable();
+            filterUsers();
+            showNotification('Пользователь удален', 'success');
+        }
+        
+        closeModal('deleteConfirmModal');
+        deleteItemType = null;
+        deleteItemId = null;
+    }
+
+    // ========== ОБРАБОТЧИКИ ФОРМ ==========
+    function setupFormHandlers() {
+        document.getElementById('announcementForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: currentEditId || Date.now(),
+                title: document.getElementById('announcementTitle').value.trim(),
+                content: document.getElementById('announcementContent').value.trim(),
+                category: document.getElementById('announcementCategory').value,
+                type: document.getElementById('announcementType').value,
+                author: document.getElementById('announcementAuthor').value.trim(),
+                pinned: document.getElementById('announcementPinned').checked,
+                urgent: document.getElementById('announcementUrgent').checked,
+                created_at: new Date().toISOString()
+            };
+            
+            if (!formData.title || !formData.content) {
+                showNotification('Заполните заголовок и текст', 'error');
+                return;
+            }
+            
+            if (!formData.author) {
+                showNotification('Укажите автора', 'error');
+                return;
+            }
+            
+            if (currentEditId) {
+                const index = demoAnnouncements.findIndex(a => a.id === currentEditId);
+                if (index !== -1) {
+                    demoAnnouncements[index] = formData;
+                }
+                showNotification('Объявление обновлено', 'success');
+            } else {
+                demoAnnouncements.unshift(formData);
+                showNotification('Объявление создано', 'success');
+            }
+            
+            fillAnnouncementsTable();
+            filterAnnouncements();
+            document.getElementById('announcementForm').reset();
+            closeModal('announcementModal');
+            currentEditId = null;
         });
         
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showNotification('Пароль успешно сброшен', 'success');
-            closeModal('resetPasswordModal');
-        } else {
-            showNotification(data.error || 'Ошибка сброса пароля', 'error');
-        }
-    } catch (error) {
-        console.error('Ошибка сброса пароля:', error);
-        showNotification('Ошибка сети', 'error');
-    }
-}
-
-// ========== ПОДТВЕРЖДЕНИЕ УДАЛЕНИЯ ==========
-let deleteItemType = null;
-let deleteItemId = null;
-
-function showDeleteConfirm(type, id, name) {
-    deleteItemType = type;
-    deleteItemId = id;
-    
-    let message = '';
-    if (type === 'announcement') message = `Удалить объявление "${name}"?`;
-    else if (type === 'schedule') message = `Удалить урок "${name}"?`;
-    else if (type === 'user') message = `Удалить пользователя "${name}"?`;
-    
-    document.getElementById('deleteConfirmMessage').textContent = message;
-    openModal('deleteConfirmModal');
-}
-
-async function confirmDelete() {
-    const token = localStorage.getItem('authToken');
-    let url = '';
-    
-    if (deleteItemType === 'announcement') {
-        url = `/api/announcements/${deleteItemId}`;
-    } else if (deleteItemType === 'schedule') {
-        url = `/api/schedules/${deleteItemId}`;
-    } else if (deleteItemType === 'user') {
-        url = `/api/admin/users/${deleteItemId}`;
-    }
-    
-    try {
-        const response = await fetch(url, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
+        document.getElementById('scheduleForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const classValue = document.getElementById('scheduleClass').value;
+            if (!classValue) {
+                showNotification('Выберите класс', 'error');
+                return;
             }
+            
+            const classNumber = parseInt(classValue.match(/\d+/)?.[0]);
+            const classLetter = classValue.match(/[А-Яа-яA-Za-z]+/)?.[0] || '';
+            
+            const formData = {
+                id: currentEditScheduleId || Date.now(),
+                class_number: classNumber,
+                class_letter: classLetter,
+                day_of_week: document.getElementById('scheduleDay').value,
+                start_time: document.getElementById('scheduleStartTime').value + ':00',
+                end_time: document.getElementById('scheduleEndTime').value + ':00',
+                subject: document.getElementById('scheduleSubject').value.trim(),
+                teacher: document.getElementById('scheduleTeacher').value.trim(),
+                room: document.getElementById('scheduleRoom').value.trim()
+            };
+            
+            if (!formData.day_of_week || !formData.subject || !formData.teacher) {
+                showNotification('Заполните все обязательные поля', 'error');
+                return;
+            }
+            
+            if (currentEditScheduleId) {
+                const index = demoSchedules.findIndex(s => s.id === currentEditScheduleId);
+                if (index !== -1) demoSchedules[index] = formData;
+                showNotification('Урок обновлен', 'success');
+            } else {
+                demoSchedules.push(formData);
+                showNotification('Урок создан', 'success');
+            }
+            
+            fillSchedulesTable();
+            filterSchedules();
+            document.getElementById('scheduleForm').reset();
+            document.getElementById('scheduleStartTime').value = '08:30';
+            document.getElementById('scheduleEndTime').value = '09:15';
+            closeModal('scheduleModal');
+            currentEditScheduleId = null;
         });
         
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showNotification('Элемент удален', 'success');
-            if (deleteItemType === 'announcement') {
-                await loadAnnouncements();
-            } else if (deleteItemType === 'schedule') {
-                await loadSchedules();
-            } else if (deleteItemType === 'user') {
-                await loadUsers();
+        document.getElementById('userForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('userFullName').value.trim();
+            const username = document.getElementById('userUsername').value.trim();
+            const role = document.getElementById('userRole').value;
+            const password = document.getElementById('userPassword').value;
+            
+            if (!fullName || !username || !role) {
+                showNotification('Заполните все поля', 'error');
+                return;
             }
-        } else {
-            showNotification(data.error || 'Ошибка удаления', 'error');
-        }
-    } catch (error) {
-        console.error('Ошибка удаления:', error);
-        showNotification('Ошибка сети', 'error');
-    }
-    
-    closeModal('deleteConfirmModal');
-    deleteItemType = null;
-    deleteItemId = null;
-}
-
-// ========== ОБРАБОТЧИКИ ФОРМ ==========
-function setupFormHandlers() {
-    document.getElementById('announcementForm')?.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const formData = {
-            title: document.getElementById('announcementTitle').value.trim(),
-            content: document.getElementById('announcementContent').value.trim(),
-            category: document.getElementById('announcementCategory').value,
-            type: document.getElementById('announcementType').value,
-            author: document.getElementById('announcementAuthor').value.trim(),
-            pinned: document.getElementById('announcementPinned').checked,
-            urgent: document.getElementById('announcementUrgent').checked
-        };
-        
-        if (!formData.title || !formData.content) {
-            showNotification('Заполните заголовок и текст', 'error');
-            return;
-        }
-        
-        try {
-            const token = localStorage.getItem('authToken');
-            const method = currentEditId ? 'PUT' : 'POST';
-            const url = currentEditId ? `/api/announcements/${currentEditId}` : '/api/announcements';
-            
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                showNotification(currentEditId ? 'Объявление обновлено' : 'Объявление создано', 'success');
-                document.getElementById('announcementForm').reset();
-                closeModal('announcementModal');
-                await loadAnnouncements();
-                currentEditId = null;
-            } else {
-                showNotification(data.error || 'Ошибка', 'error');
-            }
-        } catch (error) {
-            console.error('Ошибка сохранения:', error);
-            showNotification('Ошибка сети', 'error');
-        }
-    });
-    
-    document.getElementById('scheduleForm')?.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const classValue = document.getElementById('scheduleClass').value;
-        if (!classValue) {
-            showNotification('Выберите класс', 'error');
-            return;
-        }
-        
-        const classNumber = parseInt(classValue.match(/\d+/)?.[0]);
-        const classLetter = classValue.match(/[А-Яа-яA-Za-z]+/)?.[0] || '';
-        
-        const formData = {
-            class_number: classNumber,
-            class_letter: classLetter,
-            day_of_week: document.getElementById('scheduleDay').value,
-            start_time: document.getElementById('scheduleStartTime').value + ':00',
-            end_time: document.getElementById('scheduleEndTime').value + ':00',
-            subject: document.getElementById('scheduleSubject').value.trim(),
-            teacher: document.getElementById('scheduleTeacher').value.trim(),
-            room: document.getElementById('scheduleRoom').value.trim()
-        };
-        
-        if (!formData.day_of_week || !formData.subject || !formData.teacher) {
-            showNotification('Заполните все обязательные поля', 'error');
-            return;
-        }
-        
-        try {
-            const token = localStorage.getItem('authToken');
-            const method = currentEditScheduleId ? 'PUT' : 'POST';
-            const url = currentEditScheduleId ? `/api/schedules/${currentEditScheduleId}` : '/api/schedules';
-            
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                showNotification(currentEditScheduleId ? 'Урок обновлен' : 'Урок создан', 'success');
-                document.getElementById('scheduleForm').reset();
-                document.getElementById('scheduleStartTime').value = '08:30';
-                document.getElementById('scheduleEndTime').value = '09:15';
-                closeModal('scheduleModal');
-                await loadSchedules();
-                currentEditScheduleId = null;
-            } else {
-                showNotification(data.error || 'Ошибка', 'error');
-            }
-        } catch (error) {
-            console.error('Ошибка сохранения:', error);
-            showNotification('Ошибка сети', 'error');
-        }
-    });
-    
-    document.getElementById('userForm')?.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const fullName = document.getElementById('userFullName').value.trim();
-        const username = document.getElementById('userUsername').value.trim();
-        const role = document.getElementById('userRole').value;
-        
-        if (!fullName || !username || !role) {
-            showNotification('Заполните все поля', 'error');
-            return;
-        }
-        
-        try {
-            const token = localStorage.getItem('authToken');
             
             if (!currentUserId) {
-                const password = document.getElementById('userPassword').value;
                 const passwordConfirm = document.getElementById('userPasswordConfirm').value;
                 
                 if (!password || password.length < 6) {
@@ -1613,146 +1444,174 @@ function setupFormHandlers() {
                     return;
                 }
                 
-                const response = await fetch('/api/admin/users', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password, full_name: fullName, role })
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showNotification('Пользователь создан', 'success');
-                    document.getElementById('userForm').reset();
-                    closeModal('userModal');
-                    await loadUsers();
-                } else {
-                    showNotification(data.error || 'Ошибка', 'error');
-                }
+                const newUser = {
+                    id: Date.now(),
+                    full_name: fullName,
+                    username: username,
+                    password: password,
+                    role: role,
+                    created_at: new Date().toISOString(),
+                    last_login: null
+                };
+                demoUsers.push(newUser);
+                showNotification('Пользователь создан', 'success');
             } else {
-                const response = await fetch(`/api/admin/users/${currentUserId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ full_name: fullName, role })
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (data.success) {
+                const index = demoUsers.findIndex(u => u.id === currentUserId);
+                if (index !== -1) {
+                    demoUsers[index] = { 
+                        ...demoUsers[index], 
+                        full_name: fullName, 
+                        username: username, 
+                        role: role,
+                        password: password || demoUsers[index].password
+                    };
                     showNotification('Пользователь обновлен', 'success');
-                    document.getElementById('userForm').reset();
-                    closeModal('userModal');
-                    await loadUsers();
-                    
-                    if (currentUserId === currentUser?.id) {
-                        const updatedUser = { ...currentUser, full_name: fullName, role };
-                        localStorage.setItem('user', JSON.stringify(updatedUser));
-                    }
-                    
-                    currentUserId = null;
-                } else {
-                    showNotification(data.error || 'Ошибка', 'error');
                 }
             }
-        } catch (error) {
-            console.error('Ошибка сохранения:', error);
-            showNotification('Ошибка сети', 'error');
+            
+            fillUsersTable();
+            filterUsers();
+            document.getElementById('userForm').reset();
+            closeModal('userModal');
+            currentUserId = null;
+        });
+    }
+
+    // ========== УПРАВЛЕНИЕ ОТОБРАЖЕНИЕМ ПАРОЛЕЙ ==========
+    let visiblePasswords = {};
+
+    function togglePasswordVisibility(userId) {
+        visiblePasswords[userId] = !visiblePasswords[userId];
+        fillUsersTable();
+    }
+
+    function copyPassword(password) {
+        navigator.clipboard.writeText(password).then(() => {
+            showNotification('Пароль скопирован в буфер обмена', 'success');
+        }).catch(() => {
+            showNotification('Ошибка при копировании', 'error');
+        });
+    }
+
+    function getPasswordDisplay(user) {
+        const isVisible = visiblePasswords[user.id];
+        const maskedPassword = '••••••••';
+        
+        return `
+            <div class="password-preview">
+                <span>${isVisible ? user.password : maskedPassword}</span>
+                <button class="toggle-password-btn" onclick="togglePasswordVisibility(${user.id})" title="${isVisible ? 'Скрыть пароль' : 'Показать пароль'}">
+                    <i class="fas fa-${isVisible ? 'eye-slash' : 'eye'}"></i>
+                </button>
+                ${isVisible ? `
+                    <button class="toggle-password-btn" onclick="copyPassword('${user.password}')" title="Копировать пароль">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    // ========== СБРОС ПАРОЛЯ ==========
+    document.getElementById('confirmResetPassword')?.addEventListener('click', function() {
+        const newPassword = document.getElementById('resetPasswordInput').value;
+        const confirmPassword = document.getElementById('resetPasswordConfirm').value;
+        
+        if (!newPassword || newPassword.length < 6) {
+            showNotification('Пароль должен быть не менее 6 символов', 'error');
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            showNotification('Пароли не совпадают', 'error');
+            return;
+        }
+        
+        showNotification('Пароль успешно сброшен', 'success');
+        closeModal('resetPasswordModal');
+    });
+
+    // ========== ВЫХОД ==========
+    document.getElementById('logoutBtn')?.addEventListener('click', function() {
+        if (confirm('Вы действительно хотите выйти?')) {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
         }
     });
-}
 
-// ========== СБРОС ПАРОЛЯ ==========
-document.getElementById('confirmResetPassword')?.addEventListener('click', resetUserPassword);
-
-// ========== ВЫХОД ==========
-document.getElementById('logoutBtn')?.addEventListener('click', function() {
-    if (confirm('Вы действительно хотите выйти?')) {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
-        window.location.href = 'login.html';
-    }
-});
-
-// ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
-function initTabs() {
-    document.querySelectorAll('.filter-pill').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const tabId = this.getAttribute('data-tab');
-            
-            document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.style.display = 'none';
-            });
-            
-            const activeTab = document.getElementById(tabId + 'Tab');
-            if (activeTab) {
-                activeTab.style.display = 'block';
-                activeTab.classList.add('active');
-            }
-            
-            updateFiltersForTab(tabId);
-            
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                if (tabId === 'announcements') {
-                    searchInput.placeholder = 'Поиск объявлений...';
-                    loadAnnouncements();
-                } else if (tabId === 'schedule') {
-                    searchInput.placeholder = 'Поиск уроков...';
-                    loadSchedules();
-                } else if (tabId === 'users') {
-                    searchInput.placeholder = 'Поиск пользователей...';
-                    loadUsers();
+    // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
+    function initTabs() {
+        document.querySelectorAll('.filter-pill').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tabId = this.getAttribute('data-tab');
+                
+                document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                const activeTab = document.getElementById(tabId + 'Tab');
+                if (activeTab) {
+                    activeTab.style.display = 'block';
+                    activeTab.classList.add('active');
                 }
-            }
+                
+                updateFiltersForTab(tabId);
+                
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    if (tabId === 'announcements') {
+                        searchInput.placeholder = 'Поиск объявлений...';
+                        fillAnnouncementsTable();
+                    } else if (tabId === 'schedule') {
+                        searchInput.placeholder = 'Поиск уроков...';
+                        fillSchedulesTable();
+                    } else if (tabId === 'users') {
+                        searchInput.placeholder = 'Поиск пользователей...';
+                        fillUsersTable();
+                    }
+                }
+            });
         });
+    }
+
+    // ========== ПОИСК ==========
+    document.getElementById('searchInput')?.addEventListener('input', function() {
+        const activeTab = document.querySelector('.filter-pill.active')?.getAttribute('data-tab');
+        
+        if (activeTab === 'announcements') filterAnnouncements();
+        else if (activeTab === 'schedule') filterSchedules();
+        else if (activeTab === 'users') filterUsers();
     });
-}
 
-// ========== ПОИСК ==========
-document.getElementById('searchInput')?.addEventListener('input', function() {
-    const activeTab = document.querySelector('.filter-pill.active')?.getAttribute('data-tab');
-    
-    if (activeTab === 'announcements') filterAnnouncements();
-    else if (activeTab === 'schedule') filterSchedules();
-    else if (activeTab === 'users') filterUsers();
-});
+    // ========== КНОПКА ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ ==========
+    document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
 
-// ========== КНОПКА ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ ==========
-document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
-
-// ========== ЗАПУСК ==========
-document.addEventListener('DOMContentLoaded', function() {
-    if (!checkAuth()) return;
-    
-    // Загружаем данные
-    loadAnnouncements();
-    loadSchedules();
-    loadUsers();
-    
-    populateClassSelects();
-    setupClassButtons();
-    setupFormHandlers();
-    updateFiltersForTab('announcements');
-    initTabs();
-});
+    // ========== ЗАПУСК ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!checkAuth()) return;
+        
+        fillAnnouncementsTable();
+        fillSchedulesTable();
+        fillUsersTable();
+        populateClassSelects();
+        setupClassButtons();
+        setupFormHandlers();
+        updateFiltersForTab('announcements');
+        initTabs();
+        
+        setTimeout(() => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => loadingScreen.style.display = 'none', 300);
+            }
+        }, 500);
+    });
 </script>
 </body>
 </html>

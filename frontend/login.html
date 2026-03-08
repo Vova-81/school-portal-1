@@ -5,92 +5,321 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход - Школьный портал</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kurale&display=swap');
         
         * {
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            background: url('images/Обои\ 8.png') no-repeat center center fixed;
+            background-size: cover;
             min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Полупрозрачный слой поверх фона */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(3px);
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
         }
         
         .card {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(4px);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 
+                0 20px 40px -15px rgba(0, 0, 0, 0.3),
+                0 0 0 2px rgba(59, 130, 246, 0.1),
+                0 0 0 4px rgba(59, 130, 246, 0.05);
+            transition: box-shadow 0.3s ease;
         }
         
-        .logo-glow {
+        .card:hover {
+            box-shadow: 
+                0 25px 50px -15px rgba(0, 0, 0, 0.4),
+                0 0 0 3px rgba(59, 130, 246, 0.2),
+                0 0 0 6px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Стиль для текста "Школьный портал" в стиле Байта */
+        .byte-title {
+            font-family: 'Kurale', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60A5FA, #3B82F6, #1E3A8A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .byte-title::after {
+            content: '';
             position: absolute;
-            inset: -10px;
-            background: linear-gradient(to bottom right, #cbd5e1, #94a3b8);
+            bottom: -5px;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #3B82F6, #60A5FA, #3B82F6, transparent);
+            border-radius: 3px;
+        }
+        
+        /* Обводка вокруг лого в стиле Байта */
+        .logo-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+        }
+        
+        .logo-byte-ring {
+            position: absolute;
+            inset: -5px;
+            border: 3px solid transparent;
+            border-top-color: #60A5FA;
+            border-right-color: #3B82F6;
+            border-bottom-color: #1E3A8A;
+            border-left-color: #93C5FD;
             border-radius: 50%;
-            filter: blur(20px);
-            opacity: 0.3;
+            animation: byteSpin 3s linear infinite;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
         }
         
-        .login-alert {
-            animation: slideIn 0.3s ease-out;
+        .logo-byte-ring::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border: 2px solid transparent;
+            border-top-color: rgba(96, 165, 250, 0.3);
+            border-right-color: rgba(59, 130, 246, 0.3);
+            border-bottom-color: rgba(30, 58, 138, 0.3);
+            border-left-color: rgba(147, 197, 253, 0.3);
+            border-radius: 50%;
+            animation: byteSpinReverse 4s linear infinite;
         }
         
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
+        @keyframes byteSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes byteSpinReverse {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+        
+        .logo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 10px 30px -5px rgba(59, 130, 246, 0.3);
+        }
+        
+        .input-field {
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .input-field:focus {
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            background: white;
+        }
+        
+        .input-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus + .input-icon,
+        .input-field:focus ~ .input-icon {
+            color: #3B82F6;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #3B82F6, #1E3A8A);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px #3B82F6;
+        }
+        
+        .demo-btn {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .demo-btn:hover {
+            background: white;
+            border-color: #3B82F6;
+            box-shadow: 0 5px 15px -5px #3B82F6;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(30, 58, 138, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Уведомления в стиле Байта */
+        .byte-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #3B82F6, #1E3A8A);
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 
+                0 10px 30px -5px rgba(59, 130, 246, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 9999;
+            animation: byteNotification 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-left: 4px solid white;
+        }
+        
+        .byte-notification.error {
+            background: linear-gradient(135deg, #EF4444, #B91C1C);
+            box-shadow: 0 10px 30px -5px rgba(239, 68, 68, 0.5);
+        }
+        
+        .byte-notification i {
+            font-size: 1.5rem;
+            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.2));
+        }
+        
+        .byte-notification .notification-content {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .byte-notification .notification-title {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .byte-notification .notification-message {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .byte-notification .notification-close {
+            margin-left: 20px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+        
+        .byte-notification .notification-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes byteNotification {
+            0% {
+                transform: translateX(100%) scale(0.8);
                 opacity: 0;
             }
-            to {
-                transform: translateX(0);
+            100% {
+                transform: translateX(0) scale(1);
                 opacity: 1;
+            }
+        }
+        
+        .byte-notification.fade-out {
+            animation: byteNotificationFade 0.3s ease forwards;
+        }
+        
+        @keyframes byteNotificationFade {
+            to {
+                transform: translateX(100%) scale(0.8);
+                opacity: 0;
             }
         }
     </style>
 </head>
 <body class="flex items-center justify-center p-4 sm:p-6">
     
-    <div class="card p-8 sm:p-10 md:pt-12 md:pb-10 md:px-10 w-full max-w-md">
-        
-        <!-- Логотип и заголовок -->
-        <div class="flex flex-col items-center text-center space-y-6 sm:space-y-8 mb-6">
-            <div class="relative group">
-                <div class="logo-glow"></div>
-                <div class="relative flex shrink-0 overflow-hidden rounded-full h-20 w-20 sm:h-24 sm:w-24 shadow-lg ring-4 ring-white/50">
-                    <img class="aspect-square h-full w-full object-cover" 
-                         alt="Школьный Вестник logo" 
-                         src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6970e514a90c22559619a4de/d7639513f_logo.png">
+    <div class="container w-full max-w-md">
+        <div class="card p-8 sm:p-10 md:pt-12 md:pb-10 md:px-10">
+            
+            <!-- Логотип и заголовок в стиле Байта -->
+            <div class="flex flex-col items-center text-center space-y-6 sm:space-y-8 mb-6">
+                <div class="logo-wrapper">
+                    <div class="logo-byte-ring"></div>
+                    <img class="logo-image" 
+                         alt="Школьный портал" 
+                         src="images/logo.png">
+                </div>
+                
+                <div class="space-y-2 sm:space-y-3">
+                    <h1 class="byte-title">
+                        Школьный портал
+                    </h1>
+                    <p class="text-gray-600 text-sm sm:text-base font-medium">
+                        Вход в панель управления
+                    </p>
                 </div>
             </div>
-            
-            <div class="space-y-2 sm:space-y-3">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
-                    Школьный портал
-                </h1>
-                <p class="text-gray-600 text-sm sm:text-base font-medium">
-                    Вход в административную панель
-                </p>
-            </div>
-        </div>
 
-        <!-- Форма входа -->
-        <form id="loginForm" class="space-y-4 sm:space-y-5">
-            <div class="space-y-3 sm:space-y-4">
+            <!-- Форма входа -->
+            <form id="loginForm" class="space-y-5 sm:space-y-6">
                 <!-- Логин поле -->
-                <div class="space-y-1.5">
-                    <label class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium text-center block text-gray-700" for="username">
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700 block text-center" for="username">
                         Логин
                     </label>
                     <div class="relative">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400">
-                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
+                        <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 input-icon"></i>
                         <input type="text" 
-                               class="flex w-full border px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-10 h-11 sm:h-12 bg-gray-50/50 border-gray-200 focus:border-gray-400 focus:ring-gray-400 rounded-xl placeholder:text-gray-400" 
+                               class="input-field w-full pl-12 pr-4 py-3 rounded-xl text-base outline-none transition-all"
                                id="username" 
                                placeholder="Введите ваш логин" 
                                required>
@@ -98,496 +327,461 @@
                 </div>
 
                 <!-- Пароль поле -->
-                <div class="space-y-1.5">
-                    <label class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium text-gray-700 text-center block" for="password">
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700 block text-center" for="password">
                         Пароль
                     </label>
                     <div class="relative">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400">
-                            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
+                        <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 input-icon"></i>
                         <input type="password" 
-                               class="flex w-full border px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-10 h-11 sm:h-12 bg-gray-50/50 border-gray-200 focus:border-gray-400 focus:ring-gray-400 rounded-xl placeholder:text-gray-400" 
+                               class="input-field w-full pl-12 pr-4 py-3 rounded-xl text-base outline-none transition-all"
                                id="password" 
                                placeholder="••••••••" 
                                required>
                     </div>
                 </div>
-            </div>
 
-            <div class="space-y-3">
                 <!-- Кнопка Вход -->
-                <button type="submit" class="inline-flex items-center justify-center gap-1 whitespace-nowrap text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 px-3 py-2 w-full h-11 sm:h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm rounded-xl transition-all duration-200">
+                <button type="submit" 
+                        class="submit-btn w-full py-3.5 rounded-xl text-white font-semibold text-lg shadow-lg
+                               flex items-center justify-center gap-2 transition-all">
                     <i class="fas fa-sign-in-alt"></i>
                     Войти в систему
                 </button>
 
                 <!-- Информация для входа -->
-                <div class="text-center p-3 bg-blue-50 rounded-lg border border-blue-200 mt-4">
-                    <p class="text-sm text-blue-700 font-medium">
-                        <i class="fas fa-info-circle mr-1"></i>
+                <div class="info-box text-center p-4 rounded-xl mt-4">
+                    <p class="text-sm font-semibold text-[#3B82F6] flex items-center justify-center gap-1">
+                        <i class="fas fa-info-circle"></i>
                         Для входа используйте:
                     </p>
-                    <p class="text-xs text-blue-600 mt-1">
-                        Логин: <span class="font-bold">director</span> 
-                        | Пароль: <span class="font-bold">admin123</span>
-                    </p>
+                    <div class="flex items-center justify-center gap-3 mt-2 text-sm">
+                        <span class="px-3 py-1 bg-white rounded-full shadow-sm border border-[#3B82F6]">
+                            <span class="font-bold text-[#3B82F6]">director</span>
+                        </span>
+                        <i class="fas fa-arrow-right text-gray-400"></i>
+                        <span class="px-3 py-1 bg-white rounded-full shadow-sm border border-[#3B82F6]">
+                            <span class="font-bold text-[#1E3A8A]">admin123</span>
+                        </span>
+                    </div>
                 </div>
+            </form>
+            
+            <!-- Демо кнопки -->
+            <div class="mt-6 space-y-2">
+                <button onclick="fillDemo('director')" 
+                        class="demo-btn w-full py-3 px-4 rounded-xl text-gray-700 font-medium
+                               flex items-center justify-center gap-2 transition-all">
+                    <i class="fas fa-crown text-[#3B82F6]"></i>
+                    Войти как Директор
+                </button>
+                <button onclick="fillDemo('deputy')" 
+                        class="demo-btn w-full py-3 px-4 rounded-xl text-gray-700 font-medium
+                               flex items-center justify-center gap-2 transition-all">
+                    <i class="fas fa-user-tie text-[#3B82F6]"></i>
+                    Войти как Заместитель
+                </button>
             </div>
-        </form>
-        
-        <!-- Демо кнопки -->
-        <div class="mt-6 space-y-2">
-            <button onclick="fillDemo('director')" class="w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors">
-                <i class="fas fa-crown mr-2"></i>Войти как Директор
-            </button>
-            <button onclick="fillDemo('deputy')" class="w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors">
-                <i class="fas fa-user-tie mr-2"></i>Войти как Заместитель
-            </button>
         </div>
     </div>
 
-<script>
-    const API_BASE_URL = '';
+    <script>
+    // ========== КОНФИГУРАЦИЯ API ==========
+    // Укажите здесь URL вашего хостинга
+    const API_BASE_URL = ''; // Оставьте пустым, если API на том же домене
+    
+    // ========== ФУНКЦИЯ УВЕДОМЛЕНИЙ ==========
+    function showByteNotification(message, type = 'success') {
+        // Удаляем предыдущее уведомление
+        const oldNotification = document.querySelector('.byte-notification');
+        if (oldNotification) {
+            oldNotification.remove();
+        }
+        
+        const notification = document.createElement('div');
+        notification.className = `byte-notification ${type === 'error' ? 'error' : ''}`;
+        
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        const title = type === 'success' ? 'УСПЕХ' : 'ОШИБКА';
+        
+        notification.innerHTML = `
+            <i class="fas ${icon}"></i>
+            <div class="notification-content">
+                <span class="notification-title">${title}</span>
+                <span class="notification-message">${message}</span>
+            </div>
+            <div class="notification-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Автоматическое закрытие через 3 секунды
+        setTimeout(() => {
+            notification.classList.add('fade-out');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем, нужно ли создавать первого администратора
-    checkIfSetupNeeded().then(needsSetup => {
-        if (!needsSetup) {
-            // Если система уже настроена, проверяем авторизацию
-            const token = localStorage.getItem('authToken');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            
-            if (token) {
-                console.log('✅ Уже авторизован:', user);
-                if (['director', 'deputy'].includes(user.role)) {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'index.html';
-                }
+    // ========== ПРОВЕРКА АВТОРИЗАЦИИ ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        // Проверяем, авторизован ли пользователь
+        const token = sessionStorage.getItem('authToken');
+        const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+        
+        if (token) {
+            console.log('✅ Уже авторизован:', user);
+            if (['director', 'deputy'].includes(user.role)) {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'index.html';
             }
         }
-    });
-    
-    // Элементы формы
-    const loginForm = document.getElementById('loginForm');
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
-    const submitBtn = loginForm.querySelector('button[type="submit"]');
-    
-    // Автозаполнение для демо (если система настроена)
-    setTimeout(() => {
-        usernameInput.value = 'admin';
-        passwordInput.value = 'admin123';
-    }, 100);
-    
-    // Обработчик отправки формы
-    loginForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
         
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value.trim();
+        // Проверяем, нужно ли создавать первого администратора
+        checkIfSetupNeeded();
         
-        console.log('🔄 Пытаюсь войти:', username);
+        // Элементы формы
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const submitBtn = document.querySelector('button[type="submit"]');
         
-        // Валидация
-        if (!username || !password) {
-            showError('Введите логин и пароль');
-            return;
-        }
+        console.log('📌 Страница входа загружена');
         
-        // Показываем загрузку
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Вход...';
-        submitBtn.disabled = true;
+        // Автозаполнение для демо
+        setTimeout(() => {
+            if (usernameInput && !usernameInput.value) {
+                usernameInput.value = 'director';
+                passwordInput.value = 'admin123';
+            }
+        }, 100);
         
-        try {
-            console.log('📨 Отправляю POST запрос на /api/auth/login');
+        // Обработчик отправки формы
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            const response = await fetch(`/api/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    username: username,
-                    password: password 
-                })
-            });
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
             
-            console.log('📨 Ответ получен, статус:', response.status);
+            console.log('🔄 Попытка входа:', username);
             
-            const responseText = await response.text();
-            console.log('📨 Текст ответа:', responseText);
-            
-            let data;
-            try {
-                data = JSON.parse(responseText);
-            } catch (parseError) {
-                console.error('❌ Не удалось распарсить JSON:', responseText);
-                showError('Сервер вернул неверный формат данных');
+            if (!username || !password) {
+                showByteNotification('Введите логин и пароль', 'error');
                 return;
             }
             
-            console.log('📨 Данные ответа:', data);
+            // Показываем загрузку
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Вход...';
+            submitBtn.disabled = true;
             
-            if (!data.success) {
-                throw new Error(data.error || 'Ошибка входа');
-            }
-            
-            // Сохраняем токен и данные пользователя
-            localStorage.setItem('authToken', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-            
-            console.log('✅ Вход успешен! Пользователь:', data.user);
-            
-            // Показываем успех
-            showSuccess('Вход выполнен успешно!');
-            
-            // Ждем секунду и перенаправляем
-            setTimeout(() => {
-                if (['director', 'deputy'].includes(data.user.role)) {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'index.html';
+            try {
+                console.log('📨 Отправка запроса на /api/auth/login');
+                
+                const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        username: username,
+                        password: password 
+                    })
+                });
+                
+                console.log('📨 Статус ответа:', response.status);
+                
+                const responseText = await response.text();
+                console.log('📨 Текст ответа:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('❌ Ошибка парсинга JSON:', responseText);
+                    throw new Error('Сервер вернул неверный формат данных');
                 }
-            }, 1000);
-            
-        } catch (error) {
-            console.error('🔥 Ошибка входа:', error);
-            
-            // Подробная диагностика
-            if (error.message.includes('Failed to fetch')) {
-                showError('Сервер не отвечает. Проверьте что сервер запущен.');
-            } else if (error.message.includes('NetworkError')) {
-                showError('Проблема с сетью. Проверьте соединение.');
-            } else {
-                showError('Ошибка входа: ' + error.message);
+                
+                console.log('📨 Данные ответа:', data);
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Ошибка входа');
+                }
+                
+                // Сохраняем токен и данные пользователя в sessionStorage
+                sessionStorage.setItem('authToken', data.token);
+                sessionStorage.setItem('user', JSON.stringify(data.user));
+                
+                console.log('✅ Вход успешен! Пользователь:', data.user);
+                showByteNotification('Вход выполнен успешно!', 'success');
+                
+                // Перенаправляем
+                setTimeout(() => {
+                    if (['director', 'deputy'].includes(data.user.role)) {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                console.error('❌ Ошибка входа:', error);
+                
+                if (error.message.includes('Failed to fetch')) {
+                    showByteNotification('Сервер не отвечает. Проверьте подключение к интернету.', 'error');
+                } else if (error.message.includes('NetworkError')) {
+                    showByteNotification('Проблема с сетью. Проверьте соединение.', 'error');
+                } else {
+                    showByteNotification(error.message, 'error');
+                }
+                
+                passwordInput.value = '';
+                passwordInput.focus();
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
             }
-            
-            passwordInput.value = '';
-            passwordInput.focus();
-        } finally {
-            // Восстанавливаем кнопку
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }
+        });
     });
-    
-    // Проверяем сервер при загрузке
-    checkServer();
-});
 
-// Проверка, нужно ли создавать первого администратора
-async function checkIfSetupNeeded() {
-    try {
-        const response = await fetch(`/api/setup/check`);
-        const data = await response.json();
-        
-        if (data.needsSetup) {
-            // Показываем форму создания администратора
-            showFirstAdminForm();
-            return true;
+    // ========== ПРОВЕРКА НЕОБХОДИМОСТИ НАСТРОЙКИ ==========
+    async function checkIfSetupNeeded() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/setup/check`);
+            const data = await response.json();
+            
+            if (data.needsSetup) {
+                // Показываем форму создания администратора
+                showFirstAdminForm();
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Ошибка проверки настройки:', error);
+            return false;
         }
-        return false;
-    } catch (error) {
-        console.error('Ошибка проверки настройки:', error);
-        return false;
     }
-}
 
-// Показать форму создания первого администратора
-function showFirstAdminForm() {
-    const loginForm = document.getElementById('loginForm');
-    const demoButtons = document.querySelector('.mt-6');
-    
-    // Скрываем обычную форму
-    loginForm.style.display = 'none';
-    if (demoButtons) demoButtons.style.display = 'none';
-    
-    // Удаляем блок с информацией для входа если он есть
-    const infoBlock = document.querySelector('.text-center.p-3');
-    if (infoBlock) infoBlock.style.display = 'none';
-    
-    // Создаем форму настройки
-    const setupForm = document.createElement('div');
-    setupForm.className = 'space-y-5';
-    setupForm.innerHTML = `
-        <div class="text-center mb-4">
-            <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto flex items-center justify-center mb-3">
-                <i class="fas fa-crown text-white text-2xl"></i>
-            </div>
-            <h2 class="text-xl font-bold text-gray-900">Настройка системы</h2>
-            <p class="text-gray-600 text-sm">Создайте первого администратора</p>
-        </div>
+    // ========== ФОРМА СОЗДАНИЯ ПЕРВОГО АДМИНИСТРАТОРА ==========
+    function showFirstAdminForm() {
+        const loginForm = document.getElementById('loginForm');
+        const demoButtons = document.querySelector('.mt-6');
         
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Полное имя</label>
-                <input type="text" id="adminFullName" 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                       placeholder="Иванов Иван Иванович" required>
+        // Скрываем обычную форму
+        loginForm.style.display = 'none';
+        if (demoButtons) demoButtons.style.display = 'none';
+        
+        // Удаляем блок с информацией для входа если он есть
+        const infoBlock = document.querySelector('.info-box');
+        if (infoBlock) infoBlock.style.display = 'none';
+        
+        // Создаем форму настройки
+        const setupForm = document.createElement('div');
+        setupForm.className = 'space-y-5';
+        setupForm.innerHTML = `
+            <div class="text-center mb-4">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto flex items-center justify-center mb-3">
+                    <i class="fas fa-crown text-white text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-900">Настройка системы</h2>
+                <p class="text-gray-600 text-sm">Создайте первого администратора</p>
             </div>
             
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Логин</label>
-                <input type="text" id="adminUsername" 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                       placeholder="admin" required>
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Пароль</label>
-                <input type="password" id="adminPassword" 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                       placeholder="Не менее 6 символов" required>
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Подтверждение пароля</label>
-                <input type="password" id="adminConfirmPassword" 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                       placeholder="Повторите пароль" required>
-            </div>
-            
-            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
-                <div class="flex items-start">
-                    <i class="fas fa-exclamation-triangle text-yellow-400 mt-1 mr-2"></i>
-                    <div class="text-sm text-yellow-700">
-                        Этот пользователь будет иметь права <strong>Директора</strong>.
-                        Запомните логин и пароль!
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Полное имя</label>
+                    <input type="text" id="adminFullName" 
+                           class="input-field w-full px-4 py-3 rounded-xl outline-none"
+                           placeholder="Иванов Иван Иванович" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Логин</label>
+                    <input type="text" id="adminUsername" 
+                           class="input-field w-full px-4 py-3 rounded-xl outline-none"
+                           placeholder="admin" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Пароль</label>
+                    <input type="password" id="adminPassword" 
+                           class="input-field w-full px-4 py-3 rounded-xl outline-none"
+                           placeholder="Не менее 6 символов" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Подтверждение пароля</label>
+                    <input type="password" id="adminConfirmPassword" 
+                           class="input-field w-full px-4 py-3 rounded-xl outline-none"
+                           placeholder="Повторите пароль" required>
+                </div>
+                
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-triangle text-yellow-400 mt-1 mr-2"></i>
+                        <div class="text-sm text-yellow-700">
+                            Этот пользователь будет иметь права <strong>Директора</strong>.
+                            Запомните логин и пароль!
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+            
+            <div class="flex space-x-3">
+                <button type="button" id="cancelSetupBtn" 
+                        class="demo-btn flex-1 py-3 px-4 rounded-xl font-medium transition-all">
+                    <i class="fas fa-times mr-1"></i> Отмена
+                </button>
+                <button type="button" id="createAdminBtn" 
+                        class="submit-btn flex-1 py-3 px-4 rounded-xl font-medium transition-all">
+                    <i class="fas fa-user-plus mr-1"></i> Создать
+                </button>
+            </div>
+        `;
         
-        <div class="flex space-x-3">
-            <button type="button" id="cancelSetupBtn" 
-                    class="flex-1 py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors">
-                <i class="fas fa-times mr-1"></i> Отмена
-            </button>
-            <button type="button" id="createAdminBtn" 
-                    class="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
-                <i class="fas fa-user-plus mr-1"></i> Создать
-            </button>
-        </div>
-    `;
-    
-    // Вставляем в карточку
-    const card = document.querySelector('.card');
-    card.insertBefore(setupForm, card.firstChild);
-    
-    // Автозаполняем демо данные
-    document.getElementById('adminFullName').value = 'Администратор системы';
-    document.getElementById('adminUsername').value = 'admin';
-    document.getElementById('adminPassword').value = 'admin123';
-    document.getElementById('adminConfirmPassword').value = 'admin123';
-    
-    // Обработчики событий
-    document.getElementById('cancelSetupBtn').addEventListener('click', () => {
-        setupForm.remove();
-        loginForm.style.display = 'block';
-        if (demoButtons) demoButtons.style.display = 'block';
-        const infoBlock = document.querySelector('.text-center.p-3');
-        if (infoBlock) infoBlock.style.display = 'block';
-    });
-    
-    document.getElementById('createAdminBtn').addEventListener('click', createFirstAdmin);
-    
-    // Обработчик нажатия Enter
-    setupForm.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            createFirstAdmin();
-        }
-    });
-}
-
-// Создание первого администратора
-async function createFirstAdmin() {
-    const fullName = document.getElementById('adminFullName').value.trim();
-    const username = document.getElementById('adminUsername').value.trim();
-    const password = document.getElementById('adminPassword').value;
-    const confirmPassword = document.getElementById('adminConfirmPassword').value;
-    
-    if (!fullName || !username || !password || !confirmPassword) {
-        showError('Заполните все поля');
-        return;
-    }
-    
-    if (password.length < 6) {
-        showError('Пароль должен быть не менее 6 символов');
-        return;
-    }
-    
-    if (password !== confirmPassword) {
-        showError('Пароли не совпадают');
-        return;
-    }
-    
-    const createBtn = document.getElementById('createAdminBtn');
-    const originalText = createBtn.innerHTML;
-    createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Создание...';
-    createBtn.disabled = true;
-    
-    try {
-        const response = await fetch(`/api/setup/first-admin`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                username,
-                password,
-                full_name: fullName
-            })
+        // Вставляем в карточку
+        const card = document.querySelector('.card');
+        card.insertBefore(setupForm, card.firstChild);
+        
+        // Автозаполняем демо данные
+        document.getElementById('adminFullName').value = 'Администратор системы';
+        document.getElementById('adminUsername').value = 'admin';
+        document.getElementById('adminPassword').value = 'admin123';
+        document.getElementById('adminConfirmPassword').value = 'admin123';
+        
+        // Обработчики событий
+        document.getElementById('cancelSetupBtn').addEventListener('click', () => {
+            setupForm.remove();
+            loginForm.style.display = 'block';
+            if (demoButtons) demoButtons.style.display = 'block';
+            const infoBlock = document.querySelector('.info-box');
+            if (infoBlock) infoBlock.style.display = 'block';
         });
         
-        const responseText = await response.text();
-        let data;
+        document.getElementById('createAdminBtn').addEventListener('click', createFirstAdmin);
         
-        try {
-            data = JSON.parse(responseText);
-        } catch (parseError) {
-            console.error('❌ Ошибка парсинга JSON:', responseText);
-            showError('Сервер вернул неверный ответ');
+        // Обработчик нажатия Enter
+        setupForm.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                createFirstAdmin();
+            }
+        });
+    }
+
+    // ========== СОЗДАНИЕ ПЕРВОГО АДМИНИСТРАТОРА ==========
+    async function createFirstAdmin() {
+        const fullName = document.getElementById('adminFullName').value.trim();
+        const username = document.getElementById('adminUsername').value.trim();
+        const password = document.getElementById('adminPassword').value;
+        const confirmPassword = document.getElementById('adminConfirmPassword').value;
+        
+        if (!fullName || !username || !password || !confirmPassword) {
+            showByteNotification('Заполните все поля', 'error');
             return;
         }
         
-        if (data.success) {
-            showSuccess('Администратор успешно создан!');
+        if (password.length < 6) {
+            showByteNotification('Пароль должен быть не менее 6 символов', 'error');
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            showByteNotification('Пароли не совпадают', 'error');
+            return;
+        }
+        
+        const createBtn = document.getElementById('createAdminBtn');
+        const originalText = createBtn.innerHTML;
+        createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Создание...';
+        createBtn.disabled = true;
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/setup/first-admin`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username,
+                    password,
+                    full_name: fullName
+                })
+            });
             
-            // Показываем данные для входа
-            setTimeout(() => {
-                // Восстанавливаем обычную форму
-                const setupForm = document.querySelector('.space-y-5:first-child');
-                if (setupForm) setupForm.remove();
+            const responseText = await response.text();
+            let data;
+            
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error('❌ Ошибка парсинга JSON:', responseText);
+                showByteNotification('Сервер вернул неверный ответ', 'error');
+                return;
+            }
+            
+            if (data.success) {
+                showByteNotification('Администратор успешно создан!', 'success');
                 
-                const loginForm = document.getElementById('loginForm');
-                loginForm.style.display = 'block';
-                
-                const demoButtons = document.querySelector('.mt-6');
-                if (demoButtons) demoButtons.style.display = 'block';
-                
-                const infoBlock = document.querySelector('.text-center.p-3');
-                if (infoBlock) infoBlock.style.display = 'block';
-                
-                // Автозаполняем форму входа
-                document.getElementById('username').value = username;
-                document.getElementById('password').value = password;
-                
-                showInfo(`✅ Администратор создан!<br>Используйте для входа:<br>Логин: <strong>${username}</strong><br>Пароль: <strong>${password}</strong>`);
-                
-                // Фокусируемся на кнопке входа
                 setTimeout(() => {
-                    loginForm.querySelector('button[type="submit"]').focus();
-                }, 100);
-            }, 1500);
-        } else {
-            showError(data.error || 'Ошибка создания администратора');
+                    // Восстанавливаем обычную форму
+                    const setupForm = document.querySelector('.space-y-5:first-child');
+                    if (setupForm) setupForm.remove();
+                    
+                    const loginForm = document.getElementById('loginForm');
+                    loginForm.style.display = 'block';
+                    
+                    const demoButtons = document.querySelector('.mt-6');
+                    if (demoButtons) demoButtons.style.display = 'block';
+                    
+                    const infoBlock = document.querySelector('.info-box');
+                    if (infoBlock) infoBlock.style.display = 'block';
+                    
+                    // Автозаполняем форму входа
+                    document.getElementById('username').value = username;
+                    document.getElementById('password').value = password;
+                    
+                    showByteNotification(`✅ Администратор создан! Используйте логин: ${username}`, 'success');
+                }, 1500);
+            } else {
+                showByteNotification(data.error || 'Ошибка создания администратора', 'error');
+            }
+        } catch (error) {
+            console.error('Ошибка создания администратора:', error);
+            if (error.message.includes('Failed to fetch')) {
+                showByteNotification('Сервер не отвечает. Проверьте подключение к интернету.', 'error');
+            } else {
+                showByteNotification('Ошибка соединения с сервером', 'error');
+            }
+        } finally {
+            createBtn.innerHTML = originalText;
+            createBtn.disabled = false;
         }
-    } catch (error) {
-        console.error('Ошибка создания администратора:', error);
-        if (error.message.includes('Failed to fetch')) {
-            showError('Сервер не отвечает. Убедитесь что сервер запущен.');
-        } else {
-            showError('Ошибка соединения с сервером');
+    }
+
+    // ========== ВЫХОД ИЗ СИСТЕМЫ ==========
+    window.logout = function() {
+        sessionStorage.removeItem('authToken');
+        sessionStorage.removeItem('user');
+        window.location.href = 'login.html';
+    };
+
+    // ========== ДЕМО-ДАННЫЕ ==========
+    window.fillDemo = function(role) {
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        
+        if (role === 'director') {
+            usernameInput.value = 'director';
+            passwordInput.value = 'admin123';
+            showByteNotification('Данные директора загружены', 'success');
+        } else if (role === 'deputy') {
+            usernameInput.value = 'deputy';
+            passwordInput.value = 'admin123';
+            showByteNotification('Данные заместителя загружены', 'success');
         }
-    } finally {
-        createBtn.innerHTML = originalText;
-        createBtn.disabled = false;
     }
-}
-
-// Функции для заполнения демо данных
-function fillDemo(role) {
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
-    
-    if (role === 'director') {
-        usernameInput.value = 'director';
-        passwordInput.value = 'admin123';
-        showInfo('Заполнены данные директора');
-    } else if (role === 'deputy') {
-        usernameInput.value = 'deputy';
-        passwordInput.value = 'admin123';
-        showInfo('Заполнены данные заместителя');
-    }
-}
-
-// Проверка сервера
-async function checkServer() {
-    try {
-        const response = await fetch(`/api/health`);
-        if (response.ok) {
-            console.log('✅ Сервер доступен');
-        } else {
-            console.warn('⚠️ Сервер отвечает с ошибкой:', response.status);
-        }
-    } catch (error) {
-        console.error('❌ Сервер не отвечает:', error.message);
-        showError('⚠️ Сервер не запущен! Запустите: node server.js', true);
-    }
-}
-
-// Вспомогательные функции для уведомлений
-function showError(message, isHtml = false) {
-    const oldAlert = document.querySelector('.login-alert');
-    if (oldAlert) oldAlert.remove();
-    
-    const alert = document.createElement('div');
-    alert.className = 'login-alert fixed top-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-lg max-w-md z-50';
-    alert.innerHTML = isHtml ? 
-        `<div class="flex items-start">
-            <i class="fas fa-exclamation-triangle mt-1 mr-3"></i>
-            <div>${message}</div>
-        </div>` :
-        `<div class="flex items-start">
-            <i class="fas fa-exclamation-triangle mt-1 mr-3"></i>
-            <div>${message}</div>
-        </div>`;
-    
-    document.body.appendChild(alert);
-    setTimeout(() => alert.remove(), 5000);
-}
-
-function showSuccess(message) {
-    const oldAlert = document.querySelector('.login-alert');
-    if (oldAlert) oldAlert.remove();
-    
-    const alert = document.createElement('div');
-    alert.className = 'login-alert fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg shadow-lg max-w-md z-50';
-    alert.innerHTML = `
-        <div class="flex items-start">
-            <i class="fas fa-check-circle mt-1 mr-3"></i>
-            <div>${message}</div>
-        </div>
-    `;
-    
-    document.body.appendChild(alert);
-    setTimeout(() => alert.remove(), 3000);
-}
-
-function showInfo(message) {
-    const oldAlert = document.querySelector('.login-alert');
-    if (oldAlert) oldAlert.remove();
-    
-    const alert = document.createElement('div');
-    alert.className = 'login-alert fixed top-4 right-4 bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg shadow-lg max-w-md z-50';
-    alert.innerHTML = `
-        <div class="flex items-start">
-            <i class="fas fa-info-circle mt-1 mr-3"></i>
-            <div>${message}</div>
-        </div>
-    `;
-    
-    document.body.appendChild(alert);
-    setTimeout(() => alert.remove(), 2000);
-}
-
-// Глобальные функции для кнопок демо
-window.fillDemo = fillDemo;    
-</script>
+    </script>
 </body>
 </html>

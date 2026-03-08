@@ -1491,10 +1491,6 @@
     }
 
     /* ===== МОДАЛКА УДАЛЕНИЯ ===== */
-    #deleteModal .modal {
-        max-width: 400px;
-        border: 3px solid #FECACA;
-    }
 
     #deleteModal .modal-header {
         background: white;
@@ -1594,7 +1590,601 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
     }
+    /* Исправление для всех модалок */
+#scheduleModal .modal-close i,
+#userModal .modal-close i,
+#editAnnouncementModal .modal-close i,
+#editScheduleModal .modal-close i,
+#editUserModal .modal-close i,
+#resetPasswordModal .modal-close i,
+#deleteConfirmModal .modal-close i {
+    font-size: 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+#deleteConfirmModal .modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* ===== МОДАЛКА УДАЛЕНИЯ - ПОЛНОЕ ИСПРАВЛЕНИЕ ===== */
+#deleteConfirmModal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem 1rem;
+    border-bottom: 3px solid #FECACA;
+    background: white;
+}
 
+#deleteConfirmModal .modal-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #000;
+    font-family: 'Kurale', serif;
+    line-height: 1.3;
+    margin: 0;
+}
+
+#deleteConfirmModal .modal-close {
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important;
+    min-height: 50px !important;
+    max-width: 50px !important;
+    max-height: 50px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 2px solid #FECACA !important;
+    border-radius: 50% !important; /* Круг */
+    background: white !important;
+    color: #000 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    font-size: 0 !important; /* Убираем возможный текст */
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    overflow: hidden !important;
+    aspect-ratio: 1 / 1 !important; /* Соотношение сторон 1:1 */
+}
+
+#deleteConfirmModal .modal-close i {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    font-size: 24px !important;
+    color: #000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#deleteConfirmModal .modal-close:hover {
+    background: #FECACA !important;
+    color: #000 !important;
+    transform: rotate(90deg) scale(1.1) !important;
+}
+
+#deleteConfirmModal .modal-close:hover i {
+    color: #000 !important;
+}
+
+/* Переопределяем все возможные конфликтующие стили */
+.modal-backdrop#deleteConfirmModal .modal-close,
+.modal-backdrop#deleteConfirmModal .modal-close:focus,
+.modal-backdrop#deleteConfirmModal .modal-close:active,
+.modal-backdrop#deleteConfirmModal .modal-close:visited {
+    border-radius: 50% !important;
+    width: 50px !important;
+    height: 50px !important;
+}
+/* Стили для поля с паролем */
+.password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-field input {
+    width: 100%;
+    padding-right: 40px; /* Место для кнопки */
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: #EF6923;
+    transform: scale(1.1);
+}
+
+/* Стили для отображения пароля в таблице */
+.password-preview {
+    font-family: monospace;
+    background: #f3f4f6;
+    padding: 4px 8px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    border: 1px solid #e5e7eb;
+}
+
+.password-preview .toggle-password-btn {
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 2px 5px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.password-preview .toggle-password-btn:hover {
+    color: #EF6923;
+    background: #fee2e2;
+}
+
+/* Иконка глаза */
+.fa-eye, .fa-eye-slash {
+    pointer-events: none;
+}
+
+/* ===== УПРАВЛЕНИЕ РОЛЯМИ ===== */
+.roles-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.roles-list {
+    flex: 1;
+    background: white;
+    border-radius: 20px;
+    border: 3px solid #FECACA;
+    overflow: hidden;
+}
+
+.roles-header {
+    background: #FEE2E2;
+    padding: 15px 20px;
+    border-bottom: 2px solid #FECACA;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.roles-header h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #991B1B;
+    margin: 0;
+}
+
+.role-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #FEE2E2;
+    transition: all 0.3s ease;
+}
+
+.role-item:hover {
+    background: #FFF5F5;
+}
+
+.role-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.role-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+}
+
+.role-badge.director {
+    background: linear-gradient(135deg, #EF6923, #DC2626);
+}
+
+.role-badge.deputy {
+    background: linear-gradient(135deg, #3B82F6, #1E40AF);
+}
+
+.role-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.role-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.role-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 10px;
+    border: 2px solid #FECACA;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+}
+
+.role-btn:hover {
+    background: #FECACA;
+    color: #DC2626;
+    transform: translateY(-2px);
+}
+
+/* Панель прав */
+.permissions-panel {
+    flex: 2;
+    background: white;
+    border-radius: 20px;
+    border: 3px solid #FECACA;
+    overflow: hidden;
+}
+
+.permissions-header {
+    background: #FEE2E2;
+    padding: 15px 20px;
+    border-bottom: 2px solid #FECACA;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.permissions-header h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #991B1B;
+    margin: 0;
+}
+
+.current-role-info {
+    background: #FFF5F5;
+    padding: 15px 20px;
+    border-bottom: 2px solid #FECACA;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.current-role-badge {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #DC2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.current-role-name {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #1e293b;
+}
+
+.current-role-name small {
+    font-weight: normal;
+    font-size: 0.9rem;
+    color: #64748b;
+    display: block;
+}
+
+/* Сетка прав */
+.permissions-grid {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.permission-item {
+    background: #F8FAFC;
+    border: 2px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 12px;
+    transition: all 0.2s ease;
+}
+
+.permission-item:hover {
+    border-color: #FECACA;
+    background: #FFF5F5;
+}
+
+.permission-item label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.permission-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #DC2626;
+    cursor: pointer;
+}
+
+.permission-category {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 5px;
+    padding-left: 30px;
+}
+
+/* Модалка создания роли */
+#createRoleModal .modal {
+    max-width: 500px;
+}
+
+.role-color-picker {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.role-color-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.role-color-option:hover {
+    transform: scale(1.1);
+}
+
+.role-color-option.selected {
+    border-color: #000;
+    transform: scale(1.1);
+}
+
+/* Бейджи ролей */
+.role-badge-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: white;
+}
+
+.role-badge-display i {
+    font-size: 0.8rem;
+}
+
+/* Вкладки прав */
+.permission-tabs {
+    display: flex;
+    gap: 10px;
+    padding: 0 20px;
+    margin-top: 15px;
+}
+
+.permission-tab {
+    padding: 8px 16px;
+    border-radius: 30px;
+    background: #F1F5F9;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.permission-tab:hover {
+    background: #FECACA;
+}
+
+.permission-tab.active {
+    background: #DC2626;
+    color: white;
+    border-color: #B91C1C;
+}
+/* ===== МОДАЛКА ПОДТВЕРЖДЕНИЯ ВЫХОДА ===== */
+#logoutConfirmModal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem 1rem;
+    border-bottom: 3px solid #FECACA;
+    background: white;
+}
+
+#logoutConfirmModal .modal-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #000;
+    font-family: 'Kurale', serif;
+    line-height: 1.3;
+    margin: 0;
+}
+
+#logoutConfirmModal .modal-close {
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important;
+    min-height: 50px !important;
+    max-width: 50px !important;
+    max-height: 50px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 2px solid #FECACA !important;
+    border-radius: 50% !important;
+    background: white !important;
+    color: #000 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    font-size: 0 !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    overflow: hidden !important;
+    aspect-ratio: 1 / 1 !important;
+}
+
+#logoutConfirmModal .modal-close i {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    font-size: 24px !important;
+    color: #000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#logoutConfirmModal .modal-close:hover {
+    background: #FECACA !important;
+    color: #000 !important;
+    transform: rotate(90deg) scale(1.1) !important;
+}
+
+#logoutConfirmModal .modal-close:hover i {
+    color: #000 !important;
+}
+
+#logoutConfirmModal .modal-body {
+    padding: 2rem;
+    text-align: center;
+}
+
+#logoutConfirmModal .modal-body i {
+    font-size: 4rem;
+    color: #EF6923;
+    margin-bottom: 1rem;
+}
+
+#logoutConfirmModal .modal-body p {
+    font-size: 1.2rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+#logoutConfirmModal .modal-body .text-muted {
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+#logoutConfirmModal .modal-footer {
+    padding: 1.5rem 2rem;
+    border-top: 3px solid #FECACA;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    background: #fef9f0;
+    border-radius: 0 0 30px 30px;
+}
+
+#logoutConfirmModal .btn-secondary {
+    background: white;
+    border: 2px solid #FECACA;
+    color: #000;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    min-width: 120px;
+    transition: all 0.3s ease;
+}
+
+#logoutConfirmModal .btn-secondary:hover {
+    background: #FECACA;
+    transform: translateY(-2px);
+}
+
+#logoutConfirmModal .btn-danger {
+    background: #EF6923;
+    border: none;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    min-width: 120px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+#logoutConfirmModal .btn-danger:hover {
+    background: #DC2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 105, 35, 0.3);
+}
+
+/* Переопределяем для модалки выхода */
+.modal-backdrop#logoutConfirmModal .modal-close,
+.modal-backdrop#logoutConfirmModal .modal-close:focus,
+.modal-backdrop#logoutConfirmModal .modal-close:active,
+.modal-backdrop#logoutConfirmModal .modal-close:visited {
+    border-radius: 50% !important;
+    width: 50px !important;
+    height: 50px !important;
+}
+/* Адаптация */
+@media (max-width: 768px) {
+    .roles-container {
+        flex-direction: column;
+    }
+    
+    .permissions-grid {
+        grid-template-columns: 1fr;
+    }
+}
     /* ===== АДАПТАЦИЯ ДЛЯ ВСЕГО ПРОЕКТА ===== */
 
     /* Большие экраны 1200-1400px */
