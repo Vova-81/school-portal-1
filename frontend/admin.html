@@ -600,19 +600,18 @@
     <div id="alertsContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000;"></div>
 
 <script>
-    // ========== ПРОСТЕЙШАЯ ПРОВЕРКА ==========
+    // ========== ПРОВЕРКА АВТОРИЗАЦИИ ==========
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📌 Загрузка админ-панели');
     
-    // Только sessionStorage, никакого localStorage
+    // Проверяем sessionStorage
     const userStr = sessionStorage.getItem('user');
     const token = sessionStorage.getItem('authToken');
     
-    console.log('🔍 Данные сессии:', { user: userStr, token: token });
+    console.log('Данные авторизации:', { user: userStr, token: token });
     
-    // Если нет данных - на логин
     if (!userStr || !token) {
-        console.log('🚫 Нет авторизации');
+        console.log('❌ Нет авторизации');
         window.location.href = 'login.html';
         return;
     }
@@ -621,25 +620,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const user = JSON.parse(userStr);
         console.log('✅ Пользователь:', user);
         
-        // Если не админ - на главную
         if (user.role !== 'director' && user.role !== 'deputy') {
-            console.log('🚫 Нет прав');
+            console.log('❌ Нет прав');
             window.location.href = 'index.html';
             return;
         }
         
         // ВСЁ ОК - загружаем данные
-        console.log('✅ Доступ разрешен, загружаем данные...');
+        currentUser = user;
+        console.log('✅ Доступ разрешен');
         
-        // Даем небольшую задержку для стабилизации
-        setTimeout(() => {
-            loadAnnouncements();
-            loadSchedules();
-            loadUsers();
-        }, 100);
+        // Загружаем данные
+        loadAnnouncements();
+        loadSchedules();
+        loadUsers();
         
     } catch (e) {
-        console.error('❌ Ошибка парсинга:', e);
+        console.error('❌ Ошибка:', e);
         sessionStorage.clear();
         window.location.href = 'login.html';
     }
@@ -977,11 +974,6 @@ function updateFiltersForTab(tabId) {
 async function loadAnnouncements() {
     try {
         const token = sessionStorage.getItem('authToken');
-        if (!token) {
-            window.location.href = 'login.html';
-            return;
-        }
-        
         const response = await fetch(`/api/announcements`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -994,17 +986,11 @@ async function loadAnnouncements() {
             return;
         }
         
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
         const data = await response.json();
         
         if (Array.isArray(data)) {
             allAnnouncements = data;
         } else if (data.announcements && Array.isArray(data.announcements)) {
-            allAnnouncements = data.announcements;
-        } else if (data.success && data.announcements) {
             allAnnouncements = data.announcements;
         } else {
             allAnnouncements = [];
@@ -1021,11 +1007,6 @@ async function loadAnnouncements() {
 async function loadSchedules() {
     try {
         const token = sessionStorage.getItem('authToken');
-        if (!token) {
-            window.location.href = 'login.html';
-            return;
-        }
-        
         const response = await fetch(`/api/schedules`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -1038,17 +1019,11 @@ async function loadSchedules() {
             return;
         }
         
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
         const data = await response.json();
         
         if (Array.isArray(data)) {
             allSchedules = data;
         } else if (data.schedules && Array.isArray(data.schedules)) {
-            allSchedules = data.schedules;
-        } else if (data.success && data.schedules) {
             allSchedules = data.schedules;
         } else {
             allSchedules = [];
@@ -1065,11 +1040,6 @@ async function loadSchedules() {
 async function loadUsers() {
     try {
         const token = sessionStorage.getItem('authToken');
-        if (!token) {
-            window.location.href = 'login.html';
-            return;
-        }
-        
         const response = await fetch(`/api/admin/users`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -1082,17 +1052,11 @@ async function loadUsers() {
             return;
         }
         
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
         const data = await response.json();
         
         if (Array.isArray(data)) {
             allUsers = data;
         } else if (data.users && Array.isArray(data.users)) {
-            allUsers = data.users;
-        } else if (data.success && data.users) {
             allUsers = data.users;
         } else {
             allUsers = [];
@@ -1381,11 +1345,6 @@ async function resetUserPassword() {
     
     try {
         const token = sessionStorage.getItem('authToken');
-        if (!token) {
-            window.location.href = 'login.html';
-            return;
-        }
-        
         const response = await fetch(`/api/admin/users/${currentUserId}/reset-password`, {
             method: 'POST',
             headers: {
@@ -1433,11 +1392,6 @@ function showDeleteConfirm(type, id, name) {
 
 async function confirmDelete() {
     const token = sessionStorage.getItem('authToken');
-    if (!token) {
-        window.location.href = 'login.html';
-        return;
-    }
-    
     let url = '';
     
     if (deleteItemType === 'announcement') {
@@ -1506,11 +1460,6 @@ function setupFormHandlers() {
         
         try {
             const token = sessionStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = 'login.html';
-                return;
-            }
-            
             const method = currentEditId ? 'PUT' : 'POST';
             const url = currentEditId ? `/api/announcements/${currentEditId}` : '/api/announcements';
             
@@ -1574,11 +1523,6 @@ function setupFormHandlers() {
         
         try {
             const token = sessionStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = 'login.html';
-                return;
-            }
-            
             const method = currentEditScheduleId ? 'PUT' : 'POST';
             const url = currentEditScheduleId ? `/api/schedules/${currentEditScheduleId}` : '/api/schedules';
             
@@ -1628,10 +1572,6 @@ function setupFormHandlers() {
         
         try {
             const token = sessionStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = 'login.html';
-                return;
-            }
             
             if (!currentUserId) {
                 const password = document.getElementById('userPassword').value;
@@ -1719,7 +1659,6 @@ document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
     if (confirm('Вы действительно хотите выйти?')) {
         console.log('🚪 Выход из системы');
         sessionStorage.clear();
-        localStorage.clear();
         window.location.href = 'login.html';
     }
 });
@@ -1773,7 +1712,6 @@ document.getElementById('searchInput')?.addEventListener('input', function() {
 document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
 
 // ========== ИНИЦИАЛИЗАЦИЯ ==========
-// Заполняем селекты классов сразу
 populateClassSelects();
 setupClassButtons();
 setupFormHandlers();

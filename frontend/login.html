@@ -386,13 +386,10 @@
     </div>
 
     <script>
-        // ========== ФУНКЦИЯ УВЕДОМЛЕНИЙ В СТИЛЕ БАЙТА ==========
+        // ========== ФУНКЦИЯ УВЕДОМЛЕНИЙ ==========
 function showByteNotification(message, type = 'success') {
-    // Удаляем предыдущее уведомление
     const oldNotification = document.querySelector('.byte-notification');
-    if (oldNotification) {
-        oldNotification.remove();
-    }
+    if (oldNotification) oldNotification.remove();
     
     const notification = document.createElement('div');
     notification.className = `byte-notification ${type === 'error' ? 'error' : ''}`;
@@ -413,175 +410,42 @@ function showByteNotification(message, type = 'success') {
     
     document.body.appendChild(notification);
     
-    // Автоматическое закрытие через 3 секунды
     setTimeout(() => {
         notification.classList.add('fade-out');
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
-// ========== КОНФИГУРАЦИЯ ==========
-const CONFIG = {
-    API_BASE_URL: '',
-    SESSION: {
-        tokenKey: 'authToken',
-        userKey: 'user'
-    },
-    REDIRECT: {
-        login: 'login.html',
-        admin: 'admin.html',
-        index: 'index.html'
-    },
-    DEMO: {
-        enabled: true,
-        users: {
-            director: {
-                username: 'director',
-                password: 'admin123',
-                role: 'director',
-                full_name: 'Директор школы',
-                avatar: 'images/character-hero.png'
-            },
-            deputy: {
-                username: 'deputy',
-                password: 'admin123',
-                role: 'deputy',
-                full_name: 'Заместитель директора',
-                avatar: 'images/character-hero.png'
-            }
-        }
-    }
-};
-
-// ========== СОХРАНЕНИЕ ДАННЫХ АВТОРИЗАЦИИ ==========
-function saveAuthData(token, user) {
-    sessionStorage.setItem(CONFIG.SESSION.tokenKey, token);
-    sessionStorage.setItem(CONFIG.SESSION.userKey, JSON.stringify(user));
-    console.log('✅ Данные авторизации сохранены');
-}
-
-// ========== ПРОВЕРКА АВТОРИЗАЦИИ ПРИ ЗАГРУЗКЕ ==========
-function checkAuthOnLoad() {
-    const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
-    const userStr = sessionStorage.getItem(CONFIG.SESSION.userKey);
+// ========== ПРОВЕРКА АВТОРИЗАЦИИ ==========
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📌 Страница входа');
     
-    if (token && userStr) {
+    // Проверяем, может уже авторизован
+    const userStr = sessionStorage.getItem('user');
+    const token = sessionStorage.getItem('authToken');
+    
+    if (userStr && token) {
         try {
             const user = JSON.parse(userStr);
-            console.log('✅ Уже авторизован:', user.role);
-            
-            // Перенаправляем на админку только если мы на странице входа
-            const currentPage = window.location.pathname.split('/').pop() || 'login.html';
-            if (currentPage === 'login.html' && (user.role === 'director' || user.role === 'deputy')) {
-                console.log('➡️ Перенаправление на admin.html');
-                window.location.href = CONFIG.REDIRECT.admin;
+            if (user.role === 'director' || user.role === 'deputy') {
+                console.log('✅ Уже авторизован, перенаправление');
+                window.location.href = 'admin.html';
+                return;
             }
-            return true;
         } catch (e) {
-            console.error('Ошибка парсинга пользователя');
             sessionStorage.clear();
         }
     }
-    return false;
-}
-
-// ========== ДЕМО-ВХОД ==========
-function demoLogin(role) {
-    const demoUser = CONFIG.DEMO.users[role];
-    if (!demoUser) return false;
-    
-    const user = {
-        id: Date.now(),
-        username: demoUser.username,
-        full_name: demoUser.full_name,
-        role: demoUser.role,
-        avatar: demoUser.avatar
-    };
-    
-    saveAuthData(`demo-token-${demoUser.role}`, user);
-    showByteNotification(`Вход выполнен как ${demoUser.full_name}`, 'success');
-    
-    setTimeout(() => {
-        window.location.href = CONFIG.REDIRECT.admin;
-    }, 1000);
-    
-    return true;
-}
-
-// ========== ОСНОВНАЯ ФУНКЦИЯ ВХОДА ==========
-async function handleLogin(username, password) {
-    // Демо-вход
-    for (const [role, demoUser] of Object.entries(CONFIG.DEMO.users)) {
-        if (username === demoUser.username && password === demoUser.password) {
-            return demoLogin(role);
-        }
-    }
-    
-    // Реальный сервер
-    try {
-        const response = await fetch(`${CONFIG.API_BASE_URL}/api/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
-        });
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error || `Ошибка сервера: ${response.status}`);
-        }
-        
-        if (data.success) {
-            saveAuthData(data.token, data.user);
-            showByteNotification('Вход выполнен успешно!', 'success');
-            
-            setTimeout(() => {
-                window.location.href = CONFIG.REDIRECT.admin;
-            }, 1000);
-            
-            return true;
-        } else {
-            throw new Error(data.error || 'Ошибка входа');
-        }
-        
-    } catch (error) {
-        console.error('❌ Ошибка входа:', error);
-        showByteNotification(error.message || 'Ошибка входа', 'error');
-        return false;
-    }
-}
-
-// ========== ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ ==========
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('📌 Страница входа загружена');
     
     const loginForm = document.getElementById('loginForm');
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
     const submitBtn = document.querySelector('button[type="submit"]');
     
-    if (!loginForm || !usernameInput || !passwordInput || !submitBtn) {
-        console.error('❌ Не найдены элементы формы');
-        return;
-    }
+    // Демо-заполнение (просто для удобства)
+    usernameInput.value = 'director';
+    passwordInput.value = 'admin123';
     
-    // Проверяем авторизацию ТОЛЬКО после полной загрузки
-    setTimeout(() => {
-        checkAuthOnLoad();
-    }, 100);
-    
-    // Автозаполнение для демо
-    setTimeout(() => {
-        if (usernameInput && !usernameInput.value) {
-            usernameInput.value = CONFIG.DEMO.users.director.username;
-            passwordInput.value = CONFIG.DEMO.users.director.password;
-        }
-    }, 100);
-    
-    // Обработчик отправки формы
     loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -600,32 +464,115 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Вход...';
         submitBtn.disabled = true;
         
-        await handleLogin(username, password);
-        
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
+        try {
+            // Отправляем запрос на сервер
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || `Ошибка ${response.status}`);
+            }
+            
+            if (data.success) {
+                // Сохраняем в sessionStorage
+                sessionStorage.setItem('authToken', data.token);
+                sessionStorage.setItem('user', JSON.stringify(data.user));
+                
+                console.log('✅ Вход успешен');
+                showByteNotification('Вход выполнен успешно!', 'success');
+                
+                setTimeout(() => {
+                    if (data.user.role === 'director' || data.user.role === 'deputy') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }, 1000);
+            } else {
+                throw new Error(data.error || 'Ошибка входа');
+            }
+            
+        } catch (error) {
+            console.error('❌ Ошибка:', error);
+            
+            // ДЕМО-РЕЖИМ (если сервер не работает)
+            if (username === 'director' && password === 'admin123') {
+                const user = {
+                    id: 1,
+                    username: 'director',
+                    full_name: 'Директор школы',
+                    role: 'director'
+                };
+                
+                sessionStorage.setItem('authToken', 'demo-token');
+                sessionStorage.setItem('user', JSON.stringify(user));
+                
+                showByteNotification('Демо-вход выполнен', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'admin.html';
+                }, 1000);
+                return;
+            }
+            
+            if (username === 'deputy' && password === 'admin123') {
+                const user = {
+                    id: 2,
+                    username: 'deputy',
+                    full_name: 'Заместитель директора',
+                    role: 'deputy'
+                };
+                
+                sessionStorage.setItem('authToken', 'demo-token');
+                sessionStorage.setItem('user', JSON.stringify(user));
+                
+                showByteNotification('Демо-вход выполнен', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'admin.html';
+                }, 1000);
+                return;
+            }
+            
+            showByteNotification(error.message || 'Ошибка входа', 'error');
+            passwordInput.value = '';
+            passwordInput.focus();
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
     });
 });
 
-// ========== ГЛОБАЛЬНЫЕ ФУНКЦИИ ==========
+// ========== ДЕМО-КНОПКИ ==========
 window.fillDemo = function(role) {
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
     
-    const demoUser = CONFIG.DEMO.users[role];
-    if (demoUser) {
-        usernameInput.value = demoUser.username;
-        passwordInput.value = demoUser.password;
-        showByteNotification(`Данные ${role === 'director' ? 'директора' : 'заместителя'} загружены`, 'success');
+    if (role === 'director') {
+        usernameInput.value = 'director';
+        passwordInput.value = 'admin123';
+        showByteNotification('Данные директора загружены', 'success');
+    } else {
+        usernameInput.value = 'deputy';
+        passwordInput.value = 'admin123';
+        showByteNotification('Данные заместителя загружены', 'success');
     }
 };
 
+// ========== ВЫХОД ==========
 window.logout = function() {
     sessionStorage.clear();
-    localStorage.clear();
     showByteNotification('Выход выполнен', 'success');
     setTimeout(() => {
-        window.location.href = CONFIG.REDIRECT.login;
+        window.location.href = 'login.html';
     }, 500);
 };
     </script>
