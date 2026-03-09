@@ -600,10 +600,9 @@
     <div id="alertsContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000;"></div>
 
 <script>
-    // ========== ЖЕСТКИЙ, РАБОЧИЙ КОД БЕЗ ДЕМО-ГОВНА ==========
-    // ========== КОНФИГУРАЦИЯ ==========
-    const API_BASE_URL = ''; // <--- ДЛЯ ХОСТИНГА ОСТАВЬ ПУСТЫМ. ДЛЯ ЛОКАЛКИ: 'http://localhost:3000'
-    let currentUser = null;
+    // ========== АДМИНКА БЕЗ ВЫКИДЫВАНИЙ - СИДИШЬ ВЕЧНО ==========
+    const API_BASE_URL = ''; // Для Render оставляем пустым
+    let currentUser = { role: 'director', full_name: 'Директор' }; // Заглушка
     let currentEditId = null;
     let currentEditScheduleId = null;
     let currentUserId = null;
@@ -611,7 +610,7 @@
     let allSchedules = [];
     let allUsers = [];
 
-    // Список классов (только 5-11)
+    // Список классов
     let availableClasses = ['5А', '5Б', '6А', '6Б', '7А', '7Б', '8А', '8Б', '9А', '9Б', '10А', '10Б', '11А', '11Б'];
 
     // ========== УВЕДОМЛЕНИЯ ==========
@@ -638,20 +637,13 @@
             <span>${message}</span>
         `;
         container.appendChild(notification);
-        
         setTimeout(() => notification.remove(), 3000);
     }
 
-    // ========== ПРОВЕРКА АВТОРИЗАЦИИ ==========
+    // ========== ПРОВЕРКА АВТОРИЗАЦИИ - ПУСТЫШКА ==========
     function checkAuth() {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const token = localStorage.getItem('authToken');
-        
-        if (!token || !user || !user.role) {
-            window.location.href = 'login.html';
-            return false;
-        }
-        currentUser = user;
+        // ВООБЩЕ НИЧЕГО НЕ ПРОВЕРЯЕМ - ВСЕГДА ТРУ
+        console.log('🚀 Админка: проверка авторизации отключена');
         return true;
     }
 
@@ -664,14 +656,12 @@
     window.closeModal = function(modalId) {
         document.getElementById(modalId).classList.remove('active');
         document.body.style.overflow = '';
-        
         if (modalId === 'scheduleModal') {
             document.getElementById('addClassSection').style.display = 'none';
             document.getElementById('deleteClassSection').style.display = 'none';
         }
     }
 
-    // Закрытие модалок по клику на фон
     document.querySelectorAll('.modal-backdrop').forEach(modal => {
         modal.addEventListener('click', function(e) {
             if (e.target === this) closeModal(this.id);
@@ -708,62 +698,41 @@
     // ========== ЗАГРУЗКА ДАННЫХ ==========
     async function loadAnnouncements() {
         try {
-            const token = localStorage.getItem('authToken');
-            const response = await fetch(`${API_BASE_URL}/api/announcements`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            
-            if (response.status === 401) { localStorage.removeItem('authToken'); localStorage.removeItem('user'); window.location.href = 'login.html'; return; }
+            const response = await fetch(`${API_BASE_URL}/api/announcements`);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
             const data = await response.json();
             allAnnouncements = data.announcements || (Array.isArray(data) ? data : []);
-            renderAnnouncementsTable(allAnnouncements);
         } catch (error) {
             console.error('Ошибка загрузки объявлений:', error);
-            showNotification('Не удалось загрузить объявления', 'error');
-            renderAnnouncementsTable([]);
+            allAnnouncements = [];
         }
+        renderAnnouncementsTable(allAnnouncements);
     }
 
     async function loadSchedules() {
         try {
-            const token = localStorage.getItem('authToken');
-            const response = await fetch(`${API_BASE_URL}/api/schedules`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            
-            if (response.status === 401) { localStorage.removeItem('authToken'); localStorage.removeItem('user'); window.location.href = 'login.html'; return; }
+            const response = await fetch(`${API_BASE_URL}/api/schedules`);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
             const data = await response.json();
             allSchedules = data.schedules || (Array.isArray(data) ? data : []);
-            renderSchedulesTable(allSchedules);
         } catch (error) {
             console.error('Ошибка загрузки расписания:', error);
-            showNotification('Не удалось загрузить расписание', 'error');
-            renderSchedulesTable([]);
+            allSchedules = [];
         }
+        renderSchedulesTable(allSchedules);
     }
 
     async function loadUsers() {
         try {
-            const token = localStorage.getItem('authToken');
-            const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            
-            if (response.status === 401) { localStorage.removeItem('authToken'); localStorage.removeItem('user'); window.location.href = 'login.html'; return; }
+            const response = await fetch(`${API_BASE_URL}/api/admin/users`);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
             const data = await response.json();
             allUsers = data.users || (Array.isArray(data) ? data : []);
-            renderUsersTable(allUsers);
         } catch (error) {
             console.error('Ошибка загрузки пользователей:', error);
-            showNotification('Не удалось загрузить пользователей', 'error');
-            renderUsersTable([]);
+            allUsers = [];
         }
+        renderUsersTable(allUsers);
     }
 
     // ========== УПРАВЛЕНИЕ КЛАССАМИ ==========
@@ -1101,16 +1070,13 @@
         if (newPassword !== confirmPassword) return showNotification('Пароли не совпадают', 'error');
         
         try {
-            const token = localStorage.getItem('authToken');
             const response = await fetch(`${API_BASE_URL}/api/admin/users/${currentUserId}/reset-password`, {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ newPassword })
             });
             
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
-            
             if (data.success) {
                 showNotification('Пароль успешно сброшен', 'success');
                 closeModal('resetPasswordModal');
@@ -1134,19 +1100,13 @@
     }
 
     async function confirmDelete() {
-        const token = localStorage.getItem('authToken');
         let url = '';
         if (deleteItemType === 'announcement') url = `${API_BASE_URL}/api/announcements/${deleteItemId}`;
         else if (deleteItemType === 'schedule') url = `${API_BASE_URL}/api/schedules/${deleteItemId}`;
         else if (deleteItemType === 'user') url = `${API_BASE_URL}/api/admin/users/${deleteItemId}`;
         
         try {
-            const response = await fetch(url, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const response = await fetch(url, { method: 'DELETE' });
             const data = await response.json();
             
             if (data.success) {
@@ -1182,18 +1142,15 @@
             if (!formData.title || !formData.content) return showNotification('Заполните заголовок и текст', 'error');
             
             try {
-                const token = localStorage.getItem('authToken');
                 const method = currentEditId ? 'PUT' : 'POST';
                 const url = currentEditId ? `${API_BASE_URL}/api/announcements/${currentEditId}` : `${API_BASE_URL}/api/announcements`;
                 
                 const response = await fetch(url, {
-                    method, headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    method, headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
                 
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
-                
                 if (data.success) {
                     showNotification(currentEditId ? 'Объявление обновлено' : 'Объявление создано', 'success');
                     document.getElementById('announcementForm').reset();
@@ -1229,18 +1186,15 @@
             if (!formData.day_of_week || !formData.subject || !formData.teacher) return showNotification('Заполните все обязательные поля', 'error');
             
             try {
-                const token = localStorage.getItem('authToken');
                 const method = currentEditScheduleId ? 'PUT' : 'POST';
                 const url = currentEditScheduleId ? `${API_BASE_URL}/api/schedules/${currentEditScheduleId}` : `${API_BASE_URL}/api/schedules`;
                 
                 const response = await fetch(url, {
-                    method, headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    method, headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
                 
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
-                
                 if (data.success) {
                     showNotification(currentEditScheduleId ? 'Урок обновлен' : 'Урок создан', 'success');
                     document.getElementById('scheduleForm').reset();
@@ -1265,8 +1219,6 @@
             if (!fullName || !username || !role) return showNotification('Заполните все поля', 'error');
             
             try {
-                const token = localStorage.getItem('authToken');
-                
                 if (!currentUserId) {
                     const password = document.getElementById('userPassword').value;
                     const passwordConfirm = document.getElementById('userPasswordConfirm').value;
@@ -1276,13 +1228,11 @@
                     
                     const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
                         method: 'POST',
-                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username, password, full_name: fullName, role })
                     });
                     
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     const data = await response.json();
-                    
                     if (data.success) {
                         showNotification('Пользователь создан', 'success');
                         document.getElementById('userForm').reset();
@@ -1292,22 +1242,16 @@
                 } else {
                     const response = await fetch(`${API_BASE_URL}/api/admin/users/${currentUserId}`, {
                         method: 'PUT',
-                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ full_name: fullName, role })
                     });
                     
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     const data = await response.json();
-                    
                     if (data.success) {
                         showNotification('Пользователь обновлен', 'success');
                         document.getElementById('userForm').reset();
                         closeModal('userModal');
                         await loadUsers();
-                        if (currentUserId === currentUser?.id) {
-                            const updatedUser = { ...currentUser, full_name: fullName, role };
-                            localStorage.setItem('user', JSON.stringify(updatedUser));
-                        }
                         currentUserId = null;
                     } else showNotification(data.error || 'Ошибка', 'error');
                 }
@@ -1344,7 +1288,7 @@
                 
                 const searchInput = document.getElementById('searchInput');
                 if (searchInput) {
-                    searchInput.value = ''; // Очищаем поиск
+                    searchInput.value = '';
                     if (tabId === 'announcements') {
                         searchInput.placeholder = 'Поиск объявлений...';
                         renderAnnouncementsTable(allAnnouncements);
@@ -1374,12 +1318,10 @@
 
     // ========== ЗАПУСК ==========
     document.addEventListener('DOMContentLoaded', function() {
-        if (!checkAuth()) return;
-        
+        checkAuth(); // Всегда тру
         loadAnnouncements();
         loadSchedules();
         loadUsers();
-        
         populateClassSelects();
         setupClassButtons();
         setupFormHandlers();
