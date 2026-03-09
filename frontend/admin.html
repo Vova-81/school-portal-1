@@ -629,15 +629,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // ВСЁ ОК - загружаем данные
-        console.log('✅ Доступ разрешен');
+        console.log('✅ Доступ разрешен, загружаем данные...');
         
-        // Загружаем данные с сервера
-        loadAnnouncements();
-        loadSchedules();
-        loadUsers();
+        // Даем небольшую задержку для стабилизации
+        setTimeout(() => {
+            loadAnnouncements();
+            loadSchedules();
+            loadUsers();
+        }, 100);
         
     } catch (e) {
-        console.error('❌ Ошибка:', e);
+        console.error('❌ Ошибка парсинга:', e);
+        sessionStorage.clear();
         window.location.href = 'login.html';
     }
 });
@@ -648,10 +651,6 @@ const CONFIG = {
     SESSION: {
         tokenKey: 'authToken',
         userKey: 'user'
-    },
-    REDIRECT: {
-        login: 'login.html',
-        index: 'index.html'
     }
 };
 
@@ -977,7 +976,12 @@ function updateFiltersForTab(tabId) {
 // ========== ЗАГРУЗКА ДАННЫХ С СЕРВЕРА ==========
 async function loadAnnouncements() {
     try {
-        const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
+        const token = sessionStorage.getItem('authToken');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
         const response = await fetch(`/api/announcements`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -986,7 +990,7 @@ async function loadAnnouncements() {
         
         if (response.status === 401) {
             sessionStorage.clear();
-            window.location.href = CONFIG.REDIRECT.login;
+            window.location.href = 'login.html';
             return;
         }
         
@@ -1016,7 +1020,12 @@ async function loadAnnouncements() {
 
 async function loadSchedules() {
     try {
-        const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
+        const token = sessionStorage.getItem('authToken');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
         const response = await fetch(`/api/schedules`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -1025,7 +1034,7 @@ async function loadSchedules() {
         
         if (response.status === 401) {
             sessionStorage.clear();
-            window.location.href = CONFIG.REDIRECT.login;
+            window.location.href = 'login.html';
             return;
         }
         
@@ -1055,7 +1064,12 @@ async function loadSchedules() {
 
 async function loadUsers() {
     try {
-        const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
+        const token = sessionStorage.getItem('authToken');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
         const response = await fetch(`/api/admin/users`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -1064,7 +1078,7 @@ async function loadUsers() {
         
         if (response.status === 401) {
             sessionStorage.clear();
-            window.location.href = CONFIG.REDIRECT.login;
+            window.location.href = 'login.html';
             return;
         }
         
@@ -1366,7 +1380,12 @@ async function resetUserPassword() {
     }
     
     try {
-        const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
+        const token = sessionStorage.getItem('authToken');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
         const response = await fetch(`/api/admin/users/${currentUserId}/reset-password`, {
             method: 'POST',
             headers: {
@@ -1413,7 +1432,12 @@ function showDeleteConfirm(type, id, name) {
 }
 
 async function confirmDelete() {
-    const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
+    const token = sessionStorage.getItem('authToken');
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+    
     let url = '';
     
     if (deleteItemType === 'announcement') {
@@ -1481,7 +1505,12 @@ function setupFormHandlers() {
         }
         
         try {
-            const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
+            const token = sessionStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
             const method = currentEditId ? 'PUT' : 'POST';
             const url = currentEditId ? `/api/announcements/${currentEditId}` : '/api/announcements';
             
@@ -1544,7 +1573,12 @@ function setupFormHandlers() {
         }
         
         try {
-            const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
+            const token = sessionStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
             const method = currentEditScheduleId ? 'PUT' : 'POST';
             const url = currentEditScheduleId ? `/api/schedules/${currentEditScheduleId}` : '/api/schedules';
             
@@ -1593,7 +1627,11 @@ function setupFormHandlers() {
         }
         
         try {
-            const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
+            const token = sessionStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
             
             if (!currentUserId) {
                 const password = document.getElementById('userPassword').value;
@@ -1656,7 +1694,7 @@ function setupFormHandlers() {
                     
                     if (currentUserId === currentUser?.id) {
                         const updatedUser = { ...currentUser, full_name: fullName, role };
-                        sessionStorage.setItem(CONFIG.SESSION.userKey, JSON.stringify(updatedUser));
+                        sessionStorage.setItem('user', JSON.stringify(updatedUser));
                     }
                     
                     currentUserId = null;
@@ -1680,12 +1718,9 @@ document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
     
     if (confirm('Вы действительно хотите выйти?')) {
         console.log('🚪 Выход из системы');
-        
         sessionStorage.clear();
         localStorage.clear();
-        
-        console.log('✅ Данные очищены');
-        window.location.href = CONFIG.REDIRECT.login;
+        window.location.href = 'login.html';
     }
 });
 
@@ -1720,7 +1755,6 @@ function initTabs() {
                 } else if (tabId === 'users') {
                     searchInput.placeholder = 'Поиск пользователей...';
                 }
-                // НЕ очищаем searchInput.value при переключении
             }
         });
     });
@@ -1737,6 +1771,14 @@ document.getElementById('searchInput')?.addEventListener('input', function() {
 
 // ========== КНОПКА ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ ==========
 document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
+// Заполняем селекты классов сразу
+populateClassSelects();
+setupClassButtons();
+setupFormHandlers();
+updateFiltersForTab('announcements');
+initTabs();
 </script>
 </body>
 </html>
