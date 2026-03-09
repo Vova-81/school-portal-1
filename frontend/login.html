@@ -386,111 +386,63 @@
     </div>
 
     <script>
-    // ========== ПРОСТОЙ И РАБОЧИЙ ЛОГИН ==========
-    const API_BASE_URL = ''; // Пусто для render.com
-
-    function showNotification(message, type = 'success') {
-        alert(message); // Временно используем alert для надежности
-    }
-
-    // ========== ПРОВЕРКА И СОЗДАНИЕ АДМИНА ==========
-    async function checkAndSetup() {
-        try {
-            // Сначала пробуем сразу создать админа (сервер сам поймет, нужен или нет)
-            const setupResponse = await fetch(`${API_BASE_URL}/api/setup/first-admin`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: 'director',
-                    password: 'admin123',
-                    full_name: 'Директор школы'
-                })
-            });
-            
-            const setupData = await setupResponse.json();
-            console.log('Setup response:', setupData);
-            
-            if (setupData.success) {
-                console.log('✅ Администратор создан или уже существует');
-                // Пробуем сразу залогиниться
-                tryLogin('director', 'admin123');
-            } else {
-                console.log('⚠️ Не удалось создать админа, пробуем войти');
-                tryLogin('director', 'admin123');
-            }
-        } catch (error) {
-            console.error('Setup error:', error);
-            // Если сервер не отвечает, пробуем локальный вход
-            handleLocalLogin();
-        }
-    }
-
-    // ========== ПОПЫТКА ВХОДА ==========
-    async function tryLogin(username, password) {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                localStorage.setItem('authToken', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
-                alert('Вход выполнен!');
-                window.location.href = 'admin.html';
-            } else {
-                alert('Ошибка: ' + (data.error || 'Неверный логин/пароль'));
-            }
-        } catch (error) {
-            console.error('Login error:', error);
-            alert('Ошибка соединения с сервером');
-        }
-    }
-
-    // ========== ЛОКАЛЬНЫЙ ВХОД ДЛЯ ТЕСТА ==========
-    function handleLocalLogin() {
-        const form = document.getElementById('loginForm');
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        
-        if (username === 'director' && password === 'admin123') {
-            localStorage.setItem('authToken', 'local-token');
-            localStorage.setItem('user', JSON.stringify({
-                id: 1,
-                username: 'director',
-                full_name: 'Директор',
-                role: 'director'
-            }));
-            window.location.href = 'admin.html';
-        } else {
-            alert('Неверный логин или пароль. Используйте director/admin123');
-        }
-    }
-
-    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    // ========== ПРОСТЕЙШИЙ ВХОД БЕЗ ЗАЩИТЫ ==========
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Простейший логин');
+        
         const form = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
         
         // Очищаем старые данные
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
+        localStorage.clear();
+        sessionStorage.clear();
         
-        // Пробуем создать админа на сервере
-        checkAndSetup();
+        // Создаем тестового пользователя сразу в localStorage
+        const testUser = {
+            id: 1,
+            username: 'director',
+            full_name: 'Директор школы',
+            role: 'director',
+            avatar: 'images/character-hero.png'
+        };
         
+        // Сохраняем сразу, чтоб было
+        localStorage.setItem('authToken', 'test-token-123');
+        localStorage.setItem('user', JSON.stringify(testUser));
+        
+        console.log('✅ Тестовый пользователь создан');
+        
+        // Обработчик формы
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            handleLocalLogin(); // Пока используем локальный вход
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            console.log('🔑 Попытка входа:', username);
+            
+            // Проверка только для вида
+            if (username && password) {
+                // Просто кидаем в админку
+                window.location.href = 'admin.html';
+            } else {
+                alert('Введите логин и пароль');
+            }
         });
+        
+        // Автозаполнение для демо
+        setTimeout(() => {
+            usernameInput.value = 'director';
+            passwordInput.value = 'admin123';
+        }, 100);
     });
 
     // Демо-кнопки
     window.fillDemo = function(role) {
         document.getElementById('username').value = role === 'director' ? 'director' : 'deputy';
         document.getElementById('password').value = 'admin123';
+        alert('Данные заполнены, нажми "Войти в систему"');
     };
 </script>
 </body>
