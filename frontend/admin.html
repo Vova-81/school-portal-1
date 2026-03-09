@@ -1686,7 +1686,7 @@ document.getElementById('logoutBtn')?.addEventListener('click', function() {
     }
 });
 
-// ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
+// ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК - БЕЗ ПОДСТАВЫ ==========
 function initTabs() {
     document.querySelectorAll('.filter-pill').forEach(btn => {
         btn.addEventListener('click', function(e) {
@@ -1710,28 +1710,43 @@ function initTabs() {
             
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
+                // Просто меняем плейсхолдер, НО НЕ ТРОГАЕМ ЗНАЧЕНИЕ!
                 if (tabId === 'announcements') {
                     searchInput.placeholder = 'Поиск объявлений...';
-                    loadAnnouncements();
                 } else if (tabId === 'schedule') {
                     searchInput.placeholder = 'Поиск уроков...';
-                    loadSchedules();
                 } else if (tabId === 'users') {
                     searchInput.placeholder = 'Поиск пользователей...';
-                    loadUsers();
                 }
             }
         });
     });
 }
 
-// ========== ПОИСК ==========
+// ========== ПОИСК - ТЕПЕРЬ НЕ ПЕРЕЗАГРУЖАЕТ ==========
 document.getElementById('searchInput')?.addEventListener('input', function() {
     const activeTab = document.querySelector('.filter-pill.active')?.getAttribute('data-tab');
+    const searchTerm = this.value.toLowerCase();
     
-    if (activeTab === 'announcements') filterAnnouncements();
-    else if (activeTab === 'schedule') filterSchedules();
-    else if (activeTab === 'users') filterUsers();
+    if (activeTab === 'announcements') {
+        const filtered = allAnnouncements.filter(ann => 
+            (ann.title && ann.title.toLowerCase().includes(searchTerm)) || 
+            (ann.content && ann.content.toLowerCase().includes(searchTerm))
+        );
+        renderAnnouncementsTable(filtered);
+    } else if (activeTab === 'schedule') {
+        const filtered = allSchedules.filter(s => 
+            (s.subject && s.subject.toLowerCase().includes(searchTerm)) || 
+            (s.teacher && s.teacher.toLowerCase().includes(searchTerm))
+        );
+        renderSchedulesTable(filtered);
+    } else if (activeTab === 'users') {
+        const filtered = allUsers.filter(user => 
+            (user.full_name && user.full_name.toLowerCase().includes(searchTerm)) || 
+            (user.username && user.username.toLowerCase().includes(searchTerm))
+        );
+        renderUsersTable(filtered);
+    }
 });
 
 // ========== КНОПКА ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ ==========
