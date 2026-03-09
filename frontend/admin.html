@@ -598,8 +598,9 @@
 
     <!-- Контейнер для уведомлений -->
     <div id="alertsContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000;"></div>
+
 <script>
-// ========== КОНФИГУРАЦИЯ ==========
+    // ========== КОНФИГУРАЦИЯ ==========
 const CONFIG = {
     API_BASE_URL: '',
     SESSION: {
@@ -651,7 +652,6 @@ function checkAuth() {
     if (!token || !user || !user.role) {
         console.log('🚫 Не авторизован, перенаправление на login.html');
         sessionStorage.clear();
-        alert('Сессия истекла. Пожалуйста, войдите снова.');
         window.location.href = CONFIG.REDIRECT.login;
         return false;
     }
@@ -660,7 +660,6 @@ function checkAuth() {
     if (user.role !== 'director' && user.role !== 'deputy') {
         console.log('🚫 Нет прав доступа к админке');
         sessionStorage.clear();
-        alert('У вас нет прав доступа к этой странице.');
         window.location.href = CONFIG.REDIRECT.index;
         return false;
     }
