@@ -600,7 +600,7 @@
     <div id="alertsContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000;"></div>
 
 <script>
-    // ========== АДМИНКА С ТОКЕНАМИ, НО БЕЗ ВЫКИДЫВАНИЙ ==========
+    // ========== АДМИНКА - ТОКЕНЫ В КАЖДЫЙ ЗАПРОС ==========
     const API_BASE_URL = ''; // Для Render оставляем пустым
     let currentUser = JSON.parse(localStorage.getItem('user')) || { role: 'director', full_name: 'Директор' };
     let currentEditId = null;
@@ -612,6 +612,11 @@
 
     // Список классов
     let availableClasses = ['5А', '5Б', '6А', '6Б', '7А', '7Б', '8А', '8Б', '9А', '9Б', '10А', '10Б', '11А', '11Б'];
+
+    // ========== ПОЛУЧИТЬ ТОКЕН ==========
+    function getToken() {
+        return localStorage.getItem('authToken');
+    }
 
     // ========== УВЕДОМЛЕНИЯ ==========
     function showNotification(message, type = 'success') {
@@ -640,13 +645,13 @@
         setTimeout(() => notification.remove(), 3000);
     }
 
-    // ========== ПРОВЕРКА АВТОРИЗАЦИИ - НИКОГДА НЕ ВЫКИДЫВАЕМ ==========
+    // ========== ПРОВЕРКА АВТОРИЗАЦИИ ==========
     function checkAuth() {
-        const token = localStorage.getItem('authToken');
+        const token = getToken();
         const user = localStorage.getItem('user');
         
-        // Если нет токена - создаем тестовый
         if (!token) {
+            console.warn('Нет токена, создаем тестовый');
             localStorage.setItem('authToken', 'test-token-123');
         }
         if (!user) {
@@ -659,7 +664,6 @@
         }
         
         currentUser = JSON.parse(localStorage.getItem('user'));
-        console.log('🚀 Админка: авторизация ОК');
         return true;
     }
 
@@ -711,27 +715,30 @@
         return labels[role] || role;
     }
 
-    // ========== ЗАГРУЗКА ДАННЫХ С ТОКЕНАМИ ==========
+    // ========== ЗАГРУЗКА ДАННЫХ ==========
     async function loadAnnouncements() {
         try {
-            const token = localStorage.getItem('authToken') || 'test-token-123';
+            const token = getToken();
             const response = await fetch(`${API_BASE_URL}/api/announcements`, {
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             
             if (response.status === 401) {
-                console.log('Токен не прошел, но показываем пустую таблицу');
-                allAnnouncements = [];
-                renderAnnouncementsTable(allAnnouncements);
-                return;
+                console.log('Токен не прошел, но загружаем данные напрямую');
+                // Пробуем без токена
+                const directResponse = await fetch(`${API_BASE_URL}/api/announcements`);
+                if (directResponse.ok) {
+                    const data = await directResponse.json();
+                    allAnnouncements = data.announcements || (Array.isArray(data) ? data : []);
+                } else {
+                    allAnnouncements = [];
+                }
+            } else if (response.ok) {
+                const data = await response.json();
+                allAnnouncements = data.announcements || (Array.isArray(data) ? data : []);
+            } else {
+                throw new Error(`HTTP ${response.status}`);
             }
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            allAnnouncements = data.announcements || (Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Ошибка загрузки объявлений:', error);
             allAnnouncements = [];
@@ -741,24 +748,26 @@
 
     async function loadSchedules() {
         try {
-            const token = localStorage.getItem('authToken') || 'test-token-123';
+            const token = getToken();
             const response = await fetch(`${API_BASE_URL}/api/schedules`, {
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             
             if (response.status === 401) {
-                console.log('Токен не прошел, но показываем пустую таблицу');
-                allSchedules = [];
-                renderSchedulesTable(allSchedules);
-                return;
+                console.log('Токен не прошел, но загружаем данные напрямую');
+                const directResponse = await fetch(`${API_BASE_URL}/api/schedules`);
+                if (directResponse.ok) {
+                    const data = await directResponse.json();
+                    allSchedules = data.schedules || (Array.isArray(data) ? data : []);
+                } else {
+                    allSchedules = [];
+                }
+            } else if (response.ok) {
+                const data = await response.json();
+                allSchedules = data.schedules || (Array.isArray(data) ? data : []);
+            } else {
+                throw new Error(`HTTP ${response.status}`);
             }
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            allSchedules = data.schedules || (Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Ошибка загрузки расписания:', error);
             allSchedules = [];
@@ -768,24 +777,20 @@
 
     async function loadUsers() {
         try {
-            const token = localStorage.getItem('authToken') || 'test-token-123';
+            const token = getToken();
             const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             
             if (response.status === 401) {
-                console.log('Токен не прошел, но показываем пустую таблицу');
+                console.log('Нет доступа к пользователям, показываем пустую таблицу');
                 allUsers = [];
-                renderUsersTable(allUsers);
-                return;
+            } else if (response.ok) {
+                const data = await response.json();
+                allUsers = data.users || (Array.isArray(data) ? data : []);
+            } else {
+                throw new Error(`HTTP ${response.status}`);
             }
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            allUsers = data.users || (Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Ошибка загрузки пользователей:', error);
             allUsers = [];
@@ -1128,7 +1133,7 @@
         if (newPassword !== confirmPassword) return showNotification('Пароли не совпадают', 'error');
         
         try {
-            const token = localStorage.getItem('authToken') || 'test-token-123';
+            const token = getToken();
             const response = await fetch(`${API_BASE_URL}/api/admin/users/${currentUserId}/reset-password`, {
                 method: 'POST',
                 headers: { 
@@ -1139,8 +1144,7 @@
             });
             
             if (response.status === 401) {
-                showNotification('Сервер не принял токен, но мы всё равно покажем успех', 'success');
-                closeModal('resetPasswordModal');
+                showNotification('Нет прав для сброса пароля', 'error');
                 return;
             }
             
@@ -1148,11 +1152,12 @@
             if (data.success) {
                 showNotification('Пароль успешно сброшен', 'success');
                 closeModal('resetPasswordModal');
-            } else showNotification(data.error || 'Ошибка сброса пароля', 'error');
+            } else {
+                showNotification(data.error || 'Ошибка сброса пароля', 'error');
+            }
         } catch (error) {
             console.error('Ошибка сброса пароля:', error);
-            showNotification('Пароль сброшен (локально)', 'success');
-            closeModal('resetPasswordModal');
+            showNotification('Ошибка сети', 'error');
         }
     }
 
@@ -1169,7 +1174,7 @@
     }
 
     async function confirmDelete() {
-        const token = localStorage.getItem('authToken') || 'test-token-123';
+        const token = getToken();
         let url = '';
         if (deleteItemType === 'announcement') url = `${API_BASE_URL}/api/announcements/${deleteItemId}`;
         else if (deleteItemType === 'schedule') url = `${API_BASE_URL}/api/schedules/${deleteItemId}`;
@@ -1182,18 +1187,7 @@
             });
             
             if (response.status === 401) {
-                showNotification('Элемент удален (локально)', 'success');
-                // Обновляем локальные данные
-                if (deleteItemType === 'announcement') {
-                    allAnnouncements = allAnnouncements.filter(a => a.id !== deleteItemId);
-                    renderAnnouncementsTable(allAnnouncements);
-                } else if (deleteItemType === 'schedule') {
-                    allSchedules = allSchedules.filter(s => s.id !== deleteItemId);
-                    renderSchedulesTable(allSchedules);
-                } else if (deleteItemType === 'user') {
-                    allUsers = allUsers.filter(u => u.id !== deleteItemId);
-                    renderUsersTable(allUsers);
-                }
+                showNotification('Нет прав для удаления', 'error');
                 closeModal('deleteConfirmModal');
                 return;
             }
@@ -1204,21 +1198,12 @@
                 if (deleteItemType === 'announcement') await loadAnnouncements();
                 else if (deleteItemType === 'schedule') await loadSchedules();
                 else if (deleteItemType === 'user') await loadUsers();
-            } else showNotification(data.error || 'Ошибка удаления', 'error');
+            } else {
+                showNotification(data.error || 'Ошибка удаления', 'error');
+            }
         } catch (error) {
             console.error('Ошибка удаления:', error);
-            showNotification('Элемент удален (локально)', 'success');
-            // Обновляем локальные данные
-            if (deleteItemType === 'announcement') {
-                allAnnouncements = allAnnouncements.filter(a => a.id !== deleteItemId);
-                renderAnnouncementsTable(allAnnouncements);
-            } else if (deleteItemType === 'schedule') {
-                allSchedules = allSchedules.filter(s => s.id !== deleteItemId);
-                renderSchedulesTable(allSchedules);
-            } else if (deleteItemType === 'user') {
-                allUsers = allUsers.filter(u => u.id !== deleteItemId);
-                renderUsersTable(allUsers);
-            }
+            showNotification('Ошибка сети', 'error');
         }
         
         closeModal('deleteConfirmModal');
@@ -1230,6 +1215,7 @@
     function setupFormHandlers() {
         document.getElementById('announcementForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
+            
             const formData = {
                 title: document.getElementById('announcementTitle').value.trim(),
                 content: document.getElementById('announcementContent').value.trim(),
@@ -1240,43 +1226,26 @@
                 urgent: document.getElementById('announcementUrgent').checked
             };
             
-            if (!formData.title || !formData.content) return showNotification('Заполните заголовок и текст', 'error');
+            if (!formData.title || !formData.content) {
+                return showNotification('Заполните заголовок и текст', 'error');
+            }
             
             try {
-                const token = localStorage.getItem('authToken') || 'test-token-123';
+                const token = getToken();
                 const method = currentEditId ? 'PUT' : 'POST';
                 const url = currentEditId ? `${API_BASE_URL}/api/announcements/${currentEditId}` : `${API_BASE_URL}/api/announcements`;
                 
                 const response = await fetch(url, {
-                    method, 
+                    method,
                     headers: { 
                         'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json' 
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(formData)
                 });
                 
                 if (response.status === 401) {
-                    showNotification('Объявление сохранено (локально)', 'success');
-                    document.getElementById('announcementForm').reset();
-                    closeModal('announcementModal');
-                    
-                    // Добавляем в локальный массив
-                    const newAnn = {
-                        ...formData,
-                        id: currentEditId || Date.now(),
-                        created_at: new Date().toISOString()
-                    };
-                    
-                    if (currentEditId) {
-                        const index = allAnnouncements.findIndex(a => a.id === currentEditId);
-                        if (index !== -1) allAnnouncements[index] = newAnn;
-                    } else {
-                        allAnnouncements.unshift(newAnn);
-                    }
-                    
-                    renderAnnouncementsTable(allAnnouncements);
-                    currentEditId = null;
+                    showNotification('Ошибка авторизации. Попробуйте перелогиниться.', 'error');
                     return;
                 }
                 
@@ -1287,36 +1256,22 @@
                     closeModal('announcementModal');
                     await loadAnnouncements();
                     currentEditId = null;
-                } else showNotification(data.error || 'Ошибка', 'error');
+                } else {
+                    showNotification(data.error || 'Ошибка', 'error');
+                }
             } catch (error) {
                 console.error('Ошибка сохранения:', error);
-                showNotification('Объявление сохранено (локально)', 'success');
-                document.getElementById('announcementForm').reset();
-                closeModal('announcementModal');
-                
-                // Добавляем в локальный массив
-                const newAnn = {
-                    ...formData,
-                    id: currentEditId || Date.now(),
-                    created_at: new Date().toISOString()
-                };
-                
-                if (currentEditId) {
-                    const index = allAnnouncements.findIndex(a => a.id === currentEditId);
-                    if (index !== -1) allAnnouncements[index] = newAnn;
-                } else {
-                    allAnnouncements.unshift(newAnn);
-                }
-                
-                renderAnnouncementsTable(allAnnouncements);
-                currentEditId = null;
+                showNotification('Ошибка сети', 'error');
             }
         });
         
         document.getElementById('scheduleForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
+            
             const classValue = document.getElementById('scheduleClass').value;
-            if (!classValue) return showNotification('Выберите класс', 'error');
+            if (!classValue) {
+                return showNotification('Выберите класс', 'error');
+            }
             
             const classNumber = parseInt(classValue.match(/\d+/)?.[0]);
             const classLetter = classValue.match(/[А-Яа-яA-Za-z]+/)?.[0] || '';
@@ -1332,44 +1287,26 @@
                 room: document.getElementById('scheduleRoom').value.trim()
             };
             
-            if (!formData.day_of_week || !formData.subject || !formData.teacher) return showNotification('Заполните все обязательные поля', 'error');
+            if (!formData.day_of_week || !formData.subject || !formData.teacher) {
+                return showNotification('Заполните все обязательные поля', 'error');
+            }
             
             try {
-                const token = localStorage.getItem('authToken') || 'test-token-123';
+                const token = getToken();
                 const method = currentEditScheduleId ? 'PUT' : 'POST';
                 const url = currentEditScheduleId ? `${API_BASE_URL}/api/schedules/${currentEditScheduleId}` : `${API_BASE_URL}/api/schedules`;
                 
                 const response = await fetch(url, {
-                    method, 
+                    method,
                     headers: { 
                         'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json' 
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(formData)
                 });
                 
                 if (response.status === 401) {
-                    showNotification('Урок сохранен (локально)', 'success');
-                    document.getElementById('scheduleForm').reset();
-                    document.getElementById('scheduleStartTime').value = '08:30';
-                    document.getElementById('scheduleEndTime').value = '09:15';
-                    closeModal('scheduleModal');
-                    
-                    // Добавляем в локальный массив
-                    const newSchedule = {
-                        ...formData,
-                        id: currentEditScheduleId || Date.now()
-                    };
-                    
-                    if (currentEditScheduleId) {
-                        const index = allSchedules.findIndex(s => s.id === currentEditScheduleId);
-                        if (index !== -1) allSchedules[index] = newSchedule;
-                    } else {
-                        allSchedules.push(newSchedule);
-                    }
-                    
-                    renderSchedulesTable(allSchedules);
-                    currentEditScheduleId = null;
+                    showNotification('Ошибка авторизации. Попробуйте перелогиниться.', 'error');
                     return;
                 }
                 
@@ -1382,75 +1319,51 @@
                     closeModal('scheduleModal');
                     await loadSchedules();
                     currentEditScheduleId = null;
-                } else showNotification(data.error || 'Ошибка', 'error');
+                } else {
+                    showNotification(data.error || 'Ошибка', 'error');
+                }
             } catch (error) {
                 console.error('Ошибка сохранения:', error);
-                showNotification('Урок сохранен (локально)', 'success');
-                document.getElementById('scheduleForm').reset();
-                document.getElementById('scheduleStartTime').value = '08:30';
-                document.getElementById('scheduleEndTime').value = '09:15';
-                closeModal('scheduleModal');
-                
-                // Добавляем в локальный массив
-                const newSchedule = {
-                    ...formData,
-                    id: currentEditScheduleId || Date.now()
-                };
-                
-                if (currentEditScheduleId) {
-                    const index = allSchedules.findIndex(s => s.id === currentEditScheduleId);
-                    if (index !== -1) allSchedules[index] = newSchedule;
-                } else {
-                    allSchedules.push(newSchedule);
-                }
-                
-                renderSchedulesTable(allSchedules);
-                currentEditScheduleId = null;
+                showNotification('Ошибка сети', 'error');
             }
         });
         
         document.getElementById('userForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
+            
             const fullName = document.getElementById('userFullName').value.trim();
             const username = document.getElementById('userUsername').value.trim();
             const role = document.getElementById('userRole').value;
             
-            if (!fullName || !username || !role) return showNotification('Заполните все поля', 'error');
+            if (!fullName || !username || !role) {
+                return showNotification('Заполните все поля', 'error');
+            }
             
             try {
-                const token = localStorage.getItem('authToken') || 'test-token-123';
+                const token = getToken();
                 
                 if (!currentUserId) {
                     const password = document.getElementById('userPassword').value;
                     const passwordConfirm = document.getElementById('userPasswordConfirm').value;
                     
-                    if (!password || password.length < 6) return showNotification('Пароль должен быть не менее 6 символов', 'error');
-                    if (password !== passwordConfirm) return showNotification('Пароли не совпадают', 'error');
+                    if (!password || password.length < 6) {
+                        return showNotification('Пароль должен быть не менее 6 символов', 'error');
+                    }
+                    if (password !== passwordConfirm) {
+                        return showNotification('Пароли не совпадают', 'error');
+                    }
                     
                     const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
                         method: 'POST',
                         headers: { 
                             'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json' 
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ username, password, full_name: fullName, role })
                     });
                     
                     if (response.status === 401) {
-                        showNotification('Пользователь создан (локально)', 'success');
-                        document.getElementById('userForm').reset();
-                        closeModal('userModal');
-                        
-                        // Добавляем в локальный массив
-                        const newUser = {
-                            id: Date.now(),
-                            username,
-                            full_name: fullName,
-                            role,
-                            created_at: new Date().toISOString()
-                        };
-                        allUsers.push(newUser);
-                        renderUsersTable(allUsers);
+                        showNotification('Ошибка авторизации. Попробуйте перелогиниться.', 'error');
                         return;
                     }
                     
@@ -1460,29 +1373,21 @@
                         document.getElementById('userForm').reset();
                         closeModal('userModal');
                         await loadUsers();
-                    } else showNotification(data.error || 'Ошибка', 'error');
+                    } else {
+                        showNotification(data.error || 'Ошибка', 'error');
+                    }
                 } else {
                     const response = await fetch(`${API_BASE_URL}/api/admin/users/${currentUserId}`, {
                         method: 'PUT',
                         headers: { 
                             'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json' 
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ full_name: fullName, role })
                     });
                     
                     if (response.status === 401) {
-                        showNotification('Пользователь обновлен (локально)', 'success');
-                        document.getElementById('userForm').reset();
-                        closeModal('userModal');
-                        
-                        // Обновляем в локальном массиве
-                        const index = allUsers.findIndex(u => u.id === currentUserId);
-                        if (index !== -1) {
-                            allUsers[index] = { ...allUsers[index], full_name: fullName, role };
-                        }
-                        renderUsersTable(allUsers);
-                        currentUserId = null;
+                        showNotification('Ошибка авторизации. Попробуйте перелогиниться.', 'error');
                         return;
                     }
                     
@@ -1497,31 +1402,13 @@
                             localStorage.setItem('user', JSON.stringify(updatedUser));
                         }
                         currentUserId = null;
-                    } else showNotification(data.error || 'Ошибка', 'error');
+                    } else {
+                        showNotification(data.error || 'Ошибка', 'error');
+                    }
                 }
             } catch (error) {
                 console.error('Ошибка сохранения:', error);
-                showNotification('Пользователь сохранен (локально)', 'success');
-                document.getElementById('userForm').reset();
-                closeModal('userModal');
-                
-                if (!currentUserId) {
-                    const newUser = {
-                        id: Date.now(),
-                        username: document.getElementById('userUsername').value,
-                        full_name: fullName,
-                        role,
-                        created_at: new Date().toISOString()
-                    };
-                    allUsers.push(newUser);
-                } else {
-                    const index = allUsers.findIndex(u => u.id === currentUserId);
-                    if (index !== -1) {
-                        allUsers[index] = { ...allUsers[index], full_name: fullName, role };
-                    }
-                }
-                renderUsersTable(allUsers);
-                currentUserId = null;
+                showNotification('Ошибка сети', 'error');
             }
         });
     }
@@ -1529,6 +1416,8 @@
     // ========== ВЫХОД ==========
     document.getElementById('logoutBtn')?.addEventListener('click', function() {
         if (confirm('Вы действительно хотите выйти?')) {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
             window.location.href = 'login.html';
         }
     });
@@ -1544,7 +1433,10 @@
                 this.classList.add('active');
                 
                 document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
-                document.getElementById(tabId + 'Tab').style.display = 'block';
+                const activeTab = document.getElementById(tabId + 'Tab');
+                if (activeTab) {
+                    activeTab.style.display = 'block';
+                }
                 
                 updateFiltersForTab(tabId);
                 
@@ -1589,6 +1481,13 @@
         setupFormHandlers();
         updateFiltersForTab('announcements');
         initTabs();
+        
+        // Исправляем баг с отображением всех таблиц сразу
+        setTimeout(() => {
+            document.querySelectorAll('.tab-content').forEach((tab, index) => {
+                if (index > 0) tab.style.display = 'none';
+            });
+        }, 100);
     });
 </script>
 </body>
