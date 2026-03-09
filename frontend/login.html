@@ -455,23 +455,13 @@ const CONFIG = {
 
 // ========== СОХРАНЕНИЕ ДАННЫХ АВТОРИЗАЦИИ ==========
 function saveAuthData(token, user) {
-    // Сохраняем ТОЛЬКО в sessionStorage
     sessionStorage.setItem(CONFIG.SESSION.tokenKey, token);
     sessionStorage.setItem(CONFIG.SESSION.userKey, JSON.stringify(user));
-    
-    // Удаляем из localStorage чтобы не было конфликтов
-    localStorage.removeItem(CONFIG.SESSION.tokenKey);
-    localStorage.removeItem(CONFIG.SESSION.userKey);
-    
-    console.log('✅ Данные авторизации сохранены в sessionStorage');
+    console.log('✅ Данные авторизации сохранены');
 }
 
 // ========== ПРОВЕРКА АВТОРИЗАЦИИ ПРИ ЗАГРУЗКЕ ==========
 function checkAuthOnLoad() {
-    // Очищаем localStorage принудительно
-    localStorage.removeItem(CONFIG.SESSION.tokenKey);
-    localStorage.removeItem(CONFIG.SESSION.userKey);
-    
     const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
     const userStr = sessionStorage.getItem(CONFIG.SESSION.userKey);
     
@@ -480,16 +470,11 @@ function checkAuthOnLoad() {
             const user = JSON.parse(userStr);
             console.log('✅ Уже авторизован:', user.role);
             
-            // Определяем путь перенаправления
-            const redirectPath = (user.role === 'director' || user.role === 'deputy') 
-                ? CONFIG.REDIRECT.admin 
-                : CONFIG.REDIRECT.index;
-            
-            // Перенаправляем если мы на странице входа
+            // Перенаправляем на админку только если мы на странице входа
             const currentPage = window.location.pathname.split('/').pop() || 'login.html';
-            if (currentPage === 'login.html') {
-                console.log('➡️ Перенаправление на:', redirectPath);
-                window.location.href = redirectPath;
+            if (currentPage === 'login.html' && (user.role === 'director' || user.role === 'deputy')) {
+                console.log('➡️ Перенаправление на admin.html');
+                window.location.href = CONFIG.REDIRECT.admin;
             }
             return true;
         } catch (e) {
@@ -497,7 +482,6 @@ function checkAuthOnLoad() {
             sessionStorage.clear();
         }
     }
-    
     return false;
 }
 
@@ -526,14 +510,14 @@ function demoLogin(role) {
 
 // ========== ОСНОВНАЯ ФУНКЦИЯ ВХОДА ==========
 async function handleLogin(username, password) {
-    // Сначала пробуем демо-вход
+    // Демо-вход
     for (const [role, demoUser] of Object.entries(CONFIG.DEMO.users)) {
         if (username === demoUser.username && password === demoUser.password) {
             return demoLogin(role);
         }
     }
     
-    // Если не демо, пробуем реальный сервер
+    // Реальный сервер
     try {
         const response = await fetch(`${CONFIG.API_BASE_URL}/api/auth/login`, {
             method: 'POST',
@@ -555,10 +539,7 @@ async function handleLogin(username, password) {
             showByteNotification('Вход выполнен успешно!', 'success');
             
             setTimeout(() => {
-                const redirectPath = (data.user.role === 'director' || data.user.role === 'deputy')
-                    ? CONFIG.REDIRECT.admin
-                    : CONFIG.REDIRECT.index;
-                window.location.href = redirectPath;
+                window.location.href = CONFIG.REDIRECT.admin;
             }, 1000);
             
             return true;
@@ -577,12 +558,6 @@ async function handleLogin(username, password) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📌 Страница входа загружена');
     
-    // Очищаем localStorage при загрузке
-    localStorage.clear();
-    
-    // Проверяем авторизацию
-    if (checkAuthOnLoad()) return;
-    
     const loginForm = document.getElementById('loginForm');
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
@@ -592,6 +567,11 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('❌ Не найдены элементы формы');
         return;
     }
+    
+    // Проверяем авторизацию ТОЛЬКО после полной загрузки
+    setTimeout(() => {
+        checkAuthOnLoad();
+    }, 100);
     
     // Автозаполнение для демо
     setTimeout(() => {
@@ -628,8 +608,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ========== ГЛОБАЛЬНЫЕ ФУНКЦИИ ==========
-
-// Функция для демо-кнопок
 window.fillDemo = function(role) {
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
@@ -642,7 +620,6 @@ window.fillDemo = function(role) {
     }
 };
 
-// Функция выхода
 window.logout = function() {
     sessionStorage.clear();
     localStorage.clear();
