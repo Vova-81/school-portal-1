@@ -1756,7 +1756,12 @@ document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDe
 document.addEventListener('DOMContentLoaded', function() {
     if (!checkAuth()) return;
     
-    // Загружаем данные
+    // ОЧИЩАЕМ ПОИСК ПРИ ЗАГРУЗКЕ!
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    
     loadAnnouncements();
     loadSchedules();
     loadUsers();
@@ -1766,6 +1771,13 @@ document.addEventListener('DOMContentLoaded', function() {
     setupFormHandlers();
     updateFiltersForTab('announcements');
     initTabs();
+    
+    // Исправляем баг с отображением всех таблиц сразу
+    setTimeout(() => {
+        document.querySelectorAll('.tab-content').forEach((tab, index) => {
+            if (index > 0) tab.style.display = 'none';
+        });
+    }, 100);
 });
 </script>
 </body>
