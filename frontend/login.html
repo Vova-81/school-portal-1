@@ -386,7 +386,41 @@
     </div>
 
     <script>
-    // ========== КОНФИГУРАЦИЯ ==========
+        // ========== ФУНКЦИЯ УВЕДОМЛЕНИЙ В СТИЛЕ БАЙТА ==========
+function showByteNotification(message, type = 'success') {
+    // Удаляем предыдущее уведомление
+    const oldNotification = document.querySelector('.byte-notification');
+    if (oldNotification) {
+        oldNotification.remove();
+    }
+    
+    const notification = document.createElement('div');
+    notification.className = `byte-notification ${type === 'error' ? 'error' : ''}`;
+    
+    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+    const title = type === 'success' ? 'УСПЕХ' : 'ОШИБКА';
+    
+    notification.innerHTML = `
+        <i class="fas ${icon}"></i>
+        <div class="notification-content">
+            <span class="notification-title">${title}</span>
+            <span class="notification-message">${message}</span>
+        </div>
+        <div class="notification-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Автоматическое закрытие через 3 секунды
+    setTimeout(() => {
+        notification.classList.add('fade-out');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// ========== КОНФИГУРАЦИЯ ==========
 const CONFIG = {
     API_BASE_URL: '',
     SESSION: {
@@ -418,38 +452,6 @@ const CONFIG = {
         }
     }
 };
-
-// ========== ФУНКЦИЯ УВЕДОМЛЕНИЙ ==========
-function showNotification(message, type = 'success') {
-    // Удаляем предыдущее уведомление
-    const oldNotification = document.querySelector('.byte-notification');
-    if (oldNotification) oldNotification.remove();
-    
-    const notification = document.createElement('div');
-    notification.className = `byte-notification ${type === 'error' ? 'error' : ''}`;
-    
-    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-    const title = type === 'success' ? 'УСПЕХ' : 'ОШИБКА';
-    
-    notification.innerHTML = `
-        <i class="fas ${icon}"></i>
-        <div class="notification-content">
-            <span class="notification-title">${title}</span>
-            <span class="notification-message">${message}</span>
-        </div>
-        <div class="notification-close" onclick="this.parentElement.remove()">
-            <i class="fas fa-times"></i>
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Автоматическое закрытие через 3 секунды
-    setTimeout(() => {
-        notification.classList.add('fade-out');
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
 
 // ========== СОХРАНЕНИЕ ДАННЫХ АВТОРИЗАЦИИ ==========
 function saveAuthData(token, user) {
@@ -513,7 +515,7 @@ function demoLogin(role) {
     };
     
     saveAuthData(`demo-token-${demoUser.role}`, user);
-    showNotification(`Вход выполнен как ${demoUser.full_name}`, 'success');
+    showByteNotification(`Вход выполнен как ${demoUser.full_name}`, 'success');
     
     setTimeout(() => {
         window.location.href = CONFIG.REDIRECT.admin;
@@ -550,7 +552,7 @@ async function handleLogin(username, password) {
         
         if (data.success) {
             saveAuthData(data.token, data.user);
-            showNotification('Вход выполнен успешно!', 'success');
+            showByteNotification('Вход выполнен успешно!', 'success');
             
             setTimeout(() => {
                 const redirectPath = (data.user.role === 'director' || data.user.role === 'deputy')
@@ -566,7 +568,7 @@ async function handleLogin(username, password) {
         
     } catch (error) {
         console.error('❌ Ошибка входа:', error);
-        showNotification(error.message || 'Ошибка входа', 'error');
+        showByteNotification(error.message || 'Ошибка входа', 'error');
         return false;
     }
 }
@@ -609,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('🔄 Попытка входа:', username);
         
         if (!username || !password) {
-            showNotification('Введите логин и пароль', 'error');
+            showByteNotification('Введите логин и пароль', 'error');
             return;
         }
         
@@ -636,7 +638,7 @@ window.fillDemo = function(role) {
     if (demoUser) {
         usernameInput.value = demoUser.username;
         passwordInput.value = demoUser.password;
-        showNotification(`Данные ${role === 'director' ? 'директора' : 'заместителя'} загружены`, 'success');
+        showByteNotification(`Данные ${role === 'director' ? 'директора' : 'заместителя'} загружены`, 'success');
     }
 };
 
@@ -644,7 +646,7 @@ window.fillDemo = function(role) {
 window.logout = function() {
     sessionStorage.clear();
     localStorage.clear();
-    showNotification('Выход выполнен', 'success');
+    showByteNotification('Выход выполнен', 'success');
     setTimeout(() => {
         window.location.href = CONFIG.REDIRECT.login;
     }, 500);

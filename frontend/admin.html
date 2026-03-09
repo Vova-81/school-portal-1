@@ -601,18 +601,7 @@
 
 <script>
     // ========== КОНФИГУРАЦИЯ ==========
-const CONFIG = {
-    API_BASE_URL: '',
-    SESSION: {
-        tokenKey: 'authToken',
-        userKey: 'user'
-    },
-    REDIRECT: {
-        login: 'login.html',
-        index: 'index.html'
-    }
-};
-
+const API_BASE_URL = ''; // Пустая строка для относительных путей на хостинге
 let currentUser = null;
 let currentEditId = null;
 let currentEditScheduleId = null;
@@ -621,68 +610,8 @@ let allAnnouncements = [];
 let allSchedules = [];
 let allUsers = [];
 
-// Список классов
+// Список классов (только 5-11)
 let availableClasses = ['5А', '5Б', '6А', '6Б', '7А', '7Б', '8А', '8Б', '9А', '9Б', '10А', '10Б', '11А', '11Б'];
-
-// ========== ПОЛУЧЕНИЕ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ ==========
-function getCurrentUser() {
-    const userStr = sessionStorage.getItem(CONFIG.SESSION.userKey);
-    if (userStr) {
-        try {
-            return JSON.parse(userStr);
-        } catch (e) {
-            console.error('Ошибка парсинга пользователя');
-            return null;
-        }
-    }
-    return null;
-}
-
-// ========== ПРОВЕРКА АВТОРИЗАЦИИ ==========
-function checkAuth() {
-    // Полностью очищаем localStorage чтобы не мешал
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    
-    const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
-    const user = getCurrentUser();
-    
-    console.log('🔍 Проверка авторизации:', token ? '✅ токен есть' : '❌ нет токена', user ? `👤 ${user.role}` : '👤 нет пользователя');
-    
-    if (!token || !user || !user.role) {
-        console.log('🚫 Не авторизован, перенаправление на login.html');
-        sessionStorage.clear();
-        window.location.href = CONFIG.REDIRECT.login;
-        return false;
-    }
-    
-    // Проверяем права доступа к админке
-    if (user.role !== 'director' && user.role !== 'deputy') {
-        console.log('🚫 Нет прав доступа к админке');
-        sessionStorage.clear();
-        window.location.href = CONFIG.REDIRECT.index;
-        return false;
-    }
-    
-    currentUser = user;
-    console.log('✅ Авторизован как:', user.role);
-    return true;
-}
-
-// ========== ПРОВЕРКА ПРАВ ДОСТУПА ==========
-function hasPermission(permission) {
-    if (!currentUser) return false;
-    if (currentUser.role === 'director') return true;
-    if (currentUser.role === 'deputy') {
-        const deputyPermissions = [
-            'users.view', 'users.create', 'users.edit',
-            'announcements.view', 'announcements.create', 'announcements.edit', 'announcements.delete',
-            'schedule.view', 'schedule.create', 'schedule.edit', 'schedule.delete'
-        ];
-        return deputyPermissions.includes(permission);
-    }
-    return false;
-}
 
 // ========== СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ ==========
 const style = document.createElement('style');
@@ -697,6 +626,15 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// ========== ПРИНУДИТЕЛЬНОЕ СКРЫТИЕ ТАБОВ ==========
+document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.style.display = 'none';
+});
+const initialActiveTab = document.querySelector('.tab-content.active');
+if (initialActiveTab) {
+    initialActiveTab.style.display = 'block';
+}
 
 // ========== УВЕДОМЛЕНИЯ ==========
 function showNotification(message, type = 'success') {
@@ -781,11 +719,172 @@ function getDayLabel(day) {
 }
 
 function getRoleLabel(role) {
-    const labels = { 
-        'director': '<span class="badge badge-warning">Директор</span>', 
-        'deputy': '<span class="badge badge-primary">Заместитель</span>' 
-    };
+    const labels = { 'director': '<span class="badge badge-warning">Директор</span>', 'deputy': '<span class="badge badge-primary">Заместитель</span>' };
     return labels[role] || role;
+}
+
+// ========== АУТЕНТИФИКАЦИЯ ==========
+function checkAuth() {
+    // Используем sessionStorage для совместимости с login.html
+    const userStr = sessionStorage.getItem('user');
+    const token = sessionStorage.getItem('authToken');
+    
+    if (!token || !userStr) {
+        console.log('🚫 Не авторизован, перенаправление на login.html');
+        window.location.href = 'login.html';
+        return false;
+    }
+    
+    try {
+        const user = JSON.parse(userStr);
+        if (!user || !user.role) {
+            throw new Error('Некорректные данные пользователя');
+        }
+        currentUser = user;
+        console.log('✅ Авторизован как:', user.role);
+        return true;
+    } catch (e) {
+        console.error('Ошибка парсинга пользователя:', e);
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+        return false;
+    }
+}
+
+// ========== ПРОВЕРКА ПРАВ ДОСТУПА ==========
+function hasPermission(permission) {
+    if (!currentUser) return false;
+    if (currentUser.role === 'director') return true;
+    if (currentUser.role === 'deputy') {
+        const deputyPermissions = [
+            'users.view', 'users.create', 'users.edit',
+            'announcements.view', 'announcements.create', 'announcements.edit', 'announcements.delete',
+            'schedule.view', 'schedule.create', 'schedule.edit', 'schedule.delete'
+        ];
+        return deputyPermissions.includes(permission);
+    }
+    return false;
+}
+
+// ========== ЗАГРУЗКА ДАННЫХ ==========
+async function loadAnnouncements() {
+    try {
+        const token = sessionStorage.getItem('authToken');
+        const response = await fetch(`/api/announcements`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (response.status === 401) {
+            sessionStorage.removeItem('authToken');
+            sessionStorage.removeItem('user');
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (Array.isArray(data)) {
+            allAnnouncements = data;
+        } else if (data.announcements && Array.isArray(data.announcements)) {
+            allAnnouncements = data.announcements;
+        } else if (data.success && data.announcements) {
+            allAnnouncements = data.announcements;
+        } else {
+            allAnnouncements = [];
+        }
+        
+        renderAnnouncementsTable(allAnnouncements);
+    } catch (error) {
+        console.error('Ошибка загрузки объявлений:', error);
+        showNotification('Не удалось загрузить объявления', 'error');
+        renderAnnouncementsTable([]);
+    }
+}
+
+async function loadSchedules() {
+    try {
+        const token = sessionStorage.getItem('authToken');
+        const response = await fetch(`/api/schedules`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (response.status === 401) {
+            sessionStorage.removeItem('authToken');
+            sessionStorage.removeItem('user');
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (Array.isArray(data)) {
+            allSchedules = data;
+        } else if (data.schedules && Array.isArray(data.schedules)) {
+            allSchedules = data.schedules;
+        } else if (data.success && data.schedules) {
+            allSchedules = data.schedules;
+        } else {
+            allSchedules = [];
+        }
+        
+        renderSchedulesTable(allSchedules);
+    } catch (error) {
+        console.error('Ошибка загрузки расписания:', error);
+        showNotification('Не удалось загрузить расписание', 'error');
+        renderSchedulesTable([]);
+    }
+}
+
+async function loadUsers() {
+    try {
+        const token = sessionStorage.getItem('authToken');
+        const response = await fetch(`/api/admin/users`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (response.status === 401) {
+            sessionStorage.removeItem('authToken');
+            sessionStorage.removeItem('user');
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (Array.isArray(data)) {
+            allUsers = data;
+        } else if (data.users && Array.isArray(data.users)) {
+            allUsers = data.users;
+        } else if (data.success && data.users) {
+            allUsers = data.users;
+        } else {
+            allUsers = [];
+        }
+        
+        renderUsersTable(allUsers);
+    } catch (error) {
+        console.error('Ошибка загрузки пользователей:', error);
+        showNotification('Не удалось загрузить пользователей', 'error');
+        renderUsersTable([]);
+    }
 }
 
 // ========== УПРАВЛЕНИЕ КЛАССАМИ ==========
@@ -992,124 +1091,6 @@ function updateFiltersForTab(tabId) {
         document.getElementById('dayFilter')?.addEventListener('change', filterSchedules);
     } else if (tabId === 'users') {
         document.getElementById('roleFilter')?.addEventListener('change', filterUsers);
-    }
-}
-
-// ========== ЗАГРУЗКА ДАННЫХ ==========
-async function loadAnnouncements() {
-    try {
-        const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
-        const response = await fetch(`/api/announcements`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        
-        if (response.status === 401) {
-            sessionStorage.clear();
-            window.location.href = CONFIG.REDIRECT.login;
-            return;
-        }
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (Array.isArray(data)) {
-            allAnnouncements = data;
-        } else if (data.announcements && Array.isArray(data.announcements)) {
-            allAnnouncements = data.announcements;
-        } else if (data.success && data.announcements) {
-            allAnnouncements = data.announcements;
-        } else {
-            allAnnouncements = [];
-        }
-        
-        renderAnnouncementsTable(allAnnouncements);
-    } catch (error) {
-        console.error('Ошибка загрузки объявлений:', error);
-        showNotification('Не удалось загрузить объявления', 'error');
-        renderAnnouncementsTable([]);
-    }
-}
-
-async function loadSchedules() {
-    try {
-        const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
-        const response = await fetch(`/api/schedules`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        
-        if (response.status === 401) {
-            sessionStorage.clear();
-            window.location.href = CONFIG.REDIRECT.login;
-            return;
-        }
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (Array.isArray(data)) {
-            allSchedules = data;
-        } else if (data.schedules && Array.isArray(data.schedules)) {
-            allSchedules = data.schedules;
-        } else if (data.success && data.schedules) {
-            allSchedules = data.schedules;
-        } else {
-            allSchedules = [];
-        }
-        
-        renderSchedulesTable(allSchedules);
-    } catch (error) {
-        console.error('Ошибка загрузки расписания:', error);
-        showNotification('Не удалось загрузить расписание', 'error');
-        renderSchedulesTable([]);
-    }
-}
-
-async function loadUsers() {
-    try {
-        const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
-        const response = await fetch(`/api/admin/users`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        
-        if (response.status === 401) {
-            sessionStorage.clear();
-            window.location.href = CONFIG.REDIRECT.login;
-            return;
-        }
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (Array.isArray(data)) {
-            allUsers = data;
-        } else if (data.users && Array.isArray(data.users)) {
-            allUsers = data.users;
-        } else if (data.success && data.users) {
-            allUsers = data.users;
-        } else {
-            allUsers = [];
-        }
-        
-        renderUsersTable(allUsers);
-    } catch (error) {
-        console.error('Ошибка загрузки пользователей:', error);
-        showNotification('Не удалось загрузить пользователей', 'error');
-        renderUsersTable([]);
     }
 }
 
@@ -1408,7 +1389,7 @@ async function resetUserPassword() {
     }
     
     try {
-        const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
+        const token = sessionStorage.getItem('authToken');
         const response = await fetch(`/api/admin/users/${currentUserId}/reset-password`, {
             method: 'POST',
             headers: {
@@ -1467,7 +1448,7 @@ function showDeleteConfirm(type, id, name) {
 }
 
 async function confirmDelete() {
-    const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
+    const token = sessionStorage.getItem('authToken');
     let url = '';
     
     if (deleteItemType === 'announcement') {
@@ -1540,7 +1521,7 @@ function setupFormHandlers() {
         }
         
         try {
-            const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
+            const token = sessionStorage.getItem('authToken');
             const method = currentEditId ? 'PUT' : 'POST';
             const url = currentEditId ? `/api/announcements/${currentEditId}` : '/api/announcements';
             
@@ -1608,7 +1589,7 @@ function setupFormHandlers() {
         }
         
         try {
-            const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
+            const token = sessionStorage.getItem('authToken');
             const method = currentEditScheduleId ? 'PUT' : 'POST';
             const url = currentEditScheduleId ? `/api/schedules/${currentEditScheduleId}` : '/api/schedules';
             
@@ -1662,7 +1643,7 @@ function setupFormHandlers() {
         }
         
         try {
-            const token = sessionStorage.getItem(CONFIG.SESSION.tokenKey);
+            const token = sessionStorage.getItem('authToken');
             
             if (!currentUserId) {
                 const password = document.getElementById('userPassword').value;
@@ -1725,7 +1706,7 @@ function setupFormHandlers() {
                     
                     if (currentUserId === currentUser?.id) {
                         const updatedUser = { ...currentUser, full_name: fullName, role };
-                        sessionStorage.setItem(CONFIG.SESSION.userKey, JSON.stringify(updatedUser));
+                        sessionStorage.setItem('user', JSON.stringify(updatedUser));
                     }
                     
                     currentUserId = null;
@@ -1744,17 +1725,11 @@ function setupFormHandlers() {
 document.getElementById('confirmResetPassword')?.addEventListener('click', resetUserPassword);
 
 // ========== ВЫХОД ==========
-document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
-    e.preventDefault();
-    
+document.getElementById('logoutBtn')?.addEventListener('click', function() {
     if (confirm('Вы действительно хотите выйти?')) {
-        console.log('🚪 Выход из системы');
-        
-        sessionStorage.clear();
-        localStorage.clear();
-        
-        console.log('✅ Данные очищены');
-        window.location.href = CONFIG.REDIRECT.login;
+        sessionStorage.removeItem('authToken');
+        sessionStorage.removeItem('user');
+        window.location.href = 'login.html';
     }
 });
 
@@ -1809,16 +1784,11 @@ document.getElementById('searchInput')?.addEventListener('input', function() {
 // ========== КНОПКА ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ ==========
 document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
 
-// ========== ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ==========
+// ========== ЗАПУСК ==========
 document.addEventListener('DOMContentLoaded', function() {
-    // Принудительно очищаем localStorage перед проверкой
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    
     if (!checkAuth()) return;
     
-    console.log('🚀 Запуск админ-панели');
-    
+    // Загружаем данные
     loadAnnouncements();
     loadSchedules();
     loadUsers();
@@ -1828,23 +1798,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupFormHandlers();
     updateFiltersForTab('announcements');
     initTabs();
-    
-    // Скрываем загрузочный экран если он есть
-    setTimeout(() => {
-        const loadingScreen = document.getElementById('loadingScreen');
-        if (loadingScreen) {
-            loadingScreen.style.opacity = '0';
-            setTimeout(() => loadingScreen.style.display = 'none', 300);
-        }
-    }, 500);
 });
-
-// ========== ДОБАВЛЯЕМ ФУНКЦИЮ ДЛЯ КНОПОК ==========
-window.logout = function() {
-    sessionStorage.clear();
-    localStorage.clear();
-    window.location.href = 'login.html';
-};
 </script>
 </body>
 </html>
