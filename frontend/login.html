@@ -326,20 +326,25 @@
                     </div>
                 </div>
 
-                <!-- Пароль поле -->
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-700 block text-center" for="password">
-                        Пароль
-                    </label>
-                    <div class="relative">
-                        <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 input-icon"></i>
-                        <input type="password" 
-                               class="input-field w-full pl-12 pr-4 py-3 rounded-xl text-base outline-none transition-all"
-                               id="password" 
-                               placeholder="••••••••" 
-                               required>
-                    </div>
-                </div>
+                <!-- Пароль поле - ЗАМЕНИ ЭТОТ БЛОК -->
+<div class="space-y-2">
+    <label class="text-sm font-semibold text-gray-700 block text-center" for="password">
+        Пароль
+    </label>
+    <div class="relative">
+        <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 input-icon"></i>
+        <input type="password" 
+               class="input-field w-full pl-12 pr-12 py-3 rounded-xl text-base outline-none transition-all"
+               id="password" 
+               placeholder="••••••••" 
+               required>
+        <button type="button" 
+                onclick="togglePasswordVisibility('password', this)"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
+            <i class="fas fa-eye"></i>
+        </button>
+    </div>
+</div>
 
                 <!-- Кнопка Вход -->
                 <button type="submit" 
@@ -406,7 +411,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    // Функция для показа/скрытия пароля
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
     
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
     // Элементы формы
     const loginForm = document.getElementById('loginForm');
     const usernameInput = document.getElementById('username');

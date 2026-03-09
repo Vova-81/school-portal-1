@@ -595,11 +595,36 @@
             </div>
         </div>
     </div>
-
+     <!-- Модалка подтверждения выхода -->
+    <div class="modal-backdrop" id="logoutConfirmModal">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Подтверждение выхода</h3>
+                <button class="modal-close" onclick="closeModal('logoutConfirmModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-4">
+                    <i class="fas fa-sign-out-alt text-5xl text-blue-500"></i>
+                </div>
+                <p class="text-lg mb-2">Вы действительно хотите выйти?</p>
+                <p class="text-sm text-gray-500">Сессия будет завершена</p>
+            </div>
+            <div class="modal-footer justify-center gap-3">
+                <button type="button" class="btn btn-secondary px-6" onclick="closeModal('logoutConfirmModal')">
+                    <i class="fas fa-times mr-1"></i> Отмена
+                </button>
+                <button type="button" class="btn btn-danger px-6" id="confirmLogoutBtn">
+                    <i class="fas fa-sign-out-alt mr-1"></i> Выйти
+                </button>
+            </div>
+        </div>
+    </div>
     <!-- Контейнер для уведомлений -->
     <div id="alertsContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000;"></div>
 <script>
-   // ========== КОНФИГУРАЦИЯ ==========
+// ========== КОНФИГУРАЦИЯ ==========
 const API_BASE_URL = '';
 let currentUser = null;
 let currentEditId = null;
@@ -612,6 +637,9 @@ let allUsers = [];
 // Список классов (только 5-11)
 let availableClasses = ['5А', '5Б', '6А', '6Б', '7А', '7Б', '8А', '8Б', '9А', '9Б', '10А', '10Б', '11А', '11Б'];
 
+// Объект для хранения видимости паролей
+let visiblePasswords = {};
+
 // ========== СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ ==========
 const style = document.createElement('style');
 style.textContent = `
@@ -622,6 +650,32 @@ style.textContent = `
     @keyframes fadeOut {
         from { opacity: 1; }
         to { opacity: 0; }
+    }
+    .password-cell {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .password-text {
+        font-family: monospace;
+        background: #f3f4f6;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+    .toggle-password-btn {
+        background: none;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+    .toggle-password-btn:hover {
+        background: #e5e7eb;
+        color: #374151;
     }
 `;
 document.head.appendChild(style);
@@ -700,6 +754,20 @@ document.addEventListener('keydown', function(e) {
         });
     }
 });
+
+// ========== ФУНКЦИИ ДЛЯ ПРОСМОТРА ПАРОЛЕЙ ==========
+function togglePasswordVisibility(userId) {
+    visiblePasswords[userId] = !visiblePasswords[userId];
+    renderUsersTable(allUsers);
+}
+
+function copyPassword(password) {
+    navigator.clipboard.writeText(password).then(() => {
+        showNotification('Пароль скопирован в буфер обмена', 'success');
+    }).catch(() => {
+        showNotification('Ошибка при копировании', 'error');
+    });
+}
 
 // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 function getCategoryLabel(category) {
@@ -1093,6 +1161,12 @@ function openAddUserModal() {
     document.getElementById('userPassword').required = true;
     document.getElementById('userPasswordConfirm').required = true;
     
+    // Меняем текст кнопки
+    const submitBtn = document.querySelector('#userModal .btn-primary');
+    if (submitBtn) {
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Создать пользователя';
+    }
+    
     openModal('userModal');
 }
 
@@ -1183,6 +1257,7 @@ function renderUsersTable(users) {
     tbody.innerHTML = users.map(user => {
         const created = user.created_at ? new Date(user.created_at).toLocaleDateString('ru-RU') : '-';
         const lastLogin = user.last_login ? new Date(user.last_login).toLocaleDateString('ru-RU') : 'Никогда';
+        const isVisible = visiblePasswords[user.id];
         
         return `
             <tr data-id="${user.id}">
@@ -1191,7 +1266,22 @@ function renderUsersTable(users) {
                     <div style="font-size: 0.75rem;">ID: ${user.id}</div>
                 </td>
                 <td><strong>${user.username || ''}</strong></td>
-                <td>${getRoleLabel(user.role)}</td>
+                <td>
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        ${getRoleLabel(user.role)}
+                        <div class="password-cell">
+                            <span class="password-text">${isVisible ? user.password : '••••••••'}</span>
+                            <button class="toggle-password-btn" onclick="togglePasswordVisibility(${user.id})" title="${isVisible ? 'Скрыть пароль' : 'Показать пароль'}">
+                                <i class="fas fa-${isVisible ? 'eye-slash' : 'eye'}"></i>
+                            </button>
+                            ${isVisible ? `
+                                <button class="toggle-password-btn" onclick="copyPassword('${user.password}')" title="Копировать пароль">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </td>
                 <td>${created}</td>
                 <td>${lastLogin}</td>
                 <td class="text-right">
@@ -1325,6 +1415,7 @@ function editUser(id) {
     document.getElementById('userUsername').value = user.username || '';
     document.getElementById('userRole').value = user.role || '';
     
+    // Скрываем поля пароля при редактировании
     const passwordGroup = document.getElementById('userPassword')?.closest('.input-group');
     const confirmGroup = document.getElementById('userPasswordConfirm')?.closest('.input-group');
     
@@ -1335,6 +1426,12 @@ function editUser(id) {
     if (confirmGroup) {
         confirmGroup.style.display = 'none';
         document.getElementById('userPasswordConfirm').required = false;
+    }
+    
+    // Меняем текст кнопки
+    const submitBtn = document.querySelector('#userModal .btn-primary');
+    if (submitBtn) {
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Сохранить изменения';
     }
     
     openModal('userModal');
@@ -1678,12 +1775,15 @@ function setupFormHandlers() {
 document.getElementById('confirmResetPassword')?.addEventListener('click', resetUserPassword);
 
 // ========== ВЫХОД ==========
-document.getElementById('logoutBtn')?.addEventListener('click', function() {
-    if (confirm('Вы действительно хотите выйти?')) {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
-        window.location.href = 'login.html';
-    }
+document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    openModal('logoutConfirmModal');
+});
+
+document.getElementById('confirmLogoutBtn')?.addEventListener('click', function() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
 });
 
 // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК - БЕЗ ПОДСТАВЫ ==========
